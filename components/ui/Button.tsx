@@ -12,11 +12,11 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-action-primary text-text-secondary shadow-accent hover:bg-action-primary-hover hover:shadow-accent-lg active:scale-[0.98] disabled:bg-surface-raised disabled:text-state-disabled disabled:shadow-none",
+    "bg-action-primary text-text-inverse shadow-soft hover:bg-action-primary-hover hover:shadow-accent-lg active:scale-[0.98] disabled:bg-surface-raised disabled:text-state-disabled disabled:shadow-none",
   secondary:
-    "border border-border-muted bg-surface-raised text-text-primary hover:border-border-default hover:text-text-secondary active:scale-[0.98] disabled:text-state-disabled",
+    "border border-border-muted bg-surface-raised text-text-primary shadow-card hover:border-border-default hover:shadow-soft active:scale-[0.98] disabled:text-state-disabled",
   ghost:
-    "bg-transparent text-text-primary hover:text-text-secondary active:scale-[0.98] disabled:text-state-disabled",
+    "bg-transparent text-text-secondary hover:text-text-primary active:scale-[0.98] disabled:text-state-disabled",
 };
 
 export function Button({
@@ -35,7 +35,7 @@ export function Button({
     <button
       type={type}
       className={cn(
-        "inline-flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-sm px-5 text-md font-medium tracking-wide touch-manipulation",
+        "inline-flex min-h-12 min-w-12 cursor-pointer items-center justify-center gap-2 rounded-xs px-6 text-lg font-medium tracking-wide touch-manipulation",
         variants[variant],
         fullWidth && "w-full",
         isDisabled && "cursor-not-allowed opacity-70",

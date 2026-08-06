@@ -1,18 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Kanit } from "next/font/google";
-import { FloatingActions } from "@/components/layout/FloatingActions";
-import { Header } from "@/components/layout/Header";
+import { Inter } from "next/font/google";
+import { AppShell } from "@/components/layout/AppShell";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { site } from "@/lib/content";
 import { seo, siteUrl } from "@/lib/seo";
 import "./globals.css";
 
-const kanit = Kanit({
-  variable: "--font-kanit",
+const inter = Inter({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  variable: "--font-inter",
   display: "swap",
-  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -64,6 +61,14 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   formatDetection: {
     email: false,
     address: false,
@@ -72,23 +77,21 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
-  colorScheme: "dark",
+  themeColor: "#f4f4f2",
+  colorScheme: "light",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${kanit.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col overflow-x-hidden font-sans">
+    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+      <body className="flex min-h-full flex-col overflow-x-hidden bg-surface-muted font-sans text-text-primary">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
         <JsonLd />
-        <Header />
-        {children}
-        <FloatingActions />
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

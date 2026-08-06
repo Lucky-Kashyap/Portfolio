@@ -11,7 +11,7 @@ export function Quote({ children, cite, className }: QuoteProps) {
   return (
     <blockquote
       className={cn(
-        "border-l-2 border-action-primary pl-5 text-md leading-relaxed text-text-primary",
+        "border-l-2 border-action-primary pl-5 text-lg leading-relaxed text-text-secondary",
         className,
       )}
     >

@@ -28,7 +28,7 @@ export function Heading({
 
   return (
     <Tag
-      className={cn(sizeClass[size], "text-text-secondary", className)}
+      className={cn(sizeClass[size], "text-text-primary", className)}
       {...props}
     >
       {children}

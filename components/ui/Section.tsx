@@ -1,5 +1,8 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import type { HTMLAttributes, ReactNode } from "react";
+import { Reveal } from "@/components/motion/Reveal";
 import { Container } from "./Container";
 
 type SectionProps = HTMLAttributes<HTMLElement> & {
@@ -8,6 +11,8 @@ type SectionProps = HTMLAttributes<HTMLElement> & {
   bordered?: boolean;
   atmosphere?: boolean;
   muted?: boolean;
+  /** Wrap content in scroll reveal. Disable when children form a CSS grid. */
+  reveal?: boolean;
 };
 
 export function Section({
@@ -17,6 +22,7 @@ export function Section({
   bordered = false,
   atmosphere = false,
   muted = false,
+  reveal = true,
   children,
   ...props
 }: SectionProps) {
@@ -32,7 +38,9 @@ export function Section({
       )}
       {...props}
     >
-      <Container className={containerClassName}>{children}</Container>
+      <Container className={containerClassName}>
+        {reveal ? <Reveal>{children}</Reveal> : children}
+      </Container>
     </section>
   );
 }

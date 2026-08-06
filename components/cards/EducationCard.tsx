@@ -1,16 +1,41 @@
-import { Card, Eyebrow, Text, Stack } from "@/components/ui";
+import type { ReactNode } from "react";
+import {
+  Check,
+  Code2,
+  Database,
+  GraduationCap,
+  Layers,
+  Palette,
+  ShieldCheck,
+  Wrench,
+} from "lucide-react";
+import { Card, Eyebrow, Text } from "@/components/ui";
 import type { ExperienceItem } from "@/lib/content";
+import { cn } from "@/lib/utils";
 
 type StackGroupCardProps = {
   title: string;
   items: readonly string[];
 };
 
+const stackIcons: Record<string, ReactNode> = {
+  Frontend: <Code2 size={16} aria-hidden />,
+  "State & Data": <Database size={16} aria-hidden />,
+  "Styling & Motion": <Palette size={16} aria-hidden />,
+  Quality: <ShieldCheck size={16} aria-hidden />,
+  Tools: <Wrench size={16} aria-hidden />,
+};
+
 export function StackGroupCard({ title, items }: StackGroupCardProps) {
   return (
-    <Card variant="raised" padding="sm" className="h-full">
-      <p className="text-sm font-medium text-text-secondary">{title}</p>
-      <Text tone="muted" size="sm" className="mt-2">
+    <Card variant="raised" padding="md" className="h-full">
+      <div className="flex items-center gap-3">
+        <span className="inline-flex size-9 items-center justify-center rounded-xs bg-surface-muted text-text-primary">
+          {stackIcons[title] ?? <Layers size={16} aria-hidden />}
+        </span>
+        <p className="text-lg font-medium text-text-primary">{title}</p>
+      </div>
+      <Text tone="muted" size="sm" className="mt-4 leading-relaxed">
         {items.join(" · ")}
       </Text>
     </Card>
@@ -22,6 +47,7 @@ type InfoCardProps = {
   title: string;
   items: readonly string[];
   className?: string;
+  icon?: ReactNode;
 };
 
 export function InfoListCard({
@@ -29,18 +55,35 @@ export function InfoListCard({
   title,
   items,
   className,
+  icon,
 }: InfoCardProps) {
   return (
-    <Card className={className ?? "mt-8"}>
-      <Eyebrow className="mb-0 tracking-[0.14em]">{eyebrow}</Eyebrow>
-      <p className="mt-4 text-xl font-medium text-text-secondary">{title}</p>
-      <Stack gap="sm" className="mt-4">
+    <Card padding="lg" className={cn("h-full", className)}>
+      <div className="flex items-start gap-4">
+        {icon ? (
+          <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary">
+            {icon}
+          </span>
+        ) : null}
+        <div className="min-w-0">
+          <Eyebrow className="mb-0 tracking-[0.14em]">{eyebrow}</Eyebrow>
+          <p className="mt-3 text-xl font-semibold tracking-tight text-text-primary">
+            {title}
+          </p>
+        </div>
+      </div>
+      <ul className="mt-6 space-y-3">
         {items.map((item) => (
-          <Text key={item} tone="muted" size="sm">
-            · {item}
-          </Text>
+          <li key={item} className="flex items-start gap-3">
+            <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-surface-muted text-text-primary">
+              <Check size={12} strokeWidth={2.5} aria-hidden />
+            </span>
+            <Text tone="muted" size="sm" className="leading-relaxed">
+              {item}
+            </Text>
+          </li>
         ))}
-      </Stack>
+      </ul>
     </Card>
   );
 }
@@ -51,12 +94,14 @@ type ExperienceCardProps = {
 
 export function ExperienceCard({ item }: ExperienceCardProps) {
   return (
-    <Card variant="raised" className="h-full">
+    <Card variant="raised" padding="lg" className="h-full">
       <p className="text-sm tracking-[0.12em] text-text-muted uppercase">
         {item.period} · {item.duration}
       </p>
-      <p className="mt-3 text-xl font-medium text-text-secondary">{item.role}</p>
-      <Text className="mt-2">
+      <p className="mt-4 text-2xl font-semibold tracking-tight text-text-primary">
+        {item.role}
+      </p>
+      <Text className="mt-3">
         {item.company}
         <span className="text-text-muted"> · {item.employmentType}</span>
       </Text>
@@ -64,11 +109,11 @@ export function ExperienceCard({ item }: ExperienceCardProps) {
         {item.location} · {item.workMode}
       </Text>
       {item.skills?.length ? (
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-6 flex flex-wrap gap-2">
           {item.skills.map((skill) => (
             <span
               key={skill}
-              className="rounded-sm border border-border-muted px-3 py-1 text-xs tracking-wide text-text-muted"
+              className="rounded-xs border border-border-muted bg-surface-muted px-3 py-2 text-xs tracking-wide text-text-secondary"
             >
               {skill}
             </span>
@@ -95,10 +140,19 @@ export function EducationCard({
   skills,
 }: EducationCardProps) {
   return (
-    <Card>
-      <Eyebrow className="mb-0 tracking-[0.14em]">Education</Eyebrow>
-      <p className="mt-4 text-xl font-medium text-text-secondary">{degree}</p>
-      <Text className="mt-2">{field}</Text>
+    <Card padding="lg">
+      <div className="flex items-start gap-4">
+        <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary">
+          <GraduationCap size={20} aria-hidden />
+        </span>
+        <div>
+          <Eyebrow className="mb-0 tracking-[0.14em]">Education</Eyebrow>
+          <p className="mt-3 text-2xl font-semibold tracking-tight text-text-primary">
+            {degree}
+          </p>
+        </div>
+      </div>
+      <Text className="mt-4">{field}</Text>
       <Text tone="muted" size="sm" className="mt-3">
         {institution}
       </Text>
@@ -106,11 +160,11 @@ export function EducationCard({
         {period}
       </Text>
       {skills?.length ? (
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-6 flex flex-wrap gap-2">
           {skills.map((skill) => (
             <span
               key={skill}
-              className="rounded-sm border border-border-muted px-3 py-1 text-xs tracking-wide text-text-muted"
+              className="rounded-xs border border-border-muted bg-surface-muted px-3 py-2 text-xs tracking-wide text-text-secondary"
             >
               {skill}
             </span>
@@ -120,3 +174,4 @@ export function EducationCard({
     </Card>
   );
 }
+

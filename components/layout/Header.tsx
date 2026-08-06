@@ -3,6 +3,7 @@
 import { useEffect, useId, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Container, IconButton, TextLink } from "@/components/ui";
+import { BrandMark } from "@/components/ui/BrandMark";
 import { NavLinks } from "@/components/layout/NavLinks";
 import { navItems, site } from "@/lib/content";
 import { cn } from "@/lib/utils";
@@ -33,12 +34,26 @@ export function Header() {
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-[background,box-shadow] duration-fast",
         scrolled || open
-          ? "border-b border-border-muted bg-surface-overlay backdrop-blur-md"
+          ? "border-b border-border-muted bg-surface-overlay backdrop-blur-md shadow-card"
           : "bg-transparent",
       )}
     >
       <Container className="flex h-header items-center justify-between gap-4">
-        <TextLink href="#top" variant="brand" onClick={close}>
+        <TextLink
+          href="#top"
+          variant="brand"
+          className="inline-flex items-center gap-2"
+          onClick={(event) => {
+            event.preventDefault();
+            close();
+            if (window.__lenis) {
+              window.__lenis.scrollTo(0, { duration: 1.1 });
+            } else {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+        >
+          <BrandMark size={28} className="rounded-xs" title="" />
           {site.mark}
         </TextLink>
 

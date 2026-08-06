@@ -5,12 +5,12 @@ type CardVariant = "raised" | "base" | "interactive" | "accent";
 type CardPadding = "none" | "sm" | "md" | "lg";
 
 const variantClass: Record<CardVariant, string> = {
-  raised: "border border-border-muted bg-surface-raised",
-  base: "border border-border-muted bg-surface-base",
+  raised: "border border-border-muted bg-surface-raised shadow-card",
+  base: "border border-border-muted bg-surface-muted",
   interactive:
-    "border border-border-muted bg-surface-raised transition-[border-color,transform,box-shadow] duration-fast hover:-translate-y-0.5 hover:border-border-default hover:shadow-accent",
+    "border border-border-muted bg-surface-raised shadow-card transition-[border-color,transform,box-shadow] duration-fast hover:-translate-y-0.5 hover:border-border-default hover:shadow-soft",
   accent:
-    "border border-border-muted bg-surface-base transition-[border-color,box-shadow] duration-fast hover:border-action-primary/50 hover:shadow-accent",
+    "border border-border-muted bg-surface-raised shadow-card transition-[border-color,box-shadow] duration-fast hover:border-action-primary/40 hover:shadow-soft",
 };
 
 const paddingClass: Record<CardPadding, string> = {
@@ -47,7 +47,7 @@ export function Card({
   ...props
 }: CardProps) {
   const classes = cn(
-    "rounded-lg",
+    "rounded-sm",
     variantClass[variant],
     paddingClass[padding],
     className,

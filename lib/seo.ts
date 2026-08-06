@@ -50,7 +50,7 @@ export const faqs = [
   },
   {
     question: "Where are you based, and how can I contact you?",
-    answer: `I am based in ${site.location} (${site.address}). You can email ${site.email}, call +91 ${site.phone}, or reach me on LinkedIn and GitHub.`,
+    answer: `I am based in Gokul Vatika, Jaipur, Rajasthan. Email ${site.email}, call +91 ${site.phone}, or reach me on GitHub (${site.github}) and LinkedIn (${site.linkedin}).`,
   },
   {
     question: "Do you focus on performance and accessibility?",
@@ -72,7 +72,7 @@ export function personJsonLd() {
     telephone: `+91${site.phone}`,
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Jaipur",
+      addressLocality: "Gokul Vatika, Jaipur",
       addressRegion: "Rajasthan",
       addressCountry: "IN",
     },

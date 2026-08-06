@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { Badge, Card, Heading, Text } from "@/components/ui";
 import type { Project } from "@/lib/content";
@@ -11,10 +12,17 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
   const content = (
     <>
-      <div
-        className="mb-6 aspect-[16/10] rounded-md border border-border-muted bg-[linear-gradient(145deg,color-mix(in_srgb,var(--color-action-primary-deep)_35%,#131317),#0a0a0c)]"
-        aria-hidden
-      />
+      <div className="relative mb-6 aspect-[16/10] overflow-hidden rounded-xs border border-border-muted bg-surface-muted shadow-card">
+        <Image
+          src={project.image}
+          alt={`${project.title} project preview`}
+          fill
+          className="object-cover"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
       <div className="flex flex-wrap gap-2">
         {project.tags.map((tag) => (
           <Badge key={tag}>{tag}</Badge>
@@ -55,7 +63,11 @@ export function ProjectCard({ project }: ProjectCardProps) {
   }
 
   return (
-    <Card variant="interactive" className="flex h-full flex-col">
+    <Card
+      variant="interactive"
+      className="flex h-full flex-col"
+      aria-label={`${project.title} project preview`}
+    >
       {content}
     </Card>
   );

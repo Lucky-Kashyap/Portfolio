@@ -1,4 +1,7 @@
+"use client";
+
 import { TextLink } from "@/components/ui";
+import { scrollToId } from "@/lib/scroll";
 
 type NavItem = {
   id: string;
@@ -29,7 +32,11 @@ export function NavLinks({
           <TextLink
             href={`#${item.id}`}
             variant={variant}
-            onClick={onNavigate}
+            onClick={(event) => {
+              event.preventDefault();
+              scrollToId(item.id);
+              onNavigate?.();
+            }}
           >
             {item.label}
           </TextLink>

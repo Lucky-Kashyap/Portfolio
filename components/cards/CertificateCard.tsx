@@ -15,7 +15,7 @@ export function CertificateCard({ cert }: CertificateCardProps) {
       className="flex h-full flex-col overflow-hidden"
     >
       {cert.image ? (
-        <div className="relative aspect-[16/10] border-b border-border-muted bg-surface-base">
+        <div className="relative aspect-[16/10] border-b border-border-muted bg-surface-muted">
           <Image
             src={cert.image}
             alt={`${cert.name} certificate awarded to Divyanshu Kashyap by ${cert.organization}, issued ${cert.issued}${cert.credentialId ? `, credential ID ${cert.credentialId}` : ""}`}
@@ -28,7 +28,7 @@ export function CertificateCard({ cert }: CertificateCardProps) {
         </div>
       ) : (
         <div
-          className="flex aspect-[16/10] items-center justify-center border-b border-border-muted bg-[linear-gradient(145deg,color-mix(in_srgb,var(--color-action-primary-deep)_30%,#131317),#0a0a0c)] px-6"
+          className="flex aspect-[16/10] items-center justify-center border-b border-border-muted bg-[linear-gradient(145deg,color-mix(in_srgb,#111_8%,#f4f4f2),#ffffff)] px-6"
           aria-hidden
         >
           <p className="text-center text-sm tracking-[0.14em] text-text-muted uppercase">
@@ -45,7 +45,13 @@ export function CertificateCard({ cert }: CertificateCardProps) {
           {cert.name}
         </Heading>
         <Text tone="muted" size="sm" className="mt-2">
-          {cert.organization}
+          {cert.organizationUrl ? (
+            <TextLink href={cert.organizationUrl} external>
+              {cert.organization}
+            </TextLink>
+          ) : (
+            cert.organization
+          )}
         </Text>
 
         {cert.note ? (
@@ -64,7 +70,7 @@ export function CertificateCard({ cert }: CertificateCardProps) {
           {cert.skills.map((skill) => (
             <span
               key={skill}
-              className="rounded-sm border border-border-muted px-3 py-1 text-xs tracking-wide text-text-muted"
+              className="rounded-xs border border-border-muted px-3 py-1 text-xs tracking-wide text-text-muted"
             >
               {skill}
             </span>

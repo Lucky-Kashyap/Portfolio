@@ -15,9 +15,9 @@ const variantClass: Record<IconButtonVariant, string> = {
   ghost:
     "border border-border-muted bg-transparent text-text-primary hover:bg-surface-raised",
   raised:
-    "border border-border-muted bg-surface-raised text-text-primary shadow-accent hover:border-border-default",
+    "border border-border-muted bg-surface-raised text-text-primary shadow-card hover:border-border-default hover:shadow-soft",
   primary:
-    "bg-action-primary text-text-secondary shadow-accent hover:bg-action-primary-hover hover:shadow-accent-lg",
+    "bg-action-primary text-text-inverse shadow-soft hover:bg-action-primary-hover hover:shadow-accent-lg",
 };
 
 const sizeClass: Record<IconButtonSize, string> = {
@@ -39,7 +39,7 @@ export function IconButton({
       type={type}
       aria-label={label}
       className={cn(
-        "inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm touch-manipulation active:scale-[0.98]",
+        "inline-flex min-h-11 min-w-11 items-center justify-center rounded-xs touch-manipulation active:scale-[0.98]",
         variantClass[variant],
         sizeClass[size],
         className,

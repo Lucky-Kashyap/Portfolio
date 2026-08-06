@@ -11,13 +11,13 @@ type TextLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
 
 const variants: Record<LinkVariant, string> = {
   inline:
-    "text-text-primary underline-offset-4 hover:text-text-secondary hover:underline",
-  nav: "text-sm font-medium tracking-[0.12em] text-text-muted uppercase hover:text-text-secondary",
+    "text-text-primary underline-offset-4 hover:text-action-primary-deep hover:underline",
+  nav: "text-sm font-medium tracking-[0.12em] text-text-tertiary uppercase hover:text-text-primary",
   navMobile:
-    "block rounded-md px-4 py-3 text-lg tracking-[0.08em] text-text-primary uppercase hover:bg-surface-raised hover:text-text-secondary",
+    "block rounded-xs px-4 py-3 text-lg tracking-[0.08em] text-text-primary uppercase hover:bg-surface-raised",
   brand:
-    "text-md font-semibold tracking-[0.14em] text-text-primary uppercase hover:text-text-secondary",
-  muted: "text-text-muted hover:text-text-secondary",
+    "text-lg font-semibold tracking-[0.14em] text-text-primary uppercase hover:text-text-secondary",
+  muted: "text-text-muted hover:text-text-primary",
 };
 
 export function TextLink({

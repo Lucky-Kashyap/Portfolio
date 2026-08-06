@@ -10,14 +10,15 @@ export const site = {
   role: "Frontend Engineer | React.js | Next.js | TypeScript | Scalable UI Architecture | API Integration | Performance & Accessibility",
   tagline:
     "Building scalable, responsive, and high-performance web applications.",
-  location: "Jaipur, Rajasthan, India",
-  address: "Kalindi Vihar",
+  location: "Gokul Vatika, Jaipur, Rajasthan",
+  address: "Gokul Vatika",
   email: "kashyapdivyanshu279@gmail.com",
   phone: "9634308605",
   phoneLabel: "Work",
-  github: "https://github.com/lucky-kashyap",
-  githubUser: "lucky-kashyap",
+  github: "https://github.com/Lucky-Kashyap",
+  githubUser: "Lucky-Kashyap",
   linkedin: "https://www.linkedin.com/in/divyanshu-kashyap-b09138171/",
+  avatar: "/profile/divyanshu.webp",
   summary:
     "Frontend Engineer with 2.5+ years of experience building scalable, responsive, and high-performance web applications using React.js, Next.js, Angular, TypeScript, and modern frontend technologies.",
   connect:
@@ -104,53 +105,18 @@ export const experience: ExperienceItem[] = [
     employmentType: "Full-time",
     period: "Jan 2024 — Present",
     duration: "2 yrs 8 mos",
-    location: "Jaipur, Rajasthan, India",
+    location: "Gokul Vatika, Jaipur, Rajasthan",
     workMode: "On-site",
     skills: [
-      "Cascading Style Sheets (CSS)",
-      "React JS",
-      "JavaScript",
-      "HTML5",
-      "Tailwind CSS",
-      "Bootstrap",
+      "React.js",
       "Next.js",
-      "Git",
-      "Chart.js",
-      "Angular Material",
-      "Prime flex",
-      "Ai Emergent",
-      "Google Stitch",
-      "Bitbucket",
-      "Figma (Software)",
-      "GreenSock Animation Platform (GSAP)",
-      "Responsive Web Design",
-      "React bits",
-      "Search Engine Optimization (SEO)",
-      "Prompt Engineering",
       "TypeScript",
-      "REST APIs",
-      "Redux.js",
-      "Front-End Development",
-      "Optimizing Performance",
-      "Web Accessibility",
-      "Application Programming Interfaces (API)",
-      "React Router",
       "Angular",
-      "PrimeNG",
-      "Locomotive Scroll",
-      "GSAP ScrollTrigger",
-      "Framer Motion",
-      "User Interface Design",
+      "Tailwind CSS",
+      "REST APIs",
+      "Performance",
+      "Accessibility",
     ],
-  },
-  {
-    company: "Vestige Marketing Pvt. Ltd.",
-    role: "Intern",
-    employmentType: "Internship",
-    period: "Feb 2023 — Apr 2023",
-    duration: "3 mos",
-    location: "New Delhi",
-    workMode: "On-site",
   },
 ];
 
@@ -159,22 +125,13 @@ export const education = {
   degree: "MCA (Integrated)",
   field: "Computer Knowledge",
   period: "2018 — 2023",
-  skills: [
-    "Responsive Web Design",
-    "Node.js",
-    "Web Applications",
-    "Web Development",
-    "Redux.js",
-    "Git",
-    "Tailwind CSS",
-    "JavaScript eXtension (JSX)",
-    "MongoDB",
-  ],
+  skills: ["Web Development", "JavaScript", "Responsive Design"],
 } as const;
 
 export type Certification = {
   name: string;
   organization: string;
+  organizationUrl?: string;
   issued: string;
   credentialId?: string;
   credentialUrl?: string;
@@ -185,50 +142,15 @@ export type Certification = {
 
 export const certifications: Certification[] = [
   {
-    name: "JavaScript Youtube Course",
-    organization: "KGCoding by Prashant Sir",
-    issued: "November 2023",
-    credentialId: "EKKOAJLT",
-    credentialUrl:
-      "https://www.kgcoding.in/verify-certificate?serialno=EKKOAJLT",
-    skills: ["JavaScript"],
-    note: "Gained new certification in JavaScript by passing the exam (scored above 70%).",
-  },
-  {
-    name: "CSS Youtube Course",
-    organization: "KGCoding by Prashant Sir",
-    issued: "November 2023",
-    credentialId: "5SHXMFLS",
-    credentialUrl:
-      "https://www.kgcoding.in/verify-certificate?serialno=5SHXMFLS",
-    skills: ["Cascading Style Sheets (CSS)"],
-    image: "/certificates/css-youtube-course.webp",
-    note: "Achieved certification by completing all questions and scoring above 70%.",
-  },
-  {
-    name: "JavaScript Course With Certification: Unlocking the Power of JavaScript",
-    organization: "Scaler Topics",
-    issued: "September 2023",
-    credentialUrl:
-      "https://moonshot.scaler.com/s/sl/KgaFQPRmcC",
-    skills: ["JavaScript"],
-    image: "/certificates/javascript-scaler.webp",
-    note: "Completed JavaScript Course from Scaler Topics — Certificate of Excellence (70 video tutorials, 9 modules, 8 challenges).",
-  },
-  {
     name: "Front-End Domination",
     organization: "Sheryians Coding School",
     issued: "November 2023",
     credentialId: "6315c7d5",
     credentialUrl: "https://sheryians.com/certificate/verify/6315c7d5",
     skills: [
-      "GreenSock Animation Platform (GSAP)",
+      "GSAP",
       "Tailwind CSS",
-      "CSS",
-      "Animations",
-      "Locomotive",
       "JavaScript",
-      "HTML",
       "React JS",
       "Scroll Trigger",
     ],
@@ -236,13 +158,14 @@ export const certifications: Certification[] = [
     note: "Course has covered in depth knowledge of HTML, CSS, Animations, JS, GSAP, Locomotive, Scroll Trigger, Shery.js, Modern web development and Design thinking. Approach, Modern, Design.",
   },
   {
-    name: "React and Redux Certification Test - Youtube Course",
-    organization: "KGCoding by Prashant Sir",
-    issued: "November 2023",
-    credentialId: "WEQMR7SM",
-    credentialUrl:
-      "https://www.kgcoding.in/verify-certificate?serialno=WEQMR7SM",
-    skills: ["React", "Redux"],
+    name: "JavaScript Course With Certification: Unlocking the Power of JavaScript",
+    organization: "Scaler Academy",
+    issued: "September 2023",
+    credentialUrl: "https://moonshot.scaler.com/s/sl/KgaFQPRmcC",
+    organizationUrl: "https://www.scaler.com/academy/",
+    skills: ["JavaScript"],
+    image: "/certificates/javascript-scaler.webp",
+    note: "Completed JavaScript Course from Scaler Academy — Certificate of Excellence (70 video tutorials, 9 modules, 8 challenges).",
   },
   {
     name: "Certificate of Completion — 50+ Hour of Web Development",
@@ -288,6 +211,8 @@ export type Project = {
   title: string;
   description: string;
   tags: string[];
+  /** Cover image under /public */
+  image: string;
   /** Set to live URL when ready; empty string = coming soon */
   href: string;
 };
@@ -298,6 +223,7 @@ export const projects: Project[] = [
     description:
       "Placeholder featured project. Share the live URL and I’ll wire it in.",
     tags: ["React", "Next.js"],
+    image: "/projects/project-one.webp",
     href: "",
   },
   {
@@ -305,6 +231,7 @@ export const projects: Project[] = [
     description:
       "Placeholder featured project. Share the live URL and I’ll wire it in.",
     tags: ["TypeScript", "UI"],
+    image: "/projects/project-two.webp",
     href: "",
   },
   {
@@ -312,6 +239,7 @@ export const projects: Project[] = [
     description:
       "Placeholder featured project. Share the live URL and I’ll wire it in.",
     tags: ["GSAP", "Frontend"],
+    image: "/projects/project-three.webp",
     href: "",
   },
 ];

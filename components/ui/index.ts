@@ -1,4 +1,5 @@
 export { Badge, Chip, ChipGroup } from "./Badge";
+export { BrandMark } from "./BrandMark";
 export { Button } from "./Button";
 export { Card } from "./Card";
 export { Container } from "./Container";
