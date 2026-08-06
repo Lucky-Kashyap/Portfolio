@@ -61,7 +61,7 @@ export function InfoListCard({
     <Card padding="lg" className={cn("h-full", className)}>
       <div className="flex items-start gap-4">
         {icon ? (
-          <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary">
+          <span className="inline-flex size-[44px] shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary">
             {icon}
           </span>
         ) : null}
@@ -142,7 +142,7 @@ export function EducationCard({
   return (
     <Card padding="lg">
       <div className="flex items-start gap-4">
-        <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary">
+        <span className="inline-flex size-[44px] shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary">
           <GraduationCap size={20} aria-hidden />
         </span>
         <div>

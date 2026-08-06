@@ -12,11 +12,11 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-action-primary text-text-inverse shadow-soft hover:bg-action-primary-hover hover:shadow-accent-lg active:scale-[0.98] disabled:bg-surface-raised disabled:text-state-disabled disabled:shadow-none",
+    "relative overflow-hidden bg-action-primary text-text-inverse shadow-soft transition-[transform,box-shadow,background] duration-fast hover:-translate-y-1 hover:bg-action-primary-hover hover:shadow-accent-lg active:scale-[0.98] disabled:bg-surface-raised disabled:text-state-disabled disabled:shadow-none disabled:translate-y-0 before:pointer-events-none before:absolute before:inset-0 before:translate-x-[-120%] before:bg-[linear-gradient(120deg,transparent,rgba(255,255,255,0.28),transparent)] before:transition-transform before:duration-500 hover:before:translate-x-[120%]",
   secondary:
-    "border border-border-muted bg-surface-raised text-text-primary shadow-card hover:border-border-default hover:shadow-soft active:scale-[0.98] disabled:text-state-disabled",
+    "border border-border-muted bg-surface-raised text-text-primary shadow-card transition-[transform,border-color,box-shadow] duration-fast hover:-translate-y-1 hover:border-border-default hover:shadow-soft active:scale-[0.98] disabled:text-state-disabled disabled:translate-y-0",
   ghost:
-    "bg-transparent text-text-secondary hover:text-text-primary active:scale-[0.98] disabled:text-state-disabled",
+    "bg-transparent text-text-secondary transition-[transform,color] duration-fast hover:-translate-y-0.5 hover:text-text-primary active:scale-[0.98] disabled:text-state-disabled",
 };
 
 export function Button({
@@ -35,7 +35,7 @@ export function Button({
     <button
       type={type}
       className={cn(
-        "inline-flex min-h-12 min-w-12 cursor-pointer items-center justify-center gap-2 rounded-xs px-6 text-lg font-medium tracking-wide touch-manipulation",
+        "inline-flex min-h-[48px] min-w-[48px] cursor-pointer items-center justify-center gap-2 rounded-xs px-6 text-lg font-medium tracking-wide touch-manipulation",
         variants[variant],
         fullWidth && "w-full",
         isDisabled && "cursor-not-allowed opacity-70",

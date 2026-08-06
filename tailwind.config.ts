@@ -1,62 +1,75 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Design tokens — visual foundations adapted from
- * https://shahmeer-dev-beta.vercel.app/ (clean light content site).
+ * Design tokens — dark, high-contrast portfolio language inspired by
+ * https://portfolio-alpha-lime-53.vercel.app/ (Govind Jangid visual system).
  * Brand content remains Divyanshu Kashyap.
- *
- * radius.xl extracted as 33554400px → normalized to 9999px (full pill).
- * Page canvas uses surface.muted; surface.base is ink/black for actions.
  */
 export const tokens = {
   fontFamily: {
-    sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"],
+    sans: ["var(--font-inter)", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
   },
   fontSize: {
-    xs: ["10px", { lineHeight: "1.4" }],
+    xs: ["11px", { lineHeight: "1.4" }],
     sm: ["12px", { lineHeight: "1.45" }],
-    md: ["12.5px", { lineHeight: "1.5" }],
-    lg: ["14px", { lineHeight: "20px" }],
-    xl: ["16px", { lineHeight: "1.45" }],
-    "2xl": ["18px", { lineHeight: "1.4" }],
-    "3xl": ["20px", { lineHeight: "1.3", fontWeight: "600" }],
-    "4xl": ["22px", { lineHeight: "1.25", fontWeight: "600" }],
-    "display-sm": ["clamp(1.25rem, 2.5vw, 1.5rem)", { lineHeight: "1.25", fontWeight: "600" }],
-    "display-md": ["clamp(1.75rem, 4vw, 2.25rem)", { lineHeight: "1.15", fontWeight: "700" }],
-    "display-lg": ["clamp(2.25rem, 6vw, 3.5rem)", { lineHeight: "1.05", fontWeight: "700" }],
+    md: ["14px", { lineHeight: "1.5" }],
+    lg: ["16px", { lineHeight: "24px" }],
+    xl: ["20px", { lineHeight: "1.4" }],
+    "2xl": ["28px", { lineHeight: "1.25", fontWeight: "600" }],
+    "3xl": ["40px", { lineHeight: "1.15", fontWeight: "700" }],
+    "4xl": ["52px", { lineHeight: "1.1", fontWeight: "700" }],
+    "display-sm": [
+      "clamp(1.75rem, 3.5vw, 2.5rem)",
+      { lineHeight: "1.15", fontWeight: "700" },
+    ],
+    "display-md": [
+      "clamp(2.75rem, 7vw, 3.75rem)",
+      { lineHeight: "1.05", fontWeight: "700" },
+    ],
+    "display-lg": [
+      "clamp(3.25rem, 9vw, 5rem)",
+      { lineHeight: "0.98", fontWeight: "700" },
+    ],
+    "display-xl": [
+      "clamp(4rem, 12vw, 6.75rem)",
+      { lineHeight: "0.92", fontWeight: "700" },
+    ],
   },
   colors: {
     text: {
-      primary: "#111111",
-      secondary: "#5e5e5e",
-      tertiary: "#8d8d8d",
-      inverse: "#ffffff",
-      muted: "#8d8d8d",
+      primary: "oklch(0.92 0.004 286.32)",
+      secondary: "oklch(0.705 0.015 286.067)",
+      tertiary: "oklch(0.552 0.016 285.938)",
+      inverse: "oklch(0.14 0.005 286)",
+      muted: "oklch(0.552 0.016 285.938)",
     },
     surface: {
       base: "#000000",
-      muted: "#f4f4f2",
-      raised: "#ffffff",
-      strong: "oklab(0.999994 0.0000455678 0.0000200868 / 0.9)",
-      overlay: "color-mix(in srgb, #f4f4f2 88%, transparent)",
+      muted: "oklab(0.21 0.00164225 -0.00577088 / 0.96)",
+      raised: "oklch(0.141 0.005 285.823)",
+      strong: "#ffffff",
+      overlay: "color-mix(in srgb, #000000 88%, transparent)",
     },
     border: {
-      default: "#111111",
-      muted: "color-mix(in srgb, #111111 12%, transparent)",
+      default: "color-mix(in srgb, #ffffff 55%, transparent)",
+      muted: "color-mix(in srgb, #ffffff 14%, transparent)",
     },
     action: {
-      primary: "#111111",
-      "primary-hover": "#2a2a2a",
-      "primary-deep": "#5e5e5e",
+      primary: "#ffffff",
+      "primary-hover": "#e8e8ec",
+      "primary-deep": "oklch(0.705 0.015 286.067)",
     },
     focus: {
-      ring: "#111111",
-      glow: "color-mix(in srgb, #111111 18%, transparent)",
+      ring: "#ffffff",
+      glow: "color-mix(in srgb, #ffffff 22%, transparent)",
+    },
+    accent: {
+      cyan: "#7dd3fc",
     },
     state: {
-      disabled: "color-mix(in srgb, #111111 35%, transparent)",
-      error: "#c62828",
-      loading: "#5e5e5e",
+      disabled: "color-mix(in srgb, #ffffff 35%, transparent)",
+      error: "#f87171",
+      loading: "oklch(0.705 0.015 286.067)",
     },
   },
   spacing: {
@@ -71,19 +84,22 @@ export const tokens = {
     9: "40px",
     10: "64px",
     11: "88px",
+    12: "120px",
+    13: "160px",
+    14: "200px",
   },
   borderRadius: {
-    xs: "8px",
-    sm: "14px",
-    md: "20px",
+    xs: "4px",
+    sm: "10px",
+    md: "16px",
     lg: "22px",
     xl: "9999px",
   },
   boxShadow: {
-    soft: "0 8px 30px rgba(0, 0, 0, 0.08)",
-    card: "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)",
-    accent: "0 8px 30px rgba(0, 0, 0, 0.08)",
-    "accent-lg": "0 16px 40px rgba(0, 0, 0, 0.1)",
+    soft: "0 10px 30px rgba(0, 0, 0, 0.5)",
+    card: "0 1px 0 color-mix(in srgb, #ffffff 8%, transparent)",
+    accent: "0 10px 30px rgba(0, 0, 0, 0.45)",
+    "accent-lg": "0 16px 40px rgba(0, 0, 0, 0.55)",
   },
   transitionDuration: {
     instant: "150ms",
@@ -95,7 +111,7 @@ export const tokens = {
     standard: "cubic-bezier(0.22, 1, 0.36, 1)",
   },
   maxWidth: {
-    site: "1120px",
+    site: "1200px",
   },
   height: {
     header: "64px",
@@ -116,9 +132,9 @@ const config = {
       maxWidth: tokens.maxWidth,
       height: tokens.height,
       lineHeight: {
-        base: "20px",
-        tight: "1.15",
-        snug: "1.35",
+        base: "24px",
+        tight: "1.05",
+        snug: "1.25",
         relaxed: "1.6",
       },
       keyframes: {
@@ -130,10 +146,33 @@ const config = {
           "0%": { opacity: "1" },
           "100%": { opacity: "0" },
         },
+        "hero-name-pulse": {
+          "0%, 100%": { transform: "translateY(0)", filter: "brightness(1)" },
+          "50%": { transform: "translateY(-4px)", filter: "brightness(1.08)" },
+        },
+        "avatar-hand-wave": {
+          "0%, 100%": { transform: "rotate(0deg)" },
+          "25%": { transform: "rotate(-11deg)" },
+          "50%": { transform: "rotate(8deg)" },
+          "75%": { transform: "rotate(-7deg)" },
+        },
+        "avatar-glow-pulse": {
+          "0%, 100%": { opacity: "0.45" },
+          "50%": { opacity: "0.85" },
+        },
+        "avatar-scan": {
+          "0%": { transform: "translateY(-120%)" },
+          "100%": { transform: "translateY(220%)" },
+        },
       },
       animation: {
-        "loader-progress": "loader-progress 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards",
+        "loader-progress":
+          "loader-progress 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards",
         "loader-fade-out": "loader-fade-out 0.45s ease forwards",
+        "hero-name-pulse": "hero-name-pulse 2.4s ease-in-out infinite",
+        "avatar-hand-wave": "avatar-hand-wave 2.4s ease-in-out infinite",
+        "avatar-glow-pulse": "avatar-glow-pulse 3.2s ease-in-out infinite",
+        "avatar-scan": "avatar-scan 4.5s linear infinite",
       },
     },
   },

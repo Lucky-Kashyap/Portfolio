@@ -1,7 +1,8 @@
 "use client";
 
-import { FormEvent, useId, useState, type ReactNode } from "react";
-import { ArrowUpRight, Link2, Mail, MapPin, Phone } from "lucide-react";
+import { FormEvent, useId, useRef, useState, type ReactNode } from "react";
+import { ArrowUpRight, Code2, Link2, Mail, MapPin, Phone } from "lucide-react";
+import { useGSAP } from "@gsap/react";
 import {
   Button,
   Container,
@@ -12,9 +13,11 @@ import {
   TextLink,
   Textarea,
 } from "@/components/ui";
-import { Reveal } from "@/components/motion/Reveal";
+import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { site } from "@/lib/content";
 import { cn } from "@/lib/utils";
+import { gsap, registerGsap } from "@/lib/gsap";
+import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -79,8 +82,37 @@ function ContactChannel({
 
 export function Contact() {
   const formId = useId();
+  const formRef = useRef<HTMLFormElement>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
+  const reduced = usePrefersReducedMotion();
+
+  useGSAP(
+    () => {
+      registerGsap();
+      const form = formRef.current;
+      if (!form || reduced) return;
+
+      const fields = form.querySelectorAll("[data-contact-field]");
+      gsap.fromTo(
+        fields,
+        { opacity: 0, y: 22 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.55,
+          stagger: 0.1,
+          ease: "power3.out",
+          scrollTrigger: {
+            trigger: form,
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        },
+      );
+    },
+    { dependencies: [reduced] },
+  );
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -112,7 +144,7 @@ export function Contact() {
     >
       <Container>
         <div className="grid w-full items-start gap-8 lg:grid-cols-2 lg:gap-10">
-          <Reveal>
+          <ScrollReveal>
             <p className="mb-4 inline-flex items-center gap-2 rounded-xl border border-border-muted bg-surface-raised px-3 py-1.5 text-xs font-medium tracking-[0.14em] text-text-secondary uppercase shadow-card">
               <span
                 className="size-1.5 rounded-full bg-action-primary"
@@ -174,11 +206,20 @@ export function Contact() {
                   external
                 />
               ) : null}
+              {site.leetcode ? (
+                <ContactChannel
+                  label="LeetCode"
+                  href={site.leetcode}
+                  value={`@${site.leetcodeUser} · ${site.leetcodeStats.solved} solved`}
+                  icon={<Code2 size={18} aria-hidden />}
+                  external
+                />
+              ) : null}
             </div>
-          </Reveal>
+          </ScrollReveal>
 
-          <Reveal delay={0.08} className="w-full min-w-0">
-            <div className="w-full rounded-md border border-[color-mix(in_srgb,#111_18%,transparent)] bg-surface-muted p-6 shadow-soft md:p-8">
+          <ScrollReveal delay={0.08} className="w-full min-w-0">
+            <div className="w-full rounded-md border border-border-muted bg-surface-raised p-6 shadow-soft md:p-8">
               <div className="mb-6">
                 <p className="text-xs font-medium tracking-[0.16em] text-text-tertiary uppercase">
                   Send a message
@@ -192,43 +233,50 @@ export function Contact() {
               </div>
 
               <form
+                ref={formRef}
                 onSubmit={onSubmit}
                 noValidate
                 aria-describedby={error ? `${formId}-error` : undefined}
                 className="space-y-5"
               >
                 <div className="grid gap-5 sm:grid-cols-2">
-                  <Field id={`${formId}-name`} label="Name">
-                    <Input
-                      id={`${formId}-name`}
-                      name="name"
-                      type="text"
-                      autoComplete="name"
-                      placeholder="Your name"
-                      required
-                    />
-                  </Field>
-                  <Field id={`${formId}-email`} label="Email">
-                    <Input
-                      id={`${formId}-email`}
-                      name="email"
-                      type="email"
-                      autoComplete="email"
-                      placeholder="you@company.com"
+                  <div data-contact-field>
+                    <Field id={`${formId}-name`} label="Name">
+                      <Input
+                        id={`${formId}-name`}
+                        name="name"
+                        type="text"
+                        autoComplete="name"
+                        placeholder="Your name"
+                        required
+                      />
+                    </Field>
+                  </div>
+                  <div data-contact-field>
+                    <Field id={`${formId}-email`} label="Email">
+                      <Input
+                        id={`${formId}-email`}
+                        name="email"
+                        type="email"
+                        autoComplete="email"
+                        placeholder="you@company.com"
+                        required
+                      />
+                    </Field>
+                  </div>
+                </div>
+
+                <div data-contact-field>
+                  <Field id={`${formId}-message`} label="Message">
+                    <Textarea
+                      id={`${formId}-message`}
+                      name="message"
+                      rows={6}
+                      placeholder="What are you building? Timeline, goals, or how I can help…"
                       required
                     />
                   </Field>
                 </div>
-
-                <Field id={`${formId}-message`} label="Message">
-                  <Textarea
-                    id={`${formId}-message`}
-                    name="message"
-                    rows={6}
-                    placeholder="What are you building? Timeline, goals, or how I can help…"
-                    required
-                  />
-                </Field>
 
                 {error ? (
                   <p id={`${formId}-error`} className="field-error" role="alert">
@@ -241,17 +289,19 @@ export function Contact() {
                   </Text>
                 ) : null}
 
-                <Button
-                  type="submit"
-                  className="w-full"
-                  loading={status === "loading"}
-                >
-                  Send Message
-                  <ArrowUpRight size={16} aria-hidden />
-                </Button>
+                <div data-contact-field>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    loading={status === "loading"}
+                  >
+                    Send Message
+                    <ArrowUpRight size={16} aria-hidden />
+                  </Button>
+                </div>
               </form>
             </div>
-          </Reveal>
+          </ScrollReveal>
         </div>
       </Container>
     </section>

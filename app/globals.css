@@ -8,7 +8,45 @@
 }
 
 html {
-  scroll-padding-top: calc(var(--height-header, 64px) + var(--spacing-5, 12px));
+  scroll-padding-top: calc(5.5rem + var(--spacing-6, 24px));
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent-cyan, #7dd3fc)
+    var(--color-surface-raised, #161618);
+}
+
+/* Chromium / Safari themed scrollbar */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--color-surface-base, #000000);
+  border-left: 1px solid var(--color-border-muted, rgba(255, 255, 255, 0.14));
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, #7dd3fc 85%, #ffffff),
+    #7dd3fc 40%,
+    color-mix(in srgb, #7dd3fc 55%, #000000)
+  );
+  border-radius: 9999px;
+  border: 2px solid var(--color-surface-base, #000000);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    #bae6fd,
+    #7dd3fc 45%,
+    color-mix(in srgb, #7dd3fc 70%, #0ea5e9)
+  );
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--color-surface-base, #000000);
 }
 
 html:not(.lenis) {
@@ -22,7 +60,7 @@ html:not(.lenis) {
   z-index: 110;
   transform: translateY(-160%);
   border-radius: var(--radius-xs);
-  background: var(--color-surface-base);
+  background: var(--color-surface-strong);
   color: var(--color-text-inverse);
   padding: var(--spacing-4) var(--spacing-6);
   font-size: var(--text-lg);
@@ -61,8 +99,20 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 ::selection {
-  background: var(--color-surface-base);
+  background: var(--color-surface-strong);
   color: var(--color-text-inverse);
 }
 
@@ -115,25 +165,36 @@ button {
 }
 
 .section-pad {
-  padding-block: var(--spacing-10);
+  padding-block: clamp(5.5rem, 9vw, 8.5rem);
 }
 
 @media (min-width: 768px) {
   .section-pad {
-    padding-block: var(--spacing-11);
+    padding-block: clamp(7rem, 11vw, 10rem);
   }
+}
+
+@media (min-width: 1024px) {
+  .section-pad {
+    padding-block: clamp(8.5rem, 12vw, 12.5rem);
+  }
+}
+
+/* Consistent air between section titles and content blocks */
+.section-content {
+  margin-top: clamp(2.75rem, 5vw, 4.5rem);
 }
 
 .bg-atmosphere {
   background:
     radial-gradient(
       ellipse 70% 50% at 50% -5%,
-      color-mix(in srgb, #111 5%, transparent),
+      color-mix(in srgb, #7dd3fc 8%, transparent),
       transparent 60%
     ),
     radial-gradient(
       ellipse 40% 35% at 90% 15%,
-      color-mix(in srgb, #111 3%, transparent),
+      color-mix(in srgb, #ffffff 5%, transparent),
       transparent 55%
     ),
     var(--color-surface-muted);
@@ -152,9 +213,9 @@ button {
   width: 100%;
   min-height: 52px;
   padding: 14px 16px;
-  border: 1.5px solid color-mix(in srgb, #111111 32%, transparent);
+  border: 1.5px solid var(--color-border-muted);
   border-radius: var(--radius-xs);
-  background: #ffffff;
+  background: var(--color-surface-raised);
   color: var(--color-text-primary);
   font-family: inherit;
   font-size: var(--text-lg);
@@ -165,18 +226,18 @@ button {
 }
 
 .field:hover {
-  border-color: color-mix(in srgb, #111111 50%, transparent);
+  border-color: var(--color-border-default);
 }
 
 .field:focus,
 .field:focus-visible {
-  border-color: #111111;
+  border-color: var(--color-surface-strong);
   outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, #111111 14%, transparent);
+  box-shadow: 0 0 0 3px var(--color-focus-glow);
 }
 
 .field::placeholder {
-  color: #5e5e5e;
+  color: var(--color-text-tertiary);
   opacity: 1;
 }
 
@@ -193,7 +254,7 @@ button {
 .field-label {
   display: block;
   margin-bottom: 10px;
-  color: #111111;
+  color: var(--color-text-primary);
   font-size: var(--text-xs);
   font-weight: 600;
   letter-spacing: 0.14em;
@@ -204,4 +265,111 @@ button {
   margin-top: var(--spacing-2);
   color: var(--color-state-error);
   font-size: var(--text-sm);
+}
+
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none !important;
+}
+
+html.has-custom-cursor a,
+html.has-custom-cursor button,
+html.has-custom-cursor [data-cursor="hover"] {
+  cursor: none !important;
+}
+
+/* Nav letter pop on hover */
+.nav-link:hover .nav-char,
+.nav-link:focus-visible .nav-char {
+  animation: nav-char-pop 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i, 0) * 28ms);
+}
+
+.nav-link[aria-current="true"] .nav-char {
+  color: inherit;
+}
+
+@keyframes nav-char-pop {
+  0% {
+    transform: translateY(0);
+  }
+  35% {
+    transform: translateY(-5px);
+    color: #7dd3fc;
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* Brand mark idle shimmer ring */
+.brand-mark-wrap {
+  position: relative;
+}
+
+.brand-mark-wrap::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, #7dd3fc 0%, transparent);
+  transition:
+    border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.brand-mark-wrap:hover::after,
+.brand-mark-wrap:focus-visible::after {
+  border-color: color-mix(in srgb, #7dd3fc 55%, transparent);
+  transform: rotate(6deg) scale(1.06);
+}
+
+.brand-mark-wrap svg {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.brand-mark-wrap:hover svg,
+.brand-mark-wrap:focus-visible svg {
+  transform: rotate(-4deg) scale(1.05);
+}
+
+/* Footer / layout magnetic-feel links */
+.creative-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  overflow: hidden;
+}
+
+.creative-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: right;
+  background: #7dd3fc;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.creative-link:hover::after,
+.creative-link:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-link:hover .nav-char,
+  .nav-link:focus-visible .nav-char {
+    animation: none;
+  }
+
+  .brand-mark-wrap::after,
+  .brand-mark-wrap svg,
+  .creative-link::after {
+    transition: none;
+  }
 }

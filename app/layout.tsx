@@ -40,7 +40,7 @@ export const metadata: Metadata = {
         url: seo.ogImage,
         width: 1200,
         height: 630,
-        alt: `${site.brand} — Frontend Engineer portfolio preview`,
+        alt: "Divyanshu Kashyap Frontend Engineer portfolio — React.js, Next.js, and TypeScript projects",
       },
     ],
   },
@@ -77,8 +77,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f4f4f2",
-  colorScheme: "light",
+  themeColor: "#000000",
+  colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
 };
@@ -86,7 +86,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${inter.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col overflow-x-hidden bg-surface-muted font-sans text-text-primary">
+      <body className="flex min-h-full flex-col overflow-x-hidden bg-surface-base font-sans text-text-primary">
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>

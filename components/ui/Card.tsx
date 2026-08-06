@@ -8,9 +8,9 @@ const variantClass: Record<CardVariant, string> = {
   raised: "border border-border-muted bg-surface-raised shadow-card",
   base: "border border-border-muted bg-surface-muted",
   interactive:
-    "border border-border-muted bg-surface-raised shadow-card transition-[border-color,transform,box-shadow] duration-fast hover:-translate-y-0.5 hover:border-border-default hover:shadow-soft",
+    "group/card border border-border-muted bg-surface-raised shadow-card transition-[border-color,transform,box-shadow] duration-normal hover:-translate-y-1 hover:border-accent-cyan/35 hover:shadow-accent",
   accent:
-    "border border-border-muted bg-surface-raised shadow-card transition-[border-color,box-shadow] duration-fast hover:border-action-primary/40 hover:shadow-soft",
+    "border border-border-muted bg-surface-raised shadow-card transition-[border-color,box-shadow,transform] duration-fast hover:-translate-y-0.5 hover:border-accent-cyan/40 hover:shadow-soft",
 };
 
 const paddingClass: Record<CardPadding, string> = {

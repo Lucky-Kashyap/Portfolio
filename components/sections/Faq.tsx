@@ -11,7 +11,7 @@ export function Faq() {
         description="Quick answers about experience, stack, availability, and how to get in touch."
       />
 
-      <Grid as="ul" cols={1} gap="sm" className="mt-10 w-full">
+      <Grid as="ul" cols={1} gap="sm" className="section-content w-full">
         {faqs.map((item) => (
           <li key={item.question}>
             <details className="group rounded-sm border border-border-muted bg-surface-raised shadow-card open:border-border-default open:shadow-soft">

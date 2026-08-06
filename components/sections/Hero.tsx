@@ -1,151 +1,226 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
-import {
-  Button,
-  Container,
-  Eyebrow,
-  Heading,
-  Text,
-} from "@/components/ui";
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import { Button, Container } from "@/components/ui";
+import { HeroAvatar } from "@/components/motion/HeroAvatar";
+import { SocialMagneticIcons } from "@/components/motion/SocialMagneticIcons";
 import { site } from "@/lib/content";
 import { scrollToId } from "@/lib/scroll";
+import { gsap, registerGsap } from "@/lib/gsap";
+import { cn } from "@/lib/utils";
+import {
+  usePortfolioReady,
+  usePrefersReducedMotion,
+} from "@/hooks/useMotionPrefs";
+
+function splitName(full: string) {
+  const parts = full.trim().split(/\s+/);
+  if (parts.length < 2) return { first: full, last: "" };
+  return { first: parts[0], last: parts.slice(1).join(" ") };
+}
 
 export function Hero() {
-  const reduceMotion = useReducedMotion();
-  const [introReady, setIntroReady] = useState(Boolean(reduceMotion));
+  const sectionRef = useRef<HTMLElement>(null);
+  const bgRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const nameRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLButtonElement>(null);
+  const reduced = usePrefersReducedMotion();
+  const ready = usePortfolioReady(reduced);
+  const { first, last } = splitName(site.brand);
 
-  useEffect(() => {
-    if (reduceMotion) {
-      setIntroReady(true);
-      return;
-    }
+  useGSAP(
+    () => {
+      registerGsap();
+      const section = sectionRef.current;
+      if (!section || !ready) return;
 
-    const onReady = () => setIntroReady(true);
-    window.addEventListener("portfolio:ready", onReady);
+      const q = gsap.utils.selector(section);
+      const intro = q("[data-hero-intro]");
+      const ctas = q("[data-hero-cta]");
+      const social = q("[data-hero-social]");
+      const avatar = q("[data-hero-avatar]");
 
-    // Fallback if the ready event already fired
-    const fallback = window.setTimeout(() => setIntroReady(true), 2400);
+      if (reduced) {
+        gsap.set(
+          [intro, ctas, social, avatar, nameRef.current, bgRef.current],
+          { clearProps: "all" },
+        );
+        return;
+      }
 
-    return () => {
-      window.removeEventListener("portfolio:ready", onReady);
-      window.clearTimeout(fallback);
-    };
-  }, [reduceMotion]);
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
-  const fade = (delay = 0) =>
-    reduceMotion || !introReady
-      ? {
-          initial: reduceMotion ? false : { opacity: 0, y: 18 },
-          animate: introReady || reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 18 },
-          transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] as const },
-        }
-      : {
-          initial: { opacity: 0, y: 18 },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] as const },
-        };
+      gsap.set(bgRef.current, { opacity: 0 });
+      gsap.set(intro, { opacity: 0, y: 28 });
+      gsap.set(nameRef.current, { clipPath: "inset(0 0 100% 0)", y: 28 });
+      gsap.set(ctas, { opacity: 0, y: 20 });
+      gsap.set(social, { opacity: 0, y: 16 });
+      gsap.set(avatar, { opacity: 0, y: 40, scale: 0.96 });
+      gsap.set(scrollRef.current, { opacity: 0 });
+
+      tl.to(bgRef.current, { opacity: 1, duration: 1 }, 0)
+        .to(intro, { opacity: 1, y: 0, duration: 0.7, stagger: 0.08 }, 0.12)
+        .to(
+          nameRef.current,
+          { clipPath: "inset(0 0 0% 0)", y: 0, duration: 0.95 },
+          0.28,
+        )
+        .to(avatar, { opacity: 1, y: 0, scale: 1, duration: 1 }, 0.2)
+        .to(ctas, { opacity: 1, y: 0, duration: 0.55, stagger: 0.1 }, 0.65)
+        .to(social, { opacity: 1, y: 0, duration: 0.45, stagger: 0.06 }, 0.85)
+        .to(scrollRef.current, { opacity: 1, duration: 0.5 }, 1);
+
+      const scrub = gsap.timeline({
+        scrollTrigger: {
+          trigger: section,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
+
+      scrub
+        .to(
+          contentRef.current,
+          { y: 80, scale: 0.96, opacity: 0.35, ease: "none" },
+          0,
+        )
+        .to(bgRef.current, { y: 100, ease: "none" }, 0);
+
+      if (scrollRef.current) {
+        gsap.to(scrollRef.current.querySelector("[data-scroll-arrow]"), {
+          y: 6,
+          repeat: -1,
+          yoyo: true,
+          duration: 0.9,
+          ease: "sine.inOut",
+        });
+      }
+
+      return () => {
+        tl.kill();
+        scrub.scrollTrigger?.kill();
+        scrub.kill();
+      };
+    },
+    { dependencies: [ready, reduced], scope: sectionRef },
+  );
 
   return (
     <section
+      ref={sectionRef}
       id="top"
-      className="bg-atmosphere relative flex min-h-[100svh] items-center overflow-hidden pb-16 pt-[calc(var(--height-header)+var(--spacing-8))] md:pb-20"
+      className="relative flex min-h-[100svh] items-center overflow-hidden bg-surface-base pb-20 pt-[calc(2.5rem+var(--spacing-6))] md:pb-24"
       aria-labelledby="hero-heading"
     >
-      <div className="pointer-events-none absolute inset-0 opacity-[0.14]" aria-hidden>
-        <Image
-          src="/hero/atmosphere.webp"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-        />
+      <div
+        ref={bgRef}
+        className="pointer-events-none absolute inset-0 will-change-transform"
+        aria-hidden
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_70%_20%,color-mix(in_srgb,#7dd3fc_12%,transparent),transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_15%_80%,color-mix(in_srgb,#ffffff_6%,transparent),transparent_55%)]" />
+        <p className="absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 select-none text-[clamp(4.5rem,22vw,16rem)] font-bold tracking-tighter text-text-primary/[0.04] uppercase">
+          Creative
+        </p>
       </div>
 
       <Container className="relative z-10 w-full">
-        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
-          <motion.div
-            className="mx-auto w-full max-w-[280px] lg:mx-0 lg:max-w-[340px]"
-            {...fade(0)}
-          >
-            <div className="relative aspect-square overflow-hidden rounded-full">
-              <Image
-                src={site.avatar}
-                alt={`${site.brand}, Frontend Engineer based in ${site.location}`}
-                width={640}
-                height={640}
-                priority
-                sizes="(max-width: 1024px) 280px, 340px"
-                className="size-full object-cover"
-              />
-            </div>
-          </motion.div>
-
-          <div className="min-w-0 max-w-2xl">
-            <motion.div {...fade(0.06)}>
-              <p className="mb-3 text-sm font-medium tracking-[0.16em] text-text-tertiary uppercase">
-                {site.mark}
-              </p>
-              <Eyebrow className="mb-2 tracking-[0.18em]">Hello</Eyebrow>
-              <Heading
-                id="hero-heading"
-                as={1}
-                size="display-lg"
-                className="max-w-3xl uppercase"
-              >
-                I&apos;m {site.brand}
-              </Heading>
-              <p className="mt-4 max-w-xl text-sm leading-relaxed text-text-secondary">
-                {site.role}
-              </p>
-              <p className="mt-2 text-sm text-text-tertiary">{site.location}</p>
-            </motion.div>
-
-            <motion.div {...fade(0.14)}>
-              <Text className="mt-6 max-w-xl" size="lg" tone="secondary">
-                {site.summary}
-              </Text>
-            </motion.div>
-
-            <motion.div
-              className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row"
-              {...fade(0.22)}
+        <div
+          ref={contentRef}
+          className="grid items-center gap-10 will-change-transform lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.7fr)] lg:gap-20 xl:gap-24"
+        >
+          <div className="min-w-0 order-2 lg:order-1">
+            <p
+              data-hero-intro
+              className="mb-3 text-sm font-medium tracking-[0.2em] text-accent-cyan uppercase"
             >
-              <Button
-                className="w-full sm:w-auto"
-                aria-label="View featured projects"
-                onClick={() => scrollToId("projects")}
+              Hello! I&apos;m
+            </p>
+
+            <div ref={nameRef} className="overflow-hidden will-change-transform">
+              <p
+                className={cn(
+                  "text-display-xl font-bold tracking-tight text-text-primary uppercase",
+                  !reduced && "animate-hero-name-pulse",
+                )}
               >
-                View My Work
-              </Button>
-              <Button
-                variant="secondary"
-                className="w-full sm:w-auto"
-                aria-label="Go to contact form"
-                onClick={() => scrollToId("contact")}
-              >
-                Contact Me
-              </Button>
-            </motion.div>
+                <span className="block drop-shadow-[0_0_28px_rgba(125,211,252,0.22)]">
+                  {first}
+                </span>
+                {last ? (
+                  <span className="block text-text-secondary">{last}</span>
+                ) : null}
+              </p>
+            </div>
+
+            <h1
+              id="hero-heading"
+              data-hero-intro
+              className="mt-5 text-display-sm font-bold tracking-tight text-accent-cyan uppercase md:text-display-md"
+            >
+              {site.heroHeadline}
+            </h1>
+
+            <p
+              data-hero-intro
+              className="mt-6 max-w-xl text-xl leading-relaxed text-text-secondary md:text-2xl"
+            >
+              {site.summary}
+            </p>
+
+            <div className="mt-10 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+              <div data-hero-cta>
+                <Button
+                  className="w-full min-h-[56px] px-8 text-lg sm:w-auto"
+                  aria-label="View featured projects"
+                  onClick={() => scrollToId("projects")}
+                >
+                  Explore Work
+                </Button>
+              </div>
+              <div data-hero-cta>
+                <Button
+                  variant="secondary"
+                  className="w-full min-h-[56px] px-8 text-lg sm:w-auto"
+                  aria-label="Go to contact form"
+                  onClick={() => scrollToId("contact")}
+                >
+                  Contact Me
+                </Button>
+              </div>
+            </div>
+
+            <SocialMagneticIcons
+              className="mt-8"
+              size="md"
+              itemAttr="data-hero-social"
+            />
+          </div>
+
+          <div
+            data-hero-avatar
+            className="order-1 mx-auto w-full max-w-[300px] lg:order-2 lg:mx-0 lg:max-w-[340px] xl:max-w-[360px]"
+          >
+            <HeroAvatar />
           </div>
         </div>
       </Container>
 
-      <motion.button
+      <button
+        ref={scrollRef}
         type="button"
         className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 items-center gap-2 text-xs tracking-[0.18em] text-text-tertiary uppercase md:inline-flex"
         onClick={() => scrollToId("about")}
         aria-label="Scroll to about section"
-        {...fade(0.35)}
       >
         Scroll down
-        <span aria-hidden className="animate-bounce">
+        <span data-scroll-arrow aria-hidden>
           ↓
         </span>
-      </motion.button>
+      </button>
     </section>
   );
 }

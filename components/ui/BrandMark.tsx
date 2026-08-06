@@ -24,9 +24,9 @@ export function BrandMark({
       aria-hidden={labelled ? undefined : true}
       className={cn("shrink-0", className)}
     >
-      <rect width="32" height="32" rx="8" fill="#f4f4f2" />
+      <rect width="32" height="32" rx="8" fill="#ffffff" />
       <path
-        fill="#111111"
+        fill="#000000"
         d="M9 7h7.2c4.85 0 8.3 3.35 8.3 9s-3.45 9-8.3 9H9V7zm3.4 3.2v11.6h3.7c2.95 0 4.9-2.05 4.9-5.8s-1.95-5.8-4.9-5.8H12.4z"
       />
     </svg>

@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import type { HTMLAttributes, ReactNode } from "react";
-import { Reveal } from "@/components/motion/Reveal";
+import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { Container } from "./Container";
 
 type SectionProps = HTMLAttributes<HTMLElement> & {
@@ -39,7 +39,7 @@ export function Section({
       {...props}
     >
       <Container className={containerClassName}>
-        {reveal ? <Reveal>{children}</Reveal> : children}
+        {reveal ? <ScrollReveal>{children}</ScrollReveal> : children}
       </Container>
     </section>
   );

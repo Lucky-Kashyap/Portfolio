@@ -1,21 +1,24 @@
 import { ProjectCard } from "@/components/cards/ProjectCard";
 import { Grid, Section, SectionHeader } from "@/components/ui";
+import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { projects } from "@/lib/content";
 
 export function Projects() {
   return (
-    <Section id="projects" aria-labelledby="projects-heading">
-      <SectionHeader
-        eyebrow="Projects"
-        title="Featured Projects"
-        titleId="projects-heading"
-        description="Selected work. Live links will be added as you share them."
-      />
+    <Section id="projects" aria-labelledby="projects-heading" reveal={false}>
+      <ScrollReveal>
+        <SectionHeader
+          eyebrow="Projects"
+          title="Featured Projects"
+          titleId="projects-heading"
+          description="Open-source and learning builds — Front-End Domination, React + MySQL, Angular e-commerce, Tailwind Paytm, Shery.js, Vanilla JS apps, Premier UI, and Feliciano restaurant."
+        />
+      </ScrollReveal>
 
-      <Grid as="ul" cols={3} gap="md" className="mt-10">
-        {projects.map((project) => (
-          <li key={project.title}>
-            <ProjectCard project={project} />
+      <Grid as="ul" cols={3} gap="md" className="section-content items-stretch">
+        {projects.map((project, index) => (
+          <li key={project.title} className="flex h-full min-h-0">
+            <ProjectCard project={project} index={index} />
           </li>
         ))}
       </Grid>

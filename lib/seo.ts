@@ -23,7 +23,7 @@ export const seo = {
     "Jaipur Frontend Developer",
     "Helios Web Services",
   ],
-  ogImage: "/og.webp",
+  ogImage: "/divyanshu-kashyap-frontend-engineer-portfolio-og.webp",
   locale: "en_IN",
 } as const;
 
@@ -50,7 +50,11 @@ export const faqs = [
   },
   {
     question: "Where are you based, and how can I contact you?",
-    answer: `I am based in Gokul Vatika, Jaipur, Rajasthan. Email ${site.email}, call +91 ${site.phone}, or reach me on GitHub (${site.github}) and LinkedIn (${site.linkedin}).`,
+    answer: `I am based in Gokul Vatika, Jaipur, Rajasthan. Email ${site.email}, call +91 ${site.phone}, or reach me on GitHub (${site.github}), LinkedIn (${site.linkedin}), and LeetCode (${site.leetcode}).`,
+  },
+  {
+    question: "Do you practice problem solving / DSA?",
+    answer: `Yes. I practice on LeetCode (@${site.leetcodeUser}) with ${site.leetcodeStats.solved}+ problems solved across Easy (${site.leetcodeStats.easy}) and Medium (${site.leetcodeStats.medium}), mainly in C++ and JavaScript.`,
   },
   {
     question: "Do you focus on performance and accessibility?",
@@ -76,7 +80,7 @@ export function personJsonLd() {
       addressRegion: "Rajasthan",
       addressCountry: "IN",
     },
-    sameAs: [site.github, site.linkedin].filter(Boolean),
+    sameAs: [site.github, site.linkedin, site.leetcode].filter(Boolean),
     knowsAbout: [
       "React.js",
       "Next.js",

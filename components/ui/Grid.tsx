@@ -15,9 +15,9 @@ const colsClass = {
 } as const;
 
 const gapClass = {
-  sm: "gap-4",
-  md: "gap-6",
-  lg: "gap-10 lg:gap-16",
+  sm: "gap-[1.5rem] md:gap-[2rem]",
+  md: "gap-[1.75rem] md:gap-[2.5rem]",
+  lg: "gap-[2.5rem] md:gap-[3.5rem]",
 } as const;
 
 export function Grid({
@@ -50,9 +50,9 @@ export function Stack({
     <div
       className={cn(
         "flex flex-col",
-        gap === "sm" && "gap-3",
-        gap === "md" && "gap-5",
-        gap === "lg" && "gap-8",
+        gap === "sm" && "gap-5",
+        gap === "md" && "gap-8",
+        gap === "lg" && "gap-10",
         className,
       )}
       {...props}

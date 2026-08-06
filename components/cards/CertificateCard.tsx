@@ -28,7 +28,7 @@ export function CertificateCard({ cert }: CertificateCardProps) {
         </div>
       ) : (
         <div
-          className="flex aspect-[16/10] items-center justify-center border-b border-border-muted bg-[linear-gradient(145deg,color-mix(in_srgb,#111_8%,#f4f4f2),#ffffff)] px-6"
+          className="flex aspect-[16/10] items-center justify-center border-b border-border-muted bg-[linear-gradient(145deg,color-mix(in_srgb,#ffffff_8%,#0a0a0b),oklch(0.141_0.005_285.823))] px-6"
           aria-hidden
         >
           <p className="text-center text-sm tracking-[0.14em] text-text-muted uppercase">
