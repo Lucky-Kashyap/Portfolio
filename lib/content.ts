@@ -30,6 +30,7 @@ export const navItems = [
   { id: "certifications", label: "Certifications" },
   { id: "services", label: "Services" },
   { id: "projects", label: "Projects" },
+  { id: "faq", label: "FAQ" },
   { id: "contact", label: "Contact" },
 ] as const;
 
@@ -158,6 +159,17 @@ export const education = {
   degree: "MCA (Integrated)",
   field: "Computer Knowledge",
   period: "2018 — 2023",
+  skills: [
+    "Responsive Web Design",
+    "Node.js",
+    "Web Applications",
+    "Web Development",
+    "Redux.js",
+    "Git",
+    "Tailwind CSS",
+    "JavaScript eXtension (JSX)",
+    "MongoDB",
+  ],
 } as const;
 
 export type Certification = {
@@ -186,29 +198,61 @@ export const certifications: Certification[] = [
     name: "CSS Youtube Course",
     organization: "KGCoding by Prashant Sir",
     issued: "November 2023",
-    credentialId: "EKKOAPLO",
+    credentialId: "5SHXMFLS",
     credentialUrl:
-      "https://www.kgcoding.in/verify-certificate?serialno=EKKOAPLO",
-    skills: ["CSS"],
-    image: "/certificates/css-youtube-course.png",
-  },
-  {
-    name: "HTML Youtube Course",
-    organization: "KGCoding by Prashant Sir",
-    issued: "2023",
-    skills: ["HTML"],
+      "https://www.kgcoding.in/verify-certificate?serialno=5SHXMFLS",
+    skills: ["Cascading Style Sheets (CSS)"],
+    image: "/certificates/css-youtube-course.webp",
+    note: "Achieved certification by completing all questions and scoring above 70%.",
   },
   {
     name: "JavaScript Course With Certification: Unlocking the Power of JavaScript",
-    organization: "KGCoding by Prashant Sir",
-    issued: "2023",
+    organization: "Scaler Topics",
+    issued: "September 2023",
+    credentialUrl:
+      "https://moonshot.scaler.com/s/sl/KgaFQPRmcC",
     skills: ["JavaScript"],
+    image: "/certificates/javascript-scaler.webp",
+    note: "Completed JavaScript Course from Scaler Topics — Certificate of Excellence (70 video tutorials, 9 modules, 8 challenges).",
   },
   {
     name: "Front-End Domination",
+    organization: "Sheryians Coding School",
+    issued: "November 2023",
+    credentialId: "6315c7d5",
+    credentialUrl: "https://sheryians.com/certificate/verify/6315c7d5",
+    skills: [
+      "GreenSock Animation Platform (GSAP)",
+      "Tailwind CSS",
+      "CSS",
+      "Animations",
+      "Locomotive",
+      "JavaScript",
+      "HTML",
+      "React JS",
+      "Scroll Trigger",
+    ],
+    image: "/certificates/front-end-domination.webp",
+    note: "Course has covered in depth knowledge of HTML, CSS, Animations, JS, GSAP, Locomotive, Scroll Trigger, Shery.js, Modern web development and Design thinking. Approach, Modern, Design.",
+  },
+  {
+    name: "React and Redux Certification Test - Youtube Course",
     organization: "KGCoding by Prashant Sir",
-    issued: "2023",
-    skills: ["Front-End Development"],
+    issued: "November 2023",
+    credentialId: "WEQMR7SM",
+    credentialUrl:
+      "https://www.kgcoding.in/verify-certificate?serialno=WEQMR7SM",
+    skills: ["React", "Redux"],
+  },
+  {
+    name: "Certificate of Completion — 50+ Hour of Web Development",
+    organization: "Hindi Tech Tutorials",
+    issued: "February 2023",
+    credentialId: "HTT1408DK166",
+    credentialUrl: "http://hinditechtutorials.com/verify",
+    skills: ["Web Development"],
+    image: "/certificates/hindi-tech-web-development.webp",
+    note: "Completed 50+ Hour of Web Development Online Course on Hindi Tech Tutorials.",
   },
 ];
 

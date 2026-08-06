@@ -20,7 +20,7 @@ export function NavLinks({
     <ul
       className={
         variant === "nav"
-          ? "flex items-center gap-6"
+          ? "flex flex-wrap items-center justify-end gap-x-4 gap-y-2 lg:gap-x-5"
           : "flex flex-col gap-2"
       }
     >

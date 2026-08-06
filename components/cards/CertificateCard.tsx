@@ -18,10 +18,12 @@ export function CertificateCard({ cert }: CertificateCardProps) {
         <div className="relative aspect-[16/10] border-b border-border-muted bg-surface-base">
           <Image
             src={cert.image}
-            alt={`${cert.name} certificate — ${cert.organization}`}
+            alt={`${cert.name} certificate awarded to Divyanshu Kashyap by ${cert.organization}, issued ${cert.issued}${cert.credentialId ? `, credential ID ${cert.credentialId}` : ""}`}
             fill
             className="object-contain p-3"
-            sizes="(max-width: 768px) 100vw, 33vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            loading="lazy"
+            decoding="async"
           />
         </div>
       ) : (

@@ -18,22 +18,22 @@ import { about, education, experience, site } from "@/lib/content";
 export function About() {
   return (
     <section id="about" className="section-pad" aria-labelledby="about-heading">
-      <Container className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
-        <div>
+      <Container className="grid items-start gap-10 lg:grid-cols-2 lg:gap-12">
+        <div className="min-w-0">
           <Eyebrow>About</Eyebrow>
           <Heading id="about-heading" as={2} size="display-sm">
             About me
           </Heading>
-          <Text size="lg" className="mt-6 max-w-xl">
+          <Text size="lg" className="mt-6">
             {about.lead}
           </Text>
-          <Text tone="muted" className="mt-4 max-w-xl">
+          <Text tone="muted" className="mt-4">
             {about.specialize}
           </Text>
-          <Text tone="muted" className="mt-4 max-w-xl">
+          <Text tone="muted" className="mt-4">
             {about.impact}
           </Text>
-          <Text tone="muted" className="mt-4 max-w-xl">
+          <Text tone="muted" className="mt-4">
             {about.passion}
           </Text>
           <Text tone="muted" size="sm" className="mt-4">
@@ -53,7 +53,7 @@ export function About() {
           />
         </div>
 
-        <Stack gap="lg">
+        <Stack gap="lg" className="min-w-0">
           <div>
             <Eyebrow className="tracking-[0.14em]">Top Skills</Eyebrow>
             <ChipGroup items={[...about.topSkills]} className="mt-4" />
@@ -64,7 +64,7 @@ export function About() {
             <Text tone="muted" size="sm" className="mt-4 leading-relaxed">
               {about.technologies.join(" · ")}
             </Text>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="mt-4 grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2">
               {Object.entries(about.stack).map(([group, items]) => (
                 <StackGroupCard key={group} title={group} items={items} />
               ))}
@@ -106,12 +106,13 @@ export function Experience() {
           ))}
         </div>
 
-        <div className="mt-6 max-w-2xl">
+        <div className="mt-6 max-w-3xl">
           <EducationCard
             institution={education.institution}
             degree={education.degree}
             field={education.field}
             period={education.period}
+            skills={education.skills}
           />
         </div>
       </Container>

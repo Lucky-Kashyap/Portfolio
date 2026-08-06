@@ -39,7 +39,7 @@ export function IconButton({
       type={type}
       aria-label={label}
       className={cn(
-        "inline-flex items-center justify-center rounded-sm active:scale-[0.98]",
+        "inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm touch-manipulation active:scale-[0.98]",
         variantClass[variant],
         sizeClass[size],
         className,

@@ -35,7 +35,7 @@ export function Button({
     <button
       type={type}
       className={cn(
-        "inline-flex min-h-12 items-center justify-center gap-2 rounded-sm px-5 text-md font-medium tracking-wide",
+        "inline-flex min-h-12 min-w-12 items-center justify-center gap-2 rounded-sm px-5 text-md font-medium tracking-wide touch-manipulation",
         variants[variant],
         fullWidth && "w-full",
         isDisabled && "cursor-not-allowed opacity-70",

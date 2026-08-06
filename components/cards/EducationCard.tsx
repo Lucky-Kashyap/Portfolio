@@ -8,7 +8,7 @@ type StackGroupCardProps = {
 
 export function StackGroupCard({ title, items }: StackGroupCardProps) {
   return (
-    <Card variant="raised" padding="sm">
+    <Card variant="raised" padding="sm" className="h-full">
       <p className="text-sm font-medium text-text-secondary">{title}</p>
       <Text tone="muted" size="sm" className="mt-2">
         {items.join(" · ")}
@@ -84,6 +84,7 @@ type EducationCardProps = {
   degree: string;
   field: string;
   period: string;
+  skills?: readonly string[];
 };
 
 export function EducationCard({
@@ -91,6 +92,7 @@ export function EducationCard({
   degree,
   field,
   period,
+  skills,
 }: EducationCardProps) {
   return (
     <Card>
@@ -103,6 +105,18 @@ export function EducationCard({
       <Text tone="muted" size="sm" className="mt-1">
         {period}
       </Text>
+      {skills?.length ? (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {skills.map((skill) => (
+            <span
+              key={skill}
+              className="rounded-sm border border-border-muted px-3 py-1 text-xs tracking-wide text-text-muted"
+            >
+              {skill}
+            </span>
+          ))}
+        </div>
+      ) : null}
     </Card>
   );
 }

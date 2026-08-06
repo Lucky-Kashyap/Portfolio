@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   Button,
   Container,
@@ -12,6 +12,17 @@ import { site } from "@/lib/content";
 import { scrollToId } from "@/lib/scroll";
 
 export function Hero() {
+  const reduceMotion = useReducedMotion();
+
+  const fade = (delay = 0) =>
+    reduceMotion
+      ? undefined
+      : {
+          initial: { opacity: 0, y: 16 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.4, delay },
+        };
+
   return (
     <section
       id="top"
@@ -31,11 +42,7 @@ export function Hero() {
       />
 
       <Container className="relative z-10 w-full">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45 }}
-        >
+        <motion.div {...fade(0)}>
           <Eyebrow className="mb-2 tracking-[0.2em]">
             Hi, I&apos;m {site.brand}
             <span className="text-text-muted"> · {site.pronouns}</span>
@@ -46,26 +53,17 @@ export function Hero() {
           <p className="mb-4 text-sm text-text-muted">{site.location}</p>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.08 }}
+        {/* H1 stays visible for LCP — no opacity:0 on first paint */}
+        <Heading
+          id="hero-heading"
+          as={1}
+          size="display-lg"
+          className="max-w-4xl"
         >
-          <Heading
-            id="hero-heading"
-            as={1}
-            size="display-lg"
-            className="max-w-4xl"
-          >
-            {site.tagline}
-          </Heading>
-        </motion.div>
+          {site.tagline}
+        </Heading>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.16 }}
-        >
+        <motion.div {...fade(0.12)}>
           <Text className="mt-6 max-w-2xl" size="lg">
             {site.summary}
           </Text>
@@ -73,12 +71,11 @@ export function Hero() {
 
         <motion.div
           className="mt-8 flex w-full flex-col gap-3 sm:w-auto sm:flex-row"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.24 }}
+          {...fade(0.18)}
         >
           <Button
             className="w-full sm:w-auto"
+            aria-label="View featured projects"
             onClick={() => scrollToId("projects")}
           >
             View My Work
@@ -86,6 +83,7 @@ export function Hero() {
           <Button
             variant="secondary"
             className="w-full sm:w-auto"
+            aria-label="Go to contact form"
             onClick={() => scrollToId("contact")}
           >
             Contact Me
