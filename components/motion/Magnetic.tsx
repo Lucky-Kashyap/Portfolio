@@ -1,54 +1,52 @@
 "use client";
 
-import {
-  useRef,
-  useState,
-  type MouseEvent,
-  type ReactNode,
-} from "react";
-import { motion } from "framer-motion";
-import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
+import { useRef, useState, type MouseEvent, type ReactNode } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 type MagneticProps = {
   children: ReactNode;
   className?: string;
-  /** How strongly the element pulls toward the cursor (0–1). */
+  /** Soften pull so the control doesn’t jump too far (0–1). */
   strength?: number;
+  disabled?: boolean;
+  /** @deprecated Framer spring is the only path now; kept for call-site compat. */
+  variant?: "spring" | "elastic";
 };
 
 /**
- * Framer Motion magnetic button (Olivier Larose pattern).
- * Pulls children toward the cursor on hover with a spring.
+ * Framer Motion magnetic wrapper — cursor offset spring (desktop / fine pointer).
  */
 export function Magnetic({
   children,
   className,
-  strength = 0.35,
+  strength = 0.45,
+  disabled = false,
 }: MagneticProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const reduceMotion = useReducedMotion();
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const reduced = usePrefersReducedMotion();
 
-  const handleMouse = (event: MouseEvent<HTMLDivElement>) => {
-    if (reduced || !ref.current) return;
-    const { clientX, clientY } = event;
+  const handleMouse = (e: MouseEvent<HTMLDivElement>) => {
+    if (disabled || reduceMotion || !ref.current) return;
+    const { clientX, clientY } = e;
     const { height, width, left, top } = ref.current.getBoundingClientRect();
-    const middleX = clientX - (left + width / 2);
-    const middleY = clientY - (top + height / 2);
-    setPosition({ x: middleX * strength, y: middleY * strength });
+    const middleX = (clientX - (left + width / 2)) * strength;
+    const middleY = (clientY - (top + height / 2)) * strength;
+    setPosition({ x: middleX, y: middleY });
   };
 
   const reset = () => setPosition({ x: 0, y: 0 });
 
-  if (reduced) {
-    return <div className={cn("inline-flex", className)}>{children}</div>;
+  if (disabled || reduceMotion) {
+    return <div className={cn("relative inline-flex", className)}>{children}</div>;
   }
 
   return (
     <motion.div
       ref={ref}
       className={cn("relative inline-flex", className)}
+      style={{ position: "relative" }}
       onMouseMove={handleMouse}
       onMouseLeave={reset}
       animate={{ x: position.x, y: position.y }}

@@ -36,8 +36,13 @@ export const site = {
   },
   /** Photo avatar (about / meta) */
   avatar: "/profile/divyanshu-kashyap-frontend-developer-jaipur.webp",
-  /** 3D AI avatar used in the hero showcase */
+  /** Photorealistic AI avatar used in the hero showcase */
   aiAvatar: "/avatar/divyanshu-kashyap-3d-ai-avatar-frontend-engineer.webp",
+  /** Live wave GIF — face stays intact (no CSS mask crop). Prefer intro.mp4 when ready. */
+  aiAvatarGif: "/avatar/divyanshu-kashyap-realistic-ai-avatar-wave.gif",
+  aiAvatarGifEnabled: true,
+  /** Anime-style AI persona used in About */
+  animeAvatar: "/avatar/divyanshu-kashyap-anime-ai-avatar-frontend-engineer.webp",
   /**
    * Optional talking intro video (HeyGen / D-ID / Synthesia export).
    * Drop `public/avatar/intro.mp4` (or .webm) and set `avatarVideoEnabled: true`.
@@ -72,30 +77,32 @@ export const navItems = [
 
 export const about = {
   lead: "Frontend Engineer with 2.5+ years of experience building scalable, responsive, and high-performance web applications using React.js, Next.js, Angular, TypeScript, and modern frontend technologies.",
+  headline: "AI-POWERED WEB & INTERACTIVE FRONTEND EXPERIENCES",
   specialize:
     "I specialize in transforming complex business requirements into intuitive, user-friendly digital experiences. My expertise includes developing reusable component architectures, integrating APIs, optimizing application performance, implementing accessibility standards, and delivering responsive interfaces across devices and browsers.",
   impact:
     "Over the years, I have contributed to enterprise platforms, AI-powered applications, media management systems, event management solutions, and customer-facing web products. I enjoy solving real-world problems through clean code, modern architecture, and user-centric design principles.",
   passion:
-    "I am passionate about building products that are fast, scalable, accessible, and impactful. Currently, I am expanding my expertise in Full Stack Development, Backend Technologies, Cloud Services, and AI-powered applications to build end-to-end modern web solutions.",
+    "Based in Jaipur, I build highly interactive SPA architectures and polished UI with React, Next.js, and TypeScript. I am actively learning backend technologies and full-stack fundamentals — and I am available for remote frontend opportunities worldwide.",
   expertise: [
     "React.js & Next.js Development",
     "Angular Development",
     "TypeScript & Modern JavaScript",
     "REST API Integration",
     "State Management (Redux Toolkit, React Query)",
-    "Performance Optimization",
+    "Performance Optimization & Lighthouse",
     "Accessibility & Responsive Design",
-    "Authentication & Authorization",
+    "Authentication UI & Client-side flows",
     "UI Architecture & Component Design",
-    "SEO & Web Performance",
+    "SEO tooling, Analytics & link audits",
   ],
   topSkills: ["React bits", "GSAP ScrollTrigger", "Web Accessibility"],
   learning: [
-    "Full Stack Development",
-    "Backend Technologies",
-    "Cloud Services",
-    "AI-powered Applications",
+    "Backend fundamentals (learning)",
+    "Node.js & APIs (learning)",
+    "Databases (learning)",
+    "Cloud services (learning)",
+    "AI-powered frontend experiences",
   ],
   technologies: [
     "React.js",
@@ -104,9 +111,18 @@ export const about = {
     "TypeScript",
     "JavaScript",
     "Tailwind CSS",
+    "Bootstrap",
+    "WordPress",
     "Redux Toolkit",
     "React Query",
     "GSAP",
+    "Framer Motion",
+    "Locomotive Scroll",
+    "Shery.js",
+    "Lighthouse",
+    "Google Analytics",
+    "Google Search Console",
+    "Screaming Frog",
     "REST APIs",
     "Git",
     "GitHub",
@@ -116,10 +132,25 @@ export const about = {
   stack: {
     Frontend: ["React.js", "Next.js", "Angular", "TypeScript", "JavaScript"],
     "State & Data": ["Redux Toolkit", "React Query", "REST APIs"],
-    "Styling & Motion": ["Tailwind CSS", "GSAP"],
-    Quality: ["Web Accessibility", "Performance", "SEO"],
+    "Styling & Motion": ["Tailwind CSS", "GSAP", "Framer Motion"],
+    Quality: ["Accessibility", "Performance", "SEO"],
     Tools: ["Git", "GitHub", "Bitbucket", "Jira"],
+    "Performance & SEO": [
+      "Lighthouse",
+      "Search Console",
+      "Analytics",
+      "Screaming Frog",
+    ],
   },
+  highlightStack: [
+    "React.js",
+    "Next.js",
+    "TypeScript",
+    "Angular",
+    "Tailwind CSS",
+    "GSAP",
+    "AI UI Experiences",
+  ],
   stats: [
     { label: "Years Experience", value: 2.5, suffix: "+" },
     { label: "Certifications", value: 3, suffix: "" },
@@ -237,14 +268,19 @@ export const services = [
       "REST API integration with robust state management using Redux Toolkit and React Query.",
   },
   {
-    title: "Performance & Accessibility",
+    title: "Performance & Lighthouse",
     description:
-      "Faster loads, WCAG-minded interfaces, responsive layouts, and SEO-ready frontend delivery.",
+      "Lighthouse-driven speed work — Core Web Vitals, lean bundles, and stronger production scores.",
   },
   {
     title: "Motion & Interaction",
     description:
-      "Purposeful UI motion with GSAP and ScrollTrigger for premium, high-clarity experiences.",
+      "UI motion with GSAP, ScrollTrigger, Locomotive Scroll, and Shery.js.",
+  },
+  {
+    title: "SEO & Analytics",
+    description:
+      "Search Console, Analytics, Screaming Frog, and broken-link checks — including WordPress sites.",
   },
 ] as const;
 
@@ -292,13 +328,13 @@ export const projects: Project[] = [
     ctaLabel: "View on GitHub",
   },
   {
-    title: "React Registration Form + MySQL",
+    title: "React Registration Form",
     description:
-      "Full-stack registration form with a clean React UI, live table display of submitted data, custom Node server, and MySQL persistence (managed via MySQL Workbench). Built while helping a friend connect React to a SQL database — then reimplemented end-to-end.",
-    tags: ["React", "MySQL", "Node.js", "Forms", "CRUD"],
+      "Practice project: a clean React registration UI with a live results table. Explored connecting forms to a simple server and MySQL while learning backend basics — frontend-first, with backend pieces as a learning exercise.",
+    tags: ["React", "Forms", "CRUD UI", "Learning"],
     image: "/projects/react-mysql-registration-form-fullstack.webp",
     imageAlt:
-      "React registration form with MySQL database table UI by Divyanshu Kashyap — full-stack form and CRUD screenshot",
+      "React registration form practice project by Divyanshu Kashyap — form UI and results table screenshot",
     href: "https://github.com/Lucky-Kashyap/full-stack-web-dev/tree/main/front%20end/React%20JS/projects/registration-form",
     ctaLabel: "View on GitHub",
   },

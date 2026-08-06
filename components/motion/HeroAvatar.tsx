@@ -20,6 +20,7 @@ export function HeroAvatar({ className }: HeroAvatarProps) {
   const [roleIndex, setRoleIndex] = useState(0);
   const reduced = usePrefersReducedMotion();
   const hasVideo = site.avatarVideoEnabled;
+  const useGif = site.aiAvatarGifEnabled && !reduced && !hasVideo;
   const roles = site.heroRoles?.length ? [...site.heroRoles] : [site.heroHeadline];
   const activeRole = roles[roleIndex % roles.length];
 
@@ -130,7 +131,7 @@ export function HeroAvatar({ className }: HeroAvatarProps) {
       : "Play avatar introduction video"
     : speaking
       ? "Stop spoken introduction"
-      : "Play spoken introduction from AI avatar";
+      : "Play spoken introduction from avatar";
 
   return (
     <div className={cn("relative mx-auto w-full max-w-full", className)}>
@@ -141,17 +142,18 @@ export function HeroAvatar({ className }: HeroAvatarProps) {
         aria-pressed={isActive}
         aria-label={actionLabel}
         title={isActive ? "Click to stop intro" : "Click avatar to hear intro"}
-        className="group relative block w-full overflow-hidden rounded-md bg-[#0c1118] text-left shadow-accent-lg outline-none transition-[box-shadow,transform] duration-fast hover:shadow-[0_0_0_1px_rgba(125,211,252,0.35)] focus-visible:ring-2 focus-visible:ring-accent-cyan/60"
+        className="group relative block w-full overflow-hidden rounded-md bg-[#0c1118] text-left shadow-accent-lg outline-none transition-[box-shadow] duration-fast hover:shadow-[0_0_0_1px_rgba(125,211,252,0.35)] focus-visible:ring-2 focus-visible:ring-accent-cyan/60"
       >
-        <div className="relative aspect-[3/4] w-full">
+        <div className="relative aspect-[4/5] w-full sm:aspect-[3/4]">
           <div
             className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,#152033_0%,#0c1118_70%)]"
             aria-hidden
           />
+
           {hasVideo ? (
             <video
               ref={videoRef}
-              className="absolute inset-0 size-full object-cover object-top"
+              className="absolute inset-0 size-full object-cover object-[center_18%]"
               poster={site.aiAvatar}
               playsInline
               preload="metadata"
@@ -163,83 +165,44 @@ export function HeroAvatar({ className }: HeroAvatarProps) {
             </video>
           ) : (
             <>
-              <div
-                className="absolute inset-0"
-                style={{
-                  clipPath:
-                    "polygon(36% 0%, 100% 0%, 100% 100%, 0% 100%, 0% 58%, 14% 57%, 40% 53%, 49% 36%, 46% 14%, 36% 4%)",
-                }}
-              >
-                <Image
-                  src={site.aiAvatar}
-                  alt="Divyanshu Kashyap 3D AI avatar waving — Frontend Engineer specializing in React and Next.js"
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 90vw, 420px"
-                  className={cn(
-                    "object-cover object-top transition-transform duration-slow",
-                    speaking && !reduced && "scale-[1.015]",
-                  )}
-                />
-              </div>
-
-              <div
+              {/*
+                One intact portrait — no masked second layer.
+                Fake CSS “hand wave” was rotating part of the face with the hand.
+                Wave motion comes from the GIF (or a future intro.mp4).
+              */}
+              <Image
+                src={useGif ? site.aiAvatarGif : site.aiAvatar}
+                alt="Divyanshu Kashyap realistic AI avatar waving — Frontend Engineer specializing in React and Next.js"
+                fill
+                priority
+                unoptimized={useGif}
+                sizes="(max-width: 1024px) 90vw, 50vw"
                 className={cn(
-                  "absolute inset-0 origin-[38%_46%] will-change-transform",
-                  !reduced && "animate-avatar-hand-wave",
+                  "object-cover object-[center_12%]",
+                  speaking && !reduced && "scale-[1.015] transition-transform duration-slow",
                 )}
-                style={{
-                  clipPath:
-                    "polygon(0% 5%, 35% 2%, 45% 11%, 49% 33%, 42% 52%, 14% 56%, 0% 48%)",
-                }}
-                aria-hidden
-              >
-                <Image
-                  src={site.aiAvatar}
-                  alt=""
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 90vw, 420px"
-                  className="object-cover object-top drop-shadow-[0_0_16px_rgba(125,211,252,0.3)]"
-                />
-              </div>
+              />
 
+              {/* Blue shimmer — kept, sits above the portrait */}
               <div
                 className={cn(
-                  "pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_35%_25%,rgba(125,211,252,0.18),transparent_52%)]",
+                  "pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_40%_25%,rgba(125,211,252,0.16),transparent_55%)]",
                   !reduced && "animate-avatar-glow-pulse",
                 )}
                 aria-hidden
               />
-              <div
-                className="pointer-events-none absolute inset-0 opacity-[0.09] mix-blend-screen"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(rgba(125,211,252,0.45) 1px, transparent 1px)",
-                  backgroundSize: "100% 5px",
-                }}
-                aria-hidden
-              />
               {!reduced ? (
                 <div
-                  className="pointer-events-none absolute inset-x-0 top-0 h-1/5 animate-avatar-scan bg-gradient-to-b from-transparent via-accent-cyan/18 to-transparent"
+                  className="pointer-events-none absolute inset-x-0 top-0 h-1/5 animate-avatar-scan bg-gradient-to-b from-transparent via-accent-cyan/14 to-transparent"
                   aria-hidden
                 />
               ) : null}
-              <div
-                className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-accent-cyan/20 shadow-[inset_0_0_48px_rgba(125,211,252,0.12)]"
-                aria-hidden
-              />
             </>
           )}
 
-          <p className="absolute top-4 left-4 z-10 rounded-xs border border-accent-cyan/35 bg-surface-base/80 px-3 py-1.5 text-[11px] font-medium tracking-[0.2em] text-accent-cyan uppercase backdrop-blur-sm">
-            AI avatar
-          </p>
-
           <span
             className={cn(
-              "absolute top-4 right-4 z-10 inline-flex size-9 items-center justify-center rounded-full border border-white/15 bg-black/45 text-text-primary backdrop-blur-sm transition-opacity duration-fast",
+              "absolute top-3 right-3 z-10 inline-flex size-8 items-center justify-center rounded-full border border-white/15 bg-black/45 text-text-primary backdrop-blur-sm transition-opacity duration-fast md:top-4 md:right-4 md:size-9",
               isActive
                 ? "opacity-100"
                 : "opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100",
@@ -254,15 +217,15 @@ export function HeroAvatar({ className }: HeroAvatarProps) {
             aria-hidden
           />
 
-          <div className="absolute bottom-5 left-4 right-4 z-10 min-h-[2.75rem] overflow-hidden">
+          <div className="absolute bottom-4 left-3 right-3 z-10 min-h-[2.5rem] overflow-hidden md:bottom-5 md:left-4 md:right-4">
             <AnimatePresence mode="wait">
               <motion.p
                 key={activeRole}
-                initial={reduced ? false : { y: 22, opacity: 0 }}
+                initial={reduced ? false : { y: 18, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                exit={reduced ? undefined : { y: -18, opacity: 0 }}
-                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                className="text-2xl font-bold tracking-tight text-text-primary uppercase md:text-3xl"
+                exit={reduced ? undefined : { y: -14, opacity: 0 }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="text-xl font-bold tracking-tight text-text-primary uppercase md:text-2xl lg:text-3xl"
                 aria-live="polite"
               >
                 {activeRole}

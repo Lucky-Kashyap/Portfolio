@@ -138,7 +138,7 @@ export function SocialMagneticIcons({
 
         return (
           <li key={item.label}>
-            <Magnetic strength={isHeader ? 0.35 : 0.45}>
+            <Magnetic strength={isHeader ? 0.4 : 0.55}>
               <a
                 {...attrs}
                 href={item.href}
@@ -148,14 +148,14 @@ export function SocialMagneticIcons({
                 aria-label={item.label}
                 title={item.label}
                 className={cn(
-                  "group inline-flex items-center justify-center rounded-full transition-[background,color,box-shadow,transform,border-color] duration-fast active:scale-95",
+                  "group inline-flex items-center justify-center rounded-full border transition-[background,color,box-shadow,border-color] duration-fast active:scale-95",
                   isHeader
-                    ? "border border-border-muted bg-surface-raised text-text-secondary hover:border-accent-cyan/50 hover:bg-accent-cyan hover:text-surface-base hover:shadow-[0_0_16px_rgba(125,211,252,0.35)]"
-                    : "border border-transparent bg-[#e8e4dc] text-[#1a1a1a] shadow-soft hover:bg-accent-cyan hover:text-surface-base hover:shadow-[0_0_24px_rgba(125,211,252,0.45)]",
+                    ? "border-border-muted bg-surface-raised text-text-secondary hover:border-accent-cyan/50 hover:bg-accent-cyan hover:text-surface-base hover:shadow-[0_0_16px_rgba(125,211,252,0.35)]"
+                    : "border-transparent bg-[#e8e4dc] text-[#1a1a1a] shadow-soft hover:bg-accent-cyan hover:text-surface-base hover:shadow-[0_0_24px_rgba(125,211,252,0.45)]",
                   sizeClass[size],
                 )}
               >
-                <span className="inline-flex transition-transform duration-fast group-hover:scale-110">
+                <span className="inline-flex size-[45%] items-center justify-center [&_svg]:size-full">
                   <Icon size={iconPx[size]} />
                 </span>
               </a>

@@ -8,7 +8,7 @@
 }
 
 html {
-  scroll-padding-top: calc(5.5rem + var(--spacing-6, 24px));
+  scroll-padding-top: calc(3.75rem + var(--spacing-4, 16px));
   scrollbar-width: thin;
   scrollbar-color: var(--color-accent-cyan, #7dd3fc)
     var(--color-surface-raised, #161618);

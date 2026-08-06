@@ -6,25 +6,30 @@ export const siteUrl =
   "https://divyanshu.dev";
 
 export const seo = {
-  title: `${site.brand} | Frontend Engineer — React.js, Next.js, TypeScript`,
+  title: `${site.brand} | Frontend Engineer Jaipur — React.js, Next.js, TypeScript`,
   titleTemplate: `%s | ${site.brand}`,
   description:
-    "Frontend Engineer in Jaipur with 2.5+ years experience in React.js, Next.js, Angular, and TypeScript. Scalable UI, API integration, performance, and accessibility.",
+    "Looking to hire a Frontend Engineer? Divyanshu Kashyap builds high-performance React.js and Next.js interfaces, motion-rich UI, and accessible web experiences from Jaipur — open to remote opportunities.",
   keywords: [
     "Divyanshu Kashyap",
-    "Frontend Engineer",
-    "React.js Developer",
+    "Frontend Engineer Jaipur",
+    "React.js Developer Jaipur",
     "Next.js Developer",
-    "TypeScript",
-    "Angular",
+    "TypeScript Frontend Developer",
+    "hire Frontend Engineer Jaipur",
+    "hire React developer Jaipur",
+    "Angular Developer",
     "UI Architecture",
     "Web Accessibility",
     "Performance Optimization",
-    "Jaipur Frontend Developer",
+    "GSAP Framer Motion",
+    "Responsive Web Design",
     "Helios Web Services",
   ],
   ogImage: "/divyanshu-kashyap-frontend-engineer-portfolio-og.webp",
+  profileImage: "/profile/divyanshu-kashyap-frontend-developer-jaipur.webp",
   locale: "en_IN",
+  themeColor: "#09090b",
 } as const;
 
 export const faqs = [
@@ -36,7 +41,7 @@ export const faqs = [
   {
     question: "Which technologies do you use day to day?",
     answer:
-      "React.js, Next.js, Angular, TypeScript, JavaScript, Tailwind CSS, Redux Toolkit, React Query, GSAP, Framer Motion, REST APIs, Git, GitHub, Bitbucket, and Jira.",
+      "React.js, Next.js, Angular, TypeScript, JavaScript, Tailwind CSS, Bootstrap, WordPress, Redux Toolkit, React Query, GSAP, Framer Motion, Locomotive Scroll, Shery.js, Lighthouse, Google Analytics, Google Search Console, Screaming Frog / SEO Spider link audits, REST APIs, Git, GitHub, Bitbucket, and Jira.",
   },
   {
     question: "How much experience do you have?",
@@ -46,7 +51,7 @@ export const faqs = [
   {
     question: "Are you open to new opportunities or collaborations?",
     answer:
-      "Yes. I am open to connecting with developers, recruiters, and technology leaders interested in web engineering, product development, and emerging technologies including AI-powered applications.",
+      "Yes. I am open to connecting with developers, recruiters, and technology leaders interested in web engineering, product development, and AI-powered frontend experiences.",
   },
   {
     question: "Where are you based, and how can I contact you?",
@@ -57,9 +62,9 @@ export const faqs = [
     answer: `Yes. I practice on LeetCode (@${site.leetcodeUser}) with ${site.leetcodeStats.solved}+ problems solved across Easy (${site.leetcodeStats.easy}) and Medium (${site.leetcodeStats.medium}), mainly in C++ and JavaScript.`,
   },
   {
-    question: "Do you focus on performance and accessibility?",
+    question: "Do you focus on performance and SEO?",
     answer:
-      "Yes. Performance optimization, Core Web Vitals awareness (LCP, CLS, INP), SEO-friendly markup, and web accessibility are part of how I ship production interfaces.",
+      "Yes. I use Lighthouse and Core Web Vitals to guide performance work, and SEO tooling like Google Search Console, Google Analytics, Screaming Frog / SEO Spider, and broken or dead link checks to keep sites crawlable and healthy — including WordPress-friendly frontend SEO hygiene.",
   },
 ] as const;
 
@@ -69,26 +74,40 @@ export function personJsonLd() {
     "@type": "Person",
     name: site.brand,
     url: siteUrl,
-    image: `${siteUrl}${seo.ogImage}`,
+    image: `${siteUrl}${seo.profileImage}`,
     jobTitle: "Frontend Engineer",
-    description: seo.description,
-    email: `mailto:${site.email}`,
-    telephone: `+91${site.phone}`,
+    description:
+      "Results-driven Frontend Engineer specializing in React.js, Next.js, and TypeScript. Building scalable, performant, and accessible web interfaces with modern UI architecture and motion.",
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Gokul Vatika, Jaipur",
+      addressLocality: "Jaipur",
       addressRegion: "Rajasthan",
       addressCountry: "IN",
     },
+    email: site.email,
+    telephone: `+91-${site.phone}`,
     sameAs: [site.github, site.linkedin, site.leetcode].filter(Boolean),
     knowsAbout: [
       "React.js",
       "Next.js",
       "TypeScript",
+      "JavaScript",
       "Angular",
+      "Tailwind CSS",
+      "Bootstrap",
+      "WordPress",
+      "GSAP",
+      "Framer Motion",
+      "Locomotive Scroll",
+      "Shery.js",
+      "Lighthouse",
+      "Google Analytics",
+      "Google Search Console",
+      "Screaming Frog",
       "Web Accessibility",
       "Performance Optimization",
       "UI Architecture",
+      "Frontend Development",
     ],
   };
 }

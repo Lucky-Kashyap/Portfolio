@@ -35,7 +35,7 @@ function TopLink({
   external?: boolean;
 }) {
   return (
-    <Magnetic strength={0.28}>
+    <Magnetic strength={0.35}>
       <a
         href={href}
         aria-label={label}
@@ -101,8 +101,8 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    if (!scrolled && open) setOpen(false);
-  }, [scrolled, open]);
+    if (!scrolled) setOpen(false);
+  }, [scrolled]);
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -147,7 +147,7 @@ export function Header() {
               : "border-b border-transparent bg-transparent",
           )}
         >
-          <div className="mx-auto flex h-9 max-w-site items-center justify-between gap-2 px-3 md:px-5">
+          <div className="mx-auto flex h-8 max-w-site items-center justify-between gap-2 px-3 md:px-5">
             <div className="flex min-w-0 items-center gap-2 sm:gap-3">
               <a
                 href={mailHref}
@@ -177,29 +177,31 @@ export function Header() {
               </a>
             </div>
 
-            <ul className="flex shrink-0 items-center" aria-label="Social links">
-              {SOCIALS.map(({ href, label, icon: Icon, external }) => (
-                <li key={label}>
-                  <TopLink href={href} label={label} external={external}>
-                    <Icon size={13} />
-                  </TopLink>
-                </li>
-              ))}
-            </ul>
+            <div className="flex shrink-0 items-center gap-0.5">
+              <ul className="flex items-center" aria-label="Social links">
+                {SOCIALS.map(({ href, label, icon: Icon, external }) => (
+                  <li key={label}>
+                    <TopLink href={href} label={label} external={external}>
+                      <Icon size={13} />
+                    </TopLink>
+                  </li>
+                ))}
+              </ul>
 
-            {/* Mobile menu on first view (float nav is hidden in hero) */}
-            {!scrolled ? (
-              <IconButton
-                className="!size-8 !min-h-8 !min-w-8 md:hidden"
-                size="md"
-                label={open ? "Close menu" : "Open menu"}
-                aria-expanded={open}
-                aria-controls={menuId}
-                onClick={() => setOpen((v) => !v)}
-              >
-                {open ? <X size={16} aria-hidden /> : <Menu size={16} aria-hidden />}
-              </IconButton>
-            ) : null}
+              {/* Mobile menu on first view (float nav is hidden in hero) */}
+              {!scrolled ? (
+                <IconButton
+                  className="!size-8 !min-h-8 !min-w-8 md:hidden"
+                  size="md"
+                  label={open ? "Close menu" : "Open menu"}
+                  aria-expanded={open}
+                  aria-controls={menuId}
+                  onClick={() => setOpen((v) => !v)}
+                >
+                  {open ? <X size={16} aria-hidden /> : <Menu size={16} aria-hidden />}
+                </IconButton>
+              ) : null}
+            </div>
           </div>
         </div>
       </motion.header>
@@ -209,7 +211,7 @@ export function Header() {
         {scrolled ? (
           <motion.div
             key="float-nav"
-            className="pointer-events-none fixed inset-x-0 top-11 z-50 flex justify-center px-3"
+            className="pointer-events-none fixed inset-x-0 top-9 z-50 flex justify-center px-3"
             initial={reduced ? false : { y: -12, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={reduced ? undefined : { y: -10, opacity: 0 }}
@@ -296,7 +298,7 @@ export function Header() {
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             className={cn(
               "fixed inset-x-3 z-50 overflow-hidden rounded-md border border-border-muted/70 bg-surface-base/95 shadow-soft backdrop-blur-xl md:hidden",
-              scrolled ? "top-[5.5rem]" : "top-12",
+              scrolled ? "top-[4.75rem]" : "top-10",
             )}
           >
             <nav aria-label="Mobile primary" className="px-2 py-3">

@@ -53,24 +53,21 @@ export function Hero() {
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
       gsap.set(bgRef.current, { opacity: 0 });
-      gsap.set(intro, { opacity: 0, y: 28 });
-      gsap.set(nameRef.current, { clipPath: "inset(0 0 100% 0)", y: 28 });
-      gsap.set(ctas, { opacity: 0, y: 20 });
-      gsap.set(social, { opacity: 0, y: 16 });
-      gsap.set(avatar, { opacity: 0, y: 40, scale: 0.96 });
+      gsap.set(intro, { opacity: 0, y: 24 });
+      // No clipPath — it was cropping the last letter of the name
+      gsap.set(nameRef.current, { opacity: 0, y: 22 });
+      gsap.set(ctas, { opacity: 0, y: 18 });
+      gsap.set(social, { opacity: 0, y: 14 });
+      gsap.set(avatar, { opacity: 0, y: 32, scale: 0.97 });
       gsap.set(scrollRef.current, { opacity: 0 });
 
-      tl.to(bgRef.current, { opacity: 1, duration: 1 }, 0)
-        .to(intro, { opacity: 1, y: 0, duration: 0.7, stagger: 0.08 }, 0.12)
-        .to(
-          nameRef.current,
-          { clipPath: "inset(0 0 0% 0)", y: 0, duration: 0.95 },
-          0.28,
-        )
-        .to(avatar, { opacity: 1, y: 0, scale: 1, duration: 1 }, 0.2)
-        .to(ctas, { opacity: 1, y: 0, duration: 0.55, stagger: 0.1 }, 0.65)
-        .to(social, { opacity: 1, y: 0, duration: 0.45, stagger: 0.06 }, 0.85)
-        .to(scrollRef.current, { opacity: 1, duration: 0.5 }, 1);
+      tl.to(bgRef.current, { opacity: 1, duration: 0.9 }, 0)
+        .to(intro, { opacity: 1, y: 0, duration: 0.65, stagger: 0.07 }, 0.1)
+        .to(nameRef.current, { opacity: 1, y: 0, duration: 0.8 }, 0.2)
+        .to(avatar, { opacity: 1, y: 0, scale: 1, duration: 0.9 }, 0.15)
+        .to(ctas, { opacity: 1, y: 0, duration: 0.5, stagger: 0.08 }, 0.55)
+        .to(social, { opacity: 1, y: 0, duration: 0.4, stagger: 0.05 }, 0.7)
+        .to(scrollRef.current, { opacity: 1, duration: 0.45 }, 0.9);
 
       const scrub = gsap.timeline({
         scrollTrigger: {
@@ -84,10 +81,10 @@ export function Hero() {
       scrub
         .to(
           contentRef.current,
-          { y: 80, scale: 0.96, opacity: 0.35, ease: "none" },
+          { y: 60, scale: 0.98, opacity: 0.4, ease: "none" },
           0,
         )
-        .to(bgRef.current, { y: 100, ease: "none" }, 0);
+        .to(bgRef.current, { y: 80, ease: "none" }, 0);
 
       if (scrollRef.current) {
         gsap.to(scrollRef.current.querySelector("[data-scroll-arrow]"), {
@@ -112,7 +109,7 @@ export function Hero() {
     <section
       ref={sectionRef}
       id="top"
-      className="relative flex min-h-[100svh] items-center overflow-hidden bg-surface-base pb-20 pt-[calc(2.5rem+var(--spacing-6))] md:pb-24"
+      className="relative flex min-h-[100svh] items-center justify-center overflow-x-clip overflow-y-visible bg-surface-base pt-14 pb-12 md:pt-16 md:pb-16"
       aria-labelledby="hero-heading"
     >
       <div
@@ -122,7 +119,7 @@ export function Hero() {
       >
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_70%_20%,color-mix(in_srgb,#7dd3fc_12%,transparent),transparent_60%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_15%_80%,color-mix(in_srgb,#ffffff_6%,transparent),transparent_55%)]" />
-        <p className="absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 select-none text-[clamp(4.5rem,22vw,16rem)] font-bold tracking-tighter text-text-primary/[0.04] uppercase">
+        <p className="absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 select-none text-[clamp(4rem,18vw,14rem)] font-bold tracking-tighter text-text-primary/[0.04] uppercase">
           Creative
         </p>
       </div>
@@ -130,51 +127,55 @@ export function Hero() {
       <Container className="relative z-10 w-full">
         <div
           ref={contentRef}
-          className="grid items-center gap-10 will-change-transform lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.7fr)] lg:gap-20 xl:gap-24"
+          className="grid w-full items-start gap-8 will-change-transform lg:grid-cols-2 lg:gap-12 xl:gap-16"
         >
-          <div className="min-w-0 order-2 lg:order-1">
+          {/* Left — top-aligned with avatar (not vertically centered) */}
+          <div className="min-w-0 order-2 lg:order-1 lg:pr-2 lg:pt-1">
             <p
               data-hero-intro
-              className="mb-3 text-sm font-medium tracking-[0.2em] text-accent-cyan uppercase"
+              className="mb-2 text-xs font-medium tracking-[0.22em] text-accent-cyan uppercase md:text-sm"
             >
               Hello! I&apos;m
             </p>
 
-            <div ref={nameRef} className="overflow-hidden will-change-transform">
+            {/* overflow-visible so last letter never clips */}
+            <div ref={nameRef} className="will-change-transform">
               <p
                 className={cn(
-                  "text-display-xl font-bold tracking-tight text-text-primary uppercase",
+                  "font-bold tracking-[-0.03em] text-text-primary uppercase",
+                  "text-[clamp(2.35rem,5.8vw,4.25rem)] leading-[1.02]",
                   !reduced && "animate-hero-name-pulse",
                 )}
               >
-                <span className="block drop-shadow-[0_0_28px_rgba(125,211,252,0.22)]">
+                <span className="block pr-1 drop-shadow-[0_0_28px_rgba(125,211,252,0.22)]">
                   {first}
                 </span>
                 {last ? (
-                  <span className="block text-text-secondary">{last}</span>
+                  <span className="block pr-1 text-text-secondary">{last}</span>
                 ) : null}
               </p>
             </div>
 
+            {/* Single H1 for SEO — role keyword */}
             <h1
               id="hero-heading"
               data-hero-intro
-              className="mt-5 text-display-sm font-bold tracking-tight text-accent-cyan uppercase md:text-display-md"
+              className="mt-3 text-[clamp(1.35rem,2.8vw,2.15rem)] font-bold tracking-tight text-accent-cyan uppercase md:mt-4"
             >
               {site.heroHeadline}
             </h1>
 
             <p
               data-hero-intro
-              className="mt-6 max-w-xl text-xl leading-relaxed text-text-secondary md:text-2xl"
+              className="mt-4 max-w-lg text-[clamp(1rem,1.5vw,1.25rem)] leading-relaxed text-text-secondary md:mt-5"
             >
               {site.summary}
             </p>
 
-            <div className="mt-10 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+            <div className="mt-7 flex w-full flex-col gap-3 sm:w-auto sm:flex-row md:mt-8">
               <div data-hero-cta>
                 <Button
-                  className="w-full min-h-[56px] px-8 text-lg sm:w-auto"
+                  className="w-full min-h-[48px] px-7 text-base sm:w-auto md:min-h-[52px]"
                   aria-label="View featured projects"
                   onClick={() => scrollToId("projects")}
                 >
@@ -184,7 +185,7 @@ export function Hero() {
               <div data-hero-cta>
                 <Button
                   variant="secondary"
-                  className="w-full min-h-[56px] px-8 text-lg sm:w-auto"
+                  className="w-full min-h-[48px] px-7 text-base sm:w-auto md:min-h-[52px]"
                   aria-label="Go to contact form"
                   onClick={() => scrollToId("contact")}
                 >
@@ -194,15 +195,16 @@ export function Hero() {
             </div>
 
             <SocialMagneticIcons
-              className="mt-8"
+              className="mt-7"
               size="md"
               itemAttr="data-hero-social"
             />
           </div>
 
+          {/* Right — equal column, full-width avatar */}
           <div
             data-hero-avatar
-            className="order-1 mx-auto w-full max-w-[300px] lg:order-2 lg:mx-0 lg:max-w-[340px] xl:max-w-[360px]"
+            className="order-1 mx-auto w-full max-w-[320px] sm:max-w-[380px] lg:order-2 lg:mx-0 lg:max-w-none"
           >
             <HeroAvatar />
           </div>
@@ -212,12 +214,11 @@ export function Hero() {
       <button
         ref={scrollRef}
         type="button"
-        className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 items-center gap-2 text-xs tracking-[0.18em] text-text-tertiary uppercase md:inline-flex"
+        className="absolute bottom-4 left-1/2 hidden -translate-x-1/2 items-center justify-center text-text-tertiary md:inline-flex"
         onClick={() => scrollToId("about")}
         aria-label="Scroll to about section"
       >
-        Scroll down
-        <span data-scroll-arrow aria-hidden>
+        <span data-scroll-arrow aria-hidden className="text-lg">
           ↓
         </span>
       </button>

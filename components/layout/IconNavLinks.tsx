@@ -84,7 +84,7 @@ export function IconNavLinks({
 
         return (
           <li key={item.id}>
-            {reduced ? link : <Magnetic strength={0.35}>{link}</Magnetic>}
+            {reduced ? link : <Magnetic strength={0.45}>{link}</Magnetic>}
           </li>
         );
       })}

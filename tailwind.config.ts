@@ -164,6 +164,21 @@ const config = {
           "0%": { transform: "translateY(-120%)" },
           "100%": { transform: "translateY(220%)" },
         },
+        "wa-wiggle": {
+          "0%, 100%": { transform: "rotate(0deg) scale(1)" },
+          "20%": { transform: "rotate(-14deg) scale(1.08)" },
+          "40%": { transform: "rotate(12deg) scale(1.08)" },
+          "60%": { transform: "rotate(-8deg) scale(1.05)" },
+          "80%": { transform: "rotate(6deg) scale(1.05)" },
+        },
+        "wa-ping": {
+          "0%": { transform: "scale(1)", opacity: "0.45" },
+          "100%": { transform: "scale(1.85)", opacity: "0" },
+        },
+        "wa-ring": {
+          "0%": { transform: "scale(1)", borderColor: "rgba(37,211,102,0.55)" },
+          "100%": { transform: "scale(1.55)", borderColor: "rgba(37,211,102,0)" },
+        },
       },
       animation: {
         "loader-progress":
@@ -173,6 +188,9 @@ const config = {
         "avatar-hand-wave": "avatar-hand-wave 2.4s ease-in-out infinite",
         "avatar-glow-pulse": "avatar-glow-pulse 3.2s ease-in-out infinite",
         "avatar-scan": "avatar-scan 4.5s linear infinite",
+        "wa-wiggle": "wa-wiggle 0.7s ease-in-out infinite",
+        "wa-ping": "wa-ping 0.9s cubic-bezier(0, 0, 0.2, 1) infinite",
+        "wa-ring": "wa-ring 0.9s cubic-bezier(0, 0, 0.2, 1) infinite",
       },
     },
   },

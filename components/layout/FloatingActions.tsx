@@ -5,8 +5,10 @@ import { useLenis } from "lenis/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUp } from "lucide-react";
 import { TextLink } from "@/components/ui";
+import { Magnetic } from "@/components/motion/Magnetic";
 import { site } from "@/lib/content";
 import { scrollToTop } from "@/lib/scroll";
+import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
 
 function WhatsAppIcon({ size = 18 }: { size?: number }) {
@@ -17,9 +19,10 @@ function WhatsAppIcon({ size = 18 }: { size?: number }) {
   );
 }
 
-const SIZE = 42;
-const STROKE = 2.5;
-const R = (SIZE - STROKE) / 2;
+/** Match WhatsApp FAB size */
+const BTN = 44;
+const STROKE = 2.25;
+const R = (BTN - STROKE) / 2;
 const C = 2 * Math.PI * R;
 
 function updateScrollMetrics(
@@ -31,7 +34,7 @@ function updateScrollMetrics(
   const max = doc.scrollHeight - window.innerHeight;
   const value = max > 0 ? Math.min(1, Math.max(0, scrollY / max)) : 0;
   setProgress(value);
-  setShowTop(scrollY > 480);
+  setShowTop(scrollY > Math.max(640, window.innerHeight * 0.85));
 }
 
 export function FloatingActions() {
@@ -81,72 +84,134 @@ export function FloatingActions() {
 
   return (
     <motion.div
-      className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-2 md:right-5 md:bottom-5"
-      initial={reduced ? false : { opacity: 0, y: 16 }}
+      className="fixed right-4 bottom-4 z-50 flex flex-col items-end gap-2.5 md:right-5 md:bottom-5"
+      initial={reduced ? false : { opacity: 0, y: 20 }}
       animate={
-        ready || reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 16 }
+        ready || reduced ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }
       }
       transition={{ duration: 0.55, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
     >
-      {/* Only mounts when needed — no empty reserved space on first view */}
       <AnimatePresence>
         {showTop ? (
-          <motion.button
+          <motion.div
             key="scroll-top"
-            type="button"
-            onClick={scrollToTop}
-            aria-label="Back to top"
-            data-cursor="hover"
-            initial={reduced ? false : { opacity: 0, scale: 0.8, y: 8 }}
+            initial={reduced ? false : { opacity: 0, scale: 0.8, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={reduced ? undefined : { opacity: 0, scale: 0.8, y: 8 }}
+            exit={reduced ? undefined : { opacity: 0, scale: 0.8, y: 10 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="relative inline-flex size-[42px] items-center justify-center rounded-full border border-border-muted bg-surface-base/90 text-text-primary shadow-soft backdrop-blur-md transition-colors duration-fast hover:border-accent-cyan/40 hover:bg-surface-raised"
           >
-            <svg
-              className="pointer-events-none absolute inset-0 -rotate-90"
-              width={SIZE}
-              height={SIZE}
-              viewBox={`0 0 ${SIZE} ${SIZE}`}
-              aria-hidden
-            >
-              <circle
-                cx={SIZE / 2}
-                cy={SIZE / 2}
-                r={R}
-                fill="none"
-                stroke="color-mix(in srgb, #ffffff 12%, transparent)"
-                strokeWidth={STROKE}
-              />
-              <circle
-                cx={SIZE / 2}
-                cy={SIZE / 2}
-                r={R}
-                fill="none"
-                stroke="#7dd3fc"
-                strokeWidth={STROKE}
-                strokeLinecap="round"
-                strokeDasharray={C}
-                strokeDashoffset={reduced ? 0 : C * (1 - progress)}
-                className="transition-[stroke-dashoffset] duration-150 ease-out"
-              />
-            </svg>
-            <ArrowUp size={15} aria-hidden className="relative z-10" />
-          </motion.button>
+            <Magnetic strength={0.5}>
+              <button
+                type="button"
+                onClick={scrollToTop}
+                aria-label="Back to top"
+                data-cursor="hover"
+                className={cn(
+                  "group/top relative inline-flex h-11 items-center overflow-hidden rounded-full border border-white/15 bg-surface-base/90 text-text-primary shadow-soft backdrop-blur-md",
+                  "transition-[padding,box-shadow,border-color] duration-normal ease-[cubic-bezier(0.22,1,0.36,1)]",
+                  "pl-0 pr-0 hover:border-accent-cyan/40 hover:pr-3.5 hover:pl-1",
+                  "hover:shadow-[0_0_0_4px_rgba(125,211,252,0.12),0_8px_22px_rgba(0,0,0,0.35)]",
+                )}
+              >
+                <span className="relative z-10 inline-flex size-11 shrink-0 items-center justify-center">
+                  {/* Scroll progress ring */}
+                  <svg
+                    className="pointer-events-none absolute inset-0 -rotate-90"
+                    width={BTN}
+                    height={BTN}
+                    viewBox={`0 0 ${BTN} ${BTN}`}
+                    aria-hidden
+                  >
+                    <circle
+                      cx={BTN / 2}
+                      cy={BTN / 2}
+                      r={R}
+                      fill="none"
+                      stroke="color-mix(in srgb, #ffffff 12%, transparent)"
+                      strokeWidth={STROKE}
+                    />
+                    <circle
+                      cx={BTN / 2}
+                      cy={BTN / 2}
+                      r={R}
+                      fill="none"
+                      stroke="#7dd3fc"
+                      strokeWidth={STROKE}
+                      strokeLinecap="round"
+                      strokeDasharray={C}
+                      strokeDashoffset={reduced ? 0 : C * (1 - progress)}
+                      className="transition-[stroke-dashoffset] duration-150 ease-out"
+                    />
+                  </svg>
+                  <ArrowUp
+                    size={15}
+                    aria-hidden
+                    className={cn(
+                      "relative z-10",
+                      !reduced && "transition-transform duration-fast group-hover/top:-translate-y-0.5",
+                    )}
+                  />
+                </span>
+
+                <span
+                  className={cn(
+                    "relative z-10 max-w-0 overflow-hidden whitespace-nowrap text-[11px] font-semibold tracking-[0.16em] text-accent-cyan uppercase opacity-0",
+                    "transition-[max-width,opacity,margin] duration-normal ease-[cubic-bezier(0.22,1,0.36,1)]",
+                    "group-hover/top:ml-0.5 group-hover/top:max-w-[5rem] group-hover/top:opacity-100",
+                  )}
+                >
+                  Top
+                </span>
+              </button>
+            </Magnetic>
+          </motion.div>
         ) : null}
       </AnimatePresence>
 
       {whatsapp ? (
-        <TextLink
-          href={whatsapp}
-          external
-          variant="muted"
-          data-cursor="hover"
-          className="inline-flex size-[42px] items-center justify-center rounded-full bg-[#25D366] text-white no-underline shadow-soft transition-transform duration-fast hover:scale-105 active:scale-95"
-          aria-label="Chat on WhatsApp"
-        >
-          <WhatsAppIcon size={18} />
-        </TextLink>
+        <Magnetic strength={0.5}>
+          <TextLink
+            href={whatsapp}
+            external
+            variant="muted"
+            data-cursor="hover"
+            aria-label="Chat on WhatsApp"
+            className={cn(
+              "group/wa relative inline-flex h-11 items-center overflow-hidden rounded-full bg-[#25D366] text-white no-underline shadow-soft",
+              "transition-[padding,box-shadow,background-color,width] duration-normal ease-[cubic-bezier(0.22,1,0.36,1)]",
+              "pl-0 pr-0 hover:bg-[#1ebe57] hover:pr-3.5 hover:pl-1.5",
+              "hover:shadow-[0_0_0_4px_rgba(37,211,102,0.18),0_8px_22px_rgba(37,211,102,0.3)]",
+            )}
+          >
+            {!reduced ? (
+              <span
+                className="pointer-events-none absolute inset-0 rounded-full opacity-0 group-hover/wa:animate-wa-ping"
+                aria-hidden
+              />
+            ) : null}
+
+            <span className="relative z-10 inline-flex size-11 shrink-0 items-center justify-center">
+              <span
+                className={cn(
+                  "inline-flex",
+                  !reduced && "group-hover/wa:animate-wa-wiggle",
+                )}
+              >
+                <WhatsAppIcon size={18} />
+              </span>
+            </span>
+
+            <span
+              className={cn(
+                "relative z-10 max-w-0 overflow-hidden whitespace-nowrap text-[11px] font-semibold tracking-[0.16em] uppercase opacity-0",
+                "transition-[max-width,opacity,margin] duration-normal ease-[cubic-bezier(0.22,1,0.36,1)]",
+                "group-hover/wa:ml-0.5 group-hover/wa:max-w-[7rem] group-hover/wa:opacity-100",
+              )}
+            >
+              WhatsApp
+            </span>
+          </TextLink>
+        </Magnetic>
       ) : null}
     </motion.div>
   );

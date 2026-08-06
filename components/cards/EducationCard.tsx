@@ -3,6 +3,7 @@ import {
   Check,
   Code2,
   Database,
+  Gauge,
   GraduationCap,
   Layers,
   Palette,
@@ -24,6 +25,7 @@ const stackIcons: Record<string, ReactNode> = {
   "Styling & Motion": <Palette size={16} aria-hidden />,
   Quality: <ShieldCheck size={16} aria-hidden />,
   Tools: <Wrench size={16} aria-hidden />,
+  "Performance & SEO": <Gauge size={16} aria-hidden />,
 };
 
 export function StackGroupCard({ title, items }: StackGroupCardProps) {

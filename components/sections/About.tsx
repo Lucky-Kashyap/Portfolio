@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import { useGSAP } from "@gsap/react";
 import { Code2, Sparkles } from "lucide-react";
 import {
@@ -138,6 +139,15 @@ export function About() {
               className="mt-8 text-xl leading-relaxed text-text-primary md:text-2xl md:leading-snug"
               shadowOpacity={0.14}
             />
+            <ScrollReveal delay={0.04} y={20}>
+              <p className="mt-8 max-w-2xl text-sm font-semibold tracking-[0.18em] text-accent-cyan uppercase md:text-base">
+                {about.headline}
+              </p>
+              <ChipGroup
+                items={[...about.highlightStack]}
+                className="mt-4 gap-2"
+              />
+            </ScrollReveal>
             <TextGradientScroll
               text={about.specialize}
               className="mt-8 text-lg leading-relaxed text-text-secondary"
@@ -182,24 +192,65 @@ export function About() {
             <StatCounters />
           </div>
 
-          <div
-            ref={imageRef}
-            className="relative mx-auto aspect-square w-40 overflow-hidden rounded-full border border-border-muted shadow-soft will-change-transform lg:mx-0 lg:w-44"
-          >
-            <Image
-              src={site.avatar}
-              alt="Divyanshu Kashyap, Frontend Engineer based in Jaipur, professional portrait photo"
-              fill
-              className="object-cover"
-              sizes="176px"
-            />
+          <div className="mx-auto flex w-full max-w-[220px] flex-col items-center gap-5 lg:mx-0 lg:max-w-[240px]">
+            <div
+              ref={imageRef}
+              className="relative aspect-square w-40 overflow-hidden rounded-full border border-border-muted shadow-soft will-change-transform lg:w-44"
+            >
+              <Image
+                src={site.avatar}
+                alt="Divyanshu Kashyap, Frontend Engineer based in Jaipur, professional portrait photo"
+                fill
+                className="object-cover"
+                sizes="176px"
+              />
+            </div>
+
+            <ScrollReveal delay={0.08} y={28} className="w-full">
+              <div className="relative overflow-hidden rounded-md border border-border-muted bg-surface-raised shadow-card">
+                <div className="relative aspect-square w-full">
+                  <Image
+                    src={site.animeAvatar}
+                    alt="Divyanshu Kashyap anime AI persona coding at a desk — Frontend Engineer illustration"
+                    fill
+                    className="object-cover object-[center_28%]"
+                    sizes="240px"
+                  />
+                  {!reduced ? (
+                    <motion.div
+                      className="pointer-events-none absolute inset-x-[18%] bottom-[6%] h-[18%] rounded-full bg-accent-cyan/10 blur-md"
+                      aria-hidden
+                      animate={{ opacity: [0.25, 0.7, 0.25], scaleX: [0.92, 1.06, 0.92] }}
+                      transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
+                    />
+                  ) : null}
+                  {!reduced ? (
+                    <motion.span
+                      className="pointer-events-none absolute bottom-3 left-3 rounded-xs border border-white/10 bg-black/55 px-2 py-1 text-[10px] font-medium tracking-[0.16em] text-accent-cyan uppercase backdrop-blur-sm"
+                      aria-hidden
+                      animate={{ opacity: [0.65, 1, 0.65] }}
+                      transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                      typing…
+                    </motion.span>
+                  ) : (
+                    <span className="absolute bottom-3 left-3 rounded-xs border border-white/10 bg-black/55 px-2 py-1 text-[10px] font-medium tracking-[0.16em] text-accent-cyan uppercase backdrop-blur-sm">
+                      AI persona
+                    </span>
+                  )}
+                </div>
+                <p className="border-t border-border-muted px-3 py-2 text-center text-[11px] tracking-[0.14em] text-text-tertiary uppercase">
+                  Anime AI avatar
+                </p>
+              </div>
+            </ScrollReveal>
           </div>
         </div>
 
-        <div className="mt-[clamp(2.75rem,5vw,4.5rem)] grid gap-8 md:grid-cols-2 md:gap-10 xl:grid-cols-3">
-          <ScrollReveal className="md:col-span-2 xl:col-span-1 xl:row-span-2" y={48}>
+        <div className="mt-[clamp(2.75rem,5vw,4.5rem)] grid gap-6 md:grid-cols-2 md:gap-8 xl:grid-cols-3">
+          <ScrollReveal y={36}>
             <InfoListCard
-              className="mt-0"
+              className="mt-0 h-full"
               eyebrow="Key Areas of Expertise"
               title="What I deliver end to end"
               icon={<Code2 size={20} aria-hidden />}
@@ -207,17 +258,17 @@ export function About() {
             />
           </ScrollReveal>
 
-          <ScrollReveal delay={0.05} x={-24} y={32}>
+          <ScrollReveal delay={0.05} y={36}>
             <InfoListCard
-              className="mt-0"
+              className="mt-0 h-full"
               eyebrow="Currently Expanding"
-              title="Growing toward end-to-end solutions"
+              title="Learning phase — not production claims"
               icon={<Sparkles size={20} aria-hidden />}
               items={about.learning}
             />
           </ScrollReveal>
 
-          <ScrollReveal delay={0.1} x={24} y={32}>
+          <ScrollReveal delay={0.1} y={36} className="md:col-span-2 xl:col-span-1">
             <div className="flex h-full flex-col gap-6 rounded-sm border border-border-muted bg-surface-raised p-6 shadow-card md:p-8">
               <div>
                 <Eyebrow className="mb-0 tracking-[0.14em]">Top Skills</Eyebrow>
@@ -232,7 +283,7 @@ export function About() {
             </div>
           </ScrollReveal>
 
-          <ScrollReveal delay={0.08} className="md:col-span-2" y={40}>
+          <ScrollReveal delay={0.08} className="md:col-span-2 xl:col-span-3" y={40}>
             <div className="rounded-sm border border-border-muted bg-surface-raised p-6 shadow-card md:p-8">
               <Eyebrow className="mb-0 tracking-[0.14em]">Technologies</Eyebrow>
               <Text tone="muted" size="sm" className="mt-4 max-w-3xl leading-relaxed">
@@ -243,8 +294,7 @@ export function About() {
                   <ScrollReveal
                     key={group}
                     delay={0.04 * index}
-                    y={28}
-                    x={index % 2 === 0 ? -16 : 16}
+                    y={24}
                   >
                     <StackGroupCard title={group} items={items} />
                   </ScrollReveal>

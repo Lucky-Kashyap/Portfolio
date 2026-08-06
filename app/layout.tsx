@@ -42,6 +42,12 @@ export const metadata: Metadata = {
         height: 630,
         alt: "Divyanshu Kashyap Frontend Engineer portfolio — React.js, Next.js, and TypeScript projects",
       },
+      {
+        url: seo.profileImage,
+        width: 800,
+        height: 800,
+        alt: "Divyanshu Kashyap — Frontend Engineer based in Jaipur",
+      },
     ],
   },
   twitter: {
@@ -77,7 +83,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: seo.themeColor,
   colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
