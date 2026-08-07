@@ -33,6 +33,12 @@ export const metadata: Metadata = {
   category: "technology",
   alternates: {
     canonical: "/",
+    types: {
+      "text/plain": [
+        { url: "/llms.txt", title: "llms.txt" },
+        { url: "/llms-full.txt", title: "llms-full.txt" },
+      ],
+    },
   },
   openGraph: {
     type: "website",
@@ -72,6 +78,10 @@ export const metadata: Metadata = {
       "max-snippet": -1,
       "max-video-preview": -1,
     },
+  },
+  other: {
+    "ai-llms": `${siteUrl}/llms.txt`,
+    "ai-llms-full": `${siteUrl}/llms-full.txt`,
   },
   icons: {
     icon: [

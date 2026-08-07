@@ -5,22 +5,34 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { site } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
+/** About-me status beats — longer loader so each line can land clearly */
 const STATUS_LINES = [
-  "INITIALIZING SYSTEM...",
-  "BOOTSTRAPPING REACT RUNTIME...",
-  "HYDRATING NEXT.JS ROUTES...",
-  "OPTIMIZING WEBGL SCENE...",
-  "COMPILING SHADER PASSES...",
-  "SYNCING GSAP SCROLL TRIGGERS...",
-  "LOADING PROJECT ASSETS...",
-  "CALIBRATING UI MOTION...",
-  "PORTFOLIO READY",
+  "READYING SYSTEMS…",
+  `MEET ${site.brand.toUpperCase()}`,
+  "FRONTEND ENGINEER · JAIPUR",
+  "REACT · NEXT.JS · TYPESCRIPT",
+  "SCALABLE UI · API · PERFORMANCE",
+  "SHIPPING CREATIVE EXPERIENCES",
+  "LOADING PROJECT ASSETS…",
+  "CALIBRATING MOTION & WEBGL…",
+  "FINALIZING INTERFACE…",
+  "CREATIVE EXPERIENCES — READY",
 ] as const;
 
-/** Smooth climb — digits stay in motion; short settle then exit */
-const LOAD_MS = 4800;
-const HOLD_AT_100_MS = 280;
-const EXIT_MS = 900;
+/** Bottom bar phase labels (appealing progress copy) */
+const PHASE_LABELS = [
+  { until: 0.18, label: "Readying" },
+  { until: 0.38, label: "Loading assets" },
+  { until: 0.58, label: "Creative Experiences" },
+  { until: 0.78, label: "Syncing portfolio" },
+  { until: 0.92, label: "Finalizing" },
+  { until: 1.01, label: "Almost there" },
+] as const;
+
+/** Longer climb — more time to read about-me lines */
+const LOAD_MS = 7800;
+const HOLD_AT_100_MS = 520;
+const EXIT_MS = 950;
 
 const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"] as const;
 
@@ -33,6 +45,15 @@ function brandInitials(name: string) {
   if (parts.length === 0) return "DK";
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+}
+
+type PhaseLabel = (typeof PHASE_LABELS)[number]["label"];
+
+function phaseLabelFor(t: number): PhaseLabel {
+  for (const phase of PHASE_LABELS) {
+    if (t < phase.until) return phase.label;
+  }
+  return PHASE_LABELS[PHASE_LABELS.length - 1].label;
 }
 
 /** Soft ease — never snaps early to 100 */
@@ -100,7 +121,6 @@ function RollingPercent({ value }: { value: number }) {
       aria-hidden
     >
       <span className="flex font-bold tracking-tighter">
-        {/* Keep 3 columns always so layout doesn't jump; fade leading zero feel via opacity */}
         <span className={cn(hundreds === 0 && clamped < 100 && "opacity-25")}>
           <RollingDigit value={hundreds} />
         </span>
@@ -124,6 +144,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
   );
   const [progress, setProgress] = useState(0);
   const [statusIndex, setStatusIndex] = useState(0);
+  const [phaseLabel, setPhaseLabel] = useState<PhaseLabel>(PHASE_LABELS[0].label);
   const year = useMemo(() => new Date().getFullYear(), []);
   const initials = useMemo(() => brandInitials(site.brand), []);
   const completedRef = useRef(false);
@@ -144,8 +165,8 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
     const tick = (now: number) => {
       const t = Math.min(1, (now - started) / LOAD_MS);
       const eased = easeOutQuart(t);
-      // Keep progress moving — never freeze mid-way; approach 100 smoothly
       setProgress(eased * 100);
+      setPhaseLabel(phaseLabelFor(t));
 
       setStatusIndex(
         Math.min(
@@ -158,6 +179,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
         frame = requestAnimationFrame(tick);
       } else {
         setProgress(100);
+        setPhaseLabel("Creative Experiences");
         setStatusIndex(STATUS_LINES.length - 1);
         if (!completedRef.current) {
           completedRef.current = true;
@@ -205,7 +227,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
       role="status"
       aria-live="polite"
       aria-busy="true"
-      aria-label={`Loading portfolio ${pctLabel} percent`}
+      aria-label={`Loading portfolio ${pctLabel} percent. ${STATUS_LINES[statusIndex]}`}
       initial={{ opacity: 1 }}
       animate={
         phase === "exiting"
@@ -242,7 +264,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
           {initials}
         </motion.p>
         <motion.p
-          className="text-[10px] font-medium tracking-[0.22em] text-text-secondary uppercase md:text-xs"
+          className="text-xs font-medium tracking-[0.18em] text-white/70 uppercase md:text-sm"
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.05 }}
@@ -255,7 +277,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
         className="pointer-events-none absolute left-1/2 top-[40%] z-0 w-[140%] -translate-x-1/2 -translate-y-1/2 select-none text-center text-[clamp(3rem,16vw,11rem)] font-bold tracking-tighter text-text-primary/[0.05] uppercase"
         aria-hidden
       >
-        {site.heroHeadline}
+        Creative Experiences
       </p>
 
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-6">
@@ -267,44 +289,67 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
           <RollingPercent value={progress} />
         </motion.div>
 
-        <div className="mt-8 flex min-h-[1.75rem] max-w-xl items-center justify-center gap-2.5 sm:mt-10">
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={STATUS_LINES[statusIndex]}
-              initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="text-center text-[11px] font-semibold tracking-[0.26em] text-text-primary uppercase md:text-xs"
-            >
-              {STATUS_LINES[statusIndex]}
-            </motion.p>
-          </AnimatePresence>
-          <motion.span
-            className="inline-block size-2 shrink-0 bg-accent-cyan"
-            aria-hidden
-            animate={{ opacity: [1, 0.2, 1] }}
-            transition={{ duration: 0.75, repeat: Infinity, ease: "easeInOut" }}
-          />
+        <div className="mt-8 flex min-h-[2rem] max-w-2xl flex-col items-center justify-center gap-3 sm:mt-10">
+          <div className="flex items-center justify-center gap-2.5">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={STATUS_LINES[statusIndex]}
+                initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className="text-center text-sm font-semibold tracking-[0.18em] text-white uppercase sm:text-base md:text-lg md:tracking-[0.2em]"
+              >
+                {STATUS_LINES[statusIndex]}
+              </motion.p>
+            </AnimatePresence>
+            <motion.span
+              className="inline-block size-2 shrink-0 bg-accent-cyan shadow-[0_0_10px_rgba(125,211,252,0.8)]"
+              aria-hidden
+              animate={{ opacity: [1, 0.25, 1] }}
+              transition={{
+                duration: 0.75,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          </div>
+          <p className="max-w-md text-center text-xs leading-relaxed text-white/65 sm:text-sm">
+            Building scalable, responsive experiences with React, Next.js, and
+            TypeScript — based in Jaipur.
+          </p>
         </div>
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 z-20 px-5 pb-8 md:px-10 md:pb-10">
-        <div className="relative h-px w-full bg-white/10">
+      <div className="absolute inset-x-0 bottom-0 z-20 px-5 pb-9 md:px-10 md:pb-11">
+        <div className="relative h-[2px] w-full rounded-full bg-white/15">
           <motion.div
-            className="absolute inset-y-0 left-0 bg-accent-cyan"
+            className="absolute inset-y-0 left-0 rounded-full bg-accent-cyan"
             style={{ width: barWidth }}
             aria-hidden
           />
           <motion.div
-            className="absolute top-1/2 size-2 -translate-y-1/2 rounded-full bg-white shadow-[0_0_18px_5px_rgba(125,211,252,0.9)]"
-            style={{ left: barWidth, marginLeft: "-4px" }}
+            className="absolute top-1/2 size-2.5 -translate-y-1/2 rounded-full bg-white shadow-[0_0_18px_5px_rgba(125,211,252,0.9)]"
+            style={{ left: barWidth, marginLeft: "-5px" }}
             aria-hidden
           />
         </div>
-        <div className="mt-4 flex items-center justify-between text-[10px] font-medium tracking-[0.2em] text-text-secondary uppercase md:text-xs">
-          <span>Loading assets</span>
-          <span className="tabular-nums text-text-primary">{pctLabel}%</span>
+        <div className="mt-4 flex items-center justify-between gap-4">
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={phaseLabel}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.28 }}
+              className="text-xs font-semibold tracking-[0.16em] text-white uppercase sm:text-sm md:tracking-[0.2em]"
+            >
+              {phaseLabel}
+            </motion.span>
+          </AnimatePresence>
+          <span className="text-xs font-semibold tracking-[0.16em] text-accent-cyan tabular-nums uppercase sm:text-sm">
+            {pctLabel}%
+          </span>
         </div>
       </div>
     </motion.div>

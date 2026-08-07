@@ -6,48 +6,24 @@ export const dynamic = "force-static";
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
 
-  return [
-    {
-      url: siteUrl,
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 1,
-    },
-    {
-      url: `${siteUrl}/#about`,
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/#experience`,
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${siteUrl}/#certifications`,
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${siteUrl}/#faq`,
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${siteUrl}/#projects`,
-      lastModified,
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${siteUrl}/#contact`,
-      lastModified,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
+  const sections: { path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[0]["changeFrequency"] }[] = [
+    { path: "", priority: 1, changeFrequency: "weekly" },
+    { path: "/#about", priority: 0.9, changeFrequency: "monthly" },
+    { path: "/#experience", priority: 0.85, changeFrequency: "monthly" },
+    { path: "/#skills", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/#certifications", priority: 0.75, changeFrequency: "monthly" },
+    { path: "/#services", priority: 0.85, changeFrequency: "monthly" },
+    { path: "/#projects", priority: 0.9, changeFrequency: "weekly" },
+    { path: "/#faq", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/#contact", priority: 0.85, changeFrequency: "monthly" },
+    { path: "/llms.txt", priority: 0.6, changeFrequency: "monthly" },
+    { path: "/llms-full.txt", priority: 0.7, changeFrequency: "weekly" },
   ];
+
+  return sections.map(({ path, priority, changeFrequency }) => ({
+    url: `${siteUrl}${path}`,
+    lastModified,
+    changeFrequency,
+    priority,
+  }));
 }

@@ -133,42 +133,41 @@ export function Faq() {
       />
 
       <Container className="relative z-10">
-        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.28fr)] lg:gap-8 xl:gap-10">
-          <ScrollReveal className="lg:sticky lg:top-28">
-            <Eyebrow className="mb-3">FAQ</Eyebrow>
-            <ScrollWords
-              id="faq-heading"
-              as={2}
-              text="Ask before you ping"
-              className="mt-2 text-[clamp(1.35rem,5.5vw,2.5rem)]"
-            />
-            <Text
-              tone="muted"
-              className="mt-3 max-w-sm text-sm leading-relaxed sm:text-base"
+        <ScrollReveal>
+          <Eyebrow className="mb-2">FAQ</Eyebrow>
+          <ScrollWords
+            id="faq-heading"
+            as={2}
+            text="Ask before you ping"
+            className="mt-1.5 text-[clamp(1.35rem,5.5vw,2.5rem)]"
+          />
+          <Text
+            tone="muted"
+            className="mt-2.5 max-w-xl text-sm leading-relaxed sm:text-base"
+          >
+            Stack, experience, availability — tap a question. Still stuck? Jump
+            to contact.
+          </Text>
+          <div className="mt-4 flex flex-wrap items-center gap-2.5 sm:gap-3">
+            <Button
+              variant="primary"
+              size="md"
+              onClick={() => scrollToId("contact")}
             >
-              Stack, experience, availability — tap a question. Still stuck?
-              Jump to contact.
-            </Text>
-            <div className="mt-5 flex flex-wrap gap-2 sm:gap-3">
-              <Button
-                variant="secondary"
-                className="min-h-10 px-4 text-sm sm:min-h-11 sm:px-5"
-                onClick={() => scrollToId("contact")}
-              >
-                Contact me
-              </Button>
-              <Button
-                variant="ghost"
-                className="min-h-10 px-4 text-sm sm:min-h-11 sm:px-5"
-                onClick={() => scrollToId("services")}
-              >
-                View services
-              </Button>
-            </div>
-          </ScrollReveal>
+              Contact me
+            </Button>
+            <Button
+              variant="ghost"
+              size="md"
+              onClick={() => scrollToId("services")}
+            >
+              View services
+            </Button>
+          </div>
+        </ScrollReveal>
 
-          <ScrollReveal delay={0.06} y={28}>
-            <ul className="flex list-none flex-col gap-2 p-0 sm:gap-3">
+        <ScrollReveal delay={0.06} y={28} className="mt-6 md:mt-8">
+          <ul className="mx-auto flex list-none flex-col gap-2 p-0 sm:gap-3">
               {faqs.map((item, index) => {
                 const isOpen = openIndex === index;
                 const panelId = `${baseId}-panel-${index}`;
@@ -262,9 +261,8 @@ export function Faq() {
                   </li>
                 );
               })}
-            </ul>
-          </ScrollReveal>
-        </div>
+          </ul>
+        </ScrollReveal>
       </Container>
     </section>
   );

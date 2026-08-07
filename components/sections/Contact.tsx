@@ -161,9 +161,9 @@ export function Contact() {
           </Text>
         </ScrollReveal>
 
-        {/* Equal-height columns — no sticky void under the form */}
-        <div className="mt-10 grid items-stretch gap-6 lg:mt-12 lg:grid-cols-2 lg:gap-8">
-          <ScrollReveal className="flex h-full min-h-0 flex-col gap-4">
+        {/* Contact channels + form — stretch so bottoms align on desktop */}
+        <div className="mt-8 grid gap-6 lg:mt-10 lg:grid-cols-2 lg:items-stretch lg:gap-8">
+          <ScrollReveal className="flex h-full flex-col gap-4">
             <div className="relative overflow-hidden rounded-md border border-border-muted bg-surface-raised">
               <div className="relative aspect-[2/1] w-full sm:aspect-[21/9]">
                 <Image
@@ -233,20 +233,22 @@ export function Contact() {
                 />
               ) : null}
               {site.leetcode ? (
-                <ContactChannel
-                  label="LeetCode"
-                  href={site.leetcode}
-                  value={`@${site.leetcodeUser}`}
-                  icon={<Code2 size={15} aria-hidden />}
-                  external
-                />
+                <div className="sm:col-span-2">
+                  <ContactChannel
+                    label="LeetCode"
+                    href={site.leetcode}
+                    value={`@${site.leetcodeUser}`}
+                    icon={<Code2 size={15} aria-hidden />}
+                    external
+                  />
+                </div>
               ) : null}
             </div>
           </ScrollReveal>
 
           <ScrollReveal delay={0.06} className="flex h-full min-h-0">
             <div className="flex h-full w-full flex-col rounded-md border border-border-muted bg-surface-raised p-5 shadow-soft md:p-6">
-              <div className="mb-5">
+              <div className="mb-5 shrink-0">
                 <p className="text-[11px] font-semibold tracking-[0.16em] text-accent-cyan uppercase">
                   Send a message
                 </p>
@@ -262,9 +264,9 @@ export function Contact() {
                 onSubmit={onSubmit}
                 noValidate
                 aria-describedby={error ? `${formId}-error` : undefined}
-                className="flex flex-1 flex-col gap-4"
+                className="flex min-h-0 flex-1 flex-col gap-4"
               >
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid shrink-0 gap-4 sm:grid-cols-2">
                   <div>
                     <Field id={`${formId}-name`} label="Name">
                       <Input
@@ -299,26 +301,24 @@ export function Contact() {
                   </div>
                 </div>
 
-                <div className="flex min-h-0 flex-1 flex-col">
-                  <Field
+                <Field
+                  id={`${formId}-message`}
+                  label="Message"
+                  className="flex min-h-0 flex-1 flex-col [&_textarea]:min-h-[120px] [&_textarea]:flex-1 lg:[&_textarea]:min-h-[180px]"
+                >
+                  <Textarea
                     id={`${formId}-message`}
-                    label="Message"
-                    className="flex h-full flex-col"
-                  >
-                    <Textarea
-                      id={`${formId}-message`}
-                      name="message"
-                      rows={5}
-                      placeholder="What are you building? Timeline, goals, or how I can help…"
-                      required
-                      invalid={invalid.message}
-                      className="min-h-[140px] flex-1 lg:min-h-[180px]"
-                      onChange={() =>
-                        setInvalid((prev) => ({ ...prev, message: false }))
-                      }
-                    />
-                  </Field>
-                </div>
+                    name="message"
+                    rows={5}
+                    placeholder="What are you building? Timeline, goals, or how I can help…"
+                    required
+                    invalid={invalid.message}
+                    className="resize-y"
+                    onChange={() =>
+                      setInvalid((prev) => ({ ...prev, message: false }))
+                    }
+                  />
+                </Field>
 
                 <div className="mt-auto space-y-3 pt-1">
                   {error ? (
@@ -344,14 +344,15 @@ export function Contact() {
                     </p>
                   ) : null}
 
-                  <div>
+                  <div className="flex justify-center pt-1">
                     <Button
                       type="submit"
-                      className="w-full min-h-11"
+                      size="lg"
+                      className="min-w-[200px] sm:min-w-[220px]"
                       loading={status === "loading"}
                     >
                       Send Message
-                      <ArrowUpRight size={16} aria-hidden />
+                      <ArrowUpRight size={15} aria-hidden />
                     </Button>
                   </div>
                 </div>

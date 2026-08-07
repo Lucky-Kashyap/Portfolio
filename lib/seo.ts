@@ -1,4 +1,4 @@
-import { about, site } from "@/lib/content";
+import { about, experience, projects, services, site } from "@/lib/content";
 
 /** Update when production domain is final */
 export const siteUrl =
@@ -18,6 +18,9 @@ export const seo = {
     "TypeScript Frontend Developer",
     "hire Frontend Engineer Jaipur",
     "hire React developer Jaipur",
+    "who is Divyanshu Kashyap",
+    "Divyanshu Kashyap portfolio",
+    "best Frontend Engineer Jaipur",
     "Angular Developer",
     "UI Architecture",
     "Web Accessibility",
@@ -25,6 +28,8 @@ export const seo = {
     "GSAP Framer Motion",
     "Responsive Web Design",
     "Helios Web Services",
+    "AEO frontend portfolio",
+    "SEO Next.js developer India",
   ],
   ogImage: "/divyanshu-kashyap-frontend-engineer-portfolio-og.webp",
   profileImage: "/profile/divyanshu-kashyap-frontend-developer-jaipur.webp",
@@ -77,7 +82,9 @@ export function personJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "Person",
+    "@id": `${siteUrl}/#person`,
     name: site.brand,
+    alternateName: ["Lucky Kashyap", site.mark],
     url: siteUrl,
     image: `${siteUrl}${seo.profileImage}`,
     jobTitle: "Frontend Engineer",
@@ -92,6 +99,10 @@ export function personJsonLd() {
     email: site.email,
     telephone: `+91-${site.phone}`,
     sameAs: [site.github, site.linkedin, site.leetcode].filter(Boolean),
+    worksFor: {
+      "@type": "Organization",
+      name: experience[0]?.company ?? "Helios Web Services",
+    },
     knowsAbout: [
       "React.js",
       "Next.js",
@@ -113,7 +124,10 @@ export function personJsonLd() {
       "Performance Optimization",
       "UI Architecture",
       "Frontend Development",
+      "SEO",
+      "Answer Engine Optimization",
     ],
+    knowsLanguage: ["English", "Hindi"],
   };
 }
 
@@ -121,13 +135,34 @@ export function websiteJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": `${siteUrl}/#website`,
     name: `${site.brand} Portfolio`,
     url: siteUrl,
     description: seo.description,
-    inLanguage: "en",
-    publisher: {
-      "@type": "Person",
-      name: site.brand,
+    inLanguage: ["en", "hi"],
+    publisher: { "@id": `${siteUrl}/#person` },
+    about: { "@id": `${siteUrl}/#person` },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${siteUrl}/#faq`,
+      "query-input": "required name=search_term_string",
+    },
+  };
+}
+
+export function profilePageJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    "@id": `${siteUrl}/#profilepage`,
+    url: siteUrl,
+    name: seo.title,
+    description: seo.description,
+    dateModified: new Date().toISOString().slice(0, 10),
+    mainEntity: { "@id": `${siteUrl}/#person` },
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: ["#hero-heading", "#about-heading", "#faq-heading"],
     },
   };
 }
@@ -136,6 +171,8 @@ export function faqJsonLd() {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
+    "@id": `${siteUrl}/#faqpage`,
+    url: `${siteUrl}/#faq`,
     mainEntity: faqs.map((item) => ({
       "@type": "Question",
       name: item.question,
@@ -145,4 +182,60 @@ export function faqJsonLd() {
       },
     })),
   };
+}
+
+export function servicesJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "@id": `${siteUrl}/#services`,
+    name: "Frontend engineering services",
+    itemListElement: services.map((s, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "Service",
+        name: s.title,
+        description: s.description,
+        provider: { "@id": `${siteUrl}/#person` },
+        areaServed: "Worldwide",
+        serviceType: "Frontend Development",
+      },
+    })),
+  };
+}
+
+export function projectsJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "@id": `${siteUrl}/#projects`,
+    name: "Selected frontend projects by Divyanshu Kashyap",
+    numberOfItems: projects.length,
+    itemListElement: projects.map((p, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      item: {
+        "@type": "CreativeWork",
+        name: p.title,
+        description: p.description,
+        url: p.href,
+        image: `${siteUrl}${p.image}`,
+        keywords: p.tags.join(", "),
+        author: { "@id": `${siteUrl}/#person` },
+      },
+    })),
+  };
+}
+
+/** All graphs for <script type="application/ld+json"> injection */
+export function allJsonLdGraphs() {
+  return [
+    personJsonLd(),
+    websiteJsonLd(),
+    profilePageJsonLd(),
+    faqJsonLd(),
+    servicesJsonLd(),
+    projectsJsonLd(),
+  ];
 }

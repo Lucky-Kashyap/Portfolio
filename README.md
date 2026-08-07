@@ -115,17 +115,10 @@ Muted autoplay avatar video in Hero → About; tap to unmute for narration. Post
 </table>
 
 <details>
-<summary><strong>More project shots — Angular Mini E-commerce</strong></summary>
+<summary><strong>Angular Mini E-commerce cover</strong></summary>
 
 <p align="center">
-  <img src="./public/projects/angular-ecommerce/angular-ecommerce-shopping-cart-items-hd.webp" alt="Angular e-commerce cart" width="45%" />
-  &nbsp;
-  <img src="./public/projects/angular-ecommerce/angular-ecommerce-product-detail-page-hd.webp" alt="Angular e-commerce product detail" width="45%" />
-</p>
-<p align="center">
-  <img src="./public/projects/angular-ecommerce/angular-ecommerce-login-page-hd.webp" alt="Angular e-commerce login" width="45%" />
-  &nbsp;
-  <img src="./public/projects/angular-ecommerce/angular-ecommerce-products-category-filters.webp" alt="Angular e-commerce category filters" width="45%" />
+  <img src="./public/projects/angular-ecommerce/angular-ecommerce-products-category-filters.webp" alt="Angular e-commerce category filters" width="70%" />
 </p>
 
 </details>

@@ -96,12 +96,13 @@ export const tokens = {
     6: "16px",
     7: "20px",
     8: "24px",
-    9: "40px",
-    10: "64px",
-    11: "88px",
-    12: "120px",
-    13: "160px",
-    14: "200px",
+    /** Align with Tailwind defaults so size-10 / gap-12 / pt-14 stay sane */
+    9: "36px",
+    10: "40px",
+    11: "44px",
+    12: "48px",
+    13: "52px",
+    14: "56px",
   },
   borderRadius: {
     xs: "4px",
@@ -171,6 +172,10 @@ const config = {
           "50%": { transform: "rotate(8deg)" },
           "75%": { transform: "rotate(-7deg)" },
         },
+        "avatar-idle-float": {
+          "0%, 100%": { transform: "translate3d(0, 0, 0)" },
+          "50%": { transform: "translate3d(0, -10px, 0)" },
+        },
         "avatar-glow-pulse": {
           "0%, 100%": { opacity: "0.45" },
           "50%": { opacity: "0.85" },
@@ -201,6 +206,7 @@ const config = {
         "loader-fade-out": "loader-fade-out 0.45s ease forwards",
         "hero-name-pulse": "hero-name-pulse 2.4s ease-in-out infinite",
         "avatar-hand-wave": "avatar-hand-wave 2.4s ease-in-out infinite",
+        "avatar-idle-float": "avatar-idle-float 5.5s ease-in-out infinite",
         "avatar-glow-pulse": "avatar-glow-pulse 3.2s ease-in-out infinite",
         "avatar-scan": "avatar-scan 4.5s linear infinite",
         "wa-wiggle": "wa-wiggle 0.7s ease-in-out infinite",

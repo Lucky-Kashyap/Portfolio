@@ -75,7 +75,7 @@ export function InfoListCard({
           <span
             className={cn(
               "inline-flex shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary",
-              dense ? "size-10" : "size-[44px]",
+              dense ? "size-9" : "size-[40px]",
             )}
           >
             {icon}

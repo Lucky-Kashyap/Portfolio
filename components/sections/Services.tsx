@@ -36,7 +36,7 @@ function ServiceSlide({
 }) {
   const Icon = serviceIcons[service.id];
   return (
-    <article className="flex h-full min-h-[15rem] flex-col justify-between bg-[#0a0e14] p-5 sm:min-h-[17rem] sm:p-6">
+    <article className="flex h-full min-h-[13.5rem] flex-col justify-between bg-[#0a0e14] p-4 sm:min-h-[15rem] sm:p-5 md:p-6">
       <div>
         <div className="flex items-center justify-between gap-3">
           <span className="font-mono text-sm text-accent-cyan">
@@ -160,10 +160,26 @@ export function Services() {
           })}
         </ul>
 
-        <div className="relative min-h-[260px]">
-          <div className="sticky top-28 overflow-hidden border border-border-muted bg-surface-base p-6 md:p-7">
+        <div className="relative min-h-[240px]">
+          <div className="sticky top-28 overflow-hidden border border-border-muted bg-surface-base p-5 md:p-6">
             <div
               className="pointer-events-none absolute -right-8 -top-8 size-40 rounded-full bg-[radial-gradient(circle,rgba(125,211,252,0.18),transparent_70%)]"
+              aria-hidden
+            />
+            {/* Decorative SVG mark */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={
+                current?.id === "ui-architecture" || current?.id === "react-next"
+                  ? "/icons/ui-window.svg"
+                  : current?.id === "api"
+                    ? "/icons/stack-cube.svg"
+                    : "/icons/grid-mark.svg"
+              }
+              alt=""
+              width={56}
+              height={56}
+              className="absolute top-4 right-4 opacity-70"
               aria-hidden
             />
             <AnimatePresence mode="wait">

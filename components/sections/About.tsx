@@ -99,9 +99,9 @@ export function About() {
       aria-labelledby="about-heading"
     >
       <Container>
-        <div className="grid items-center gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.25fr)] lg:gap-10 xl:gap-12">
-          <div className="order-1 w-full min-w-0">
-            <div className="relative mx-auto w-full max-w-[240px] sm:max-w-[280px] lg:mx-0 lg:max-w-[320px]">
+        <div className="mt-6 grid items-start gap-5 lg:mt-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.15fr)] lg:items-stretch lg:gap-8 xl:gap-10">
+          <div className="order-1 flex w-full min-w-0 lg:h-auto lg:min-h-0">
+            <div className="relative w-full max-lg:mx-auto max-lg:max-w-[280px] lg:h-full lg:max-w-none">
               {reduced ? (
                 <AvatarVideoFrame
                   variant="about"
@@ -110,16 +110,17 @@ export function About() {
                   lazy
                   objectPosition={site.heroAvatarObjectPosition}
                   caption="Frontend Engineer"
+                  className="lg:min-h-full"
                 />
               ) : (
-                <AvatarSlot id="about" className="w-full max-h-[min(48svh,400px)]">
-                  <div className="aspect-[3/4] w-full" />
+                <AvatarSlot id="about" className="h-full w-full">
+                  <div className="aspect-[3/4] w-full lg:aspect-auto lg:h-full lg:min-h-[24rem]" />
                 </AvatarSlot>
               )}
             </div>
           </div>
 
-          <div className="order-2 min-w-0">
+          <div className="order-2 flex min-w-0 flex-col justify-center">
             <ScrollReveal y={28}>
               <p className="text-[11px] font-semibold tracking-[0.2em] text-text-tertiary uppercase">
                 Get to know me
@@ -176,10 +177,10 @@ export function About() {
 
         <StatCounters />
 
-        <div className="mt-8 grid items-start gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)] lg:gap-5">
-          <ScrollReveal y={28}>
+        <div className="mt-8 grid items-start gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)] lg:items-stretch lg:gap-5">
+          <ScrollReveal className="min-h-0 lg:h-full" y={28}>
             <InfoListCard
-              className="mt-0"
+              className="mt-0 flex flex-col lg:h-full"
               dense
               eyebrow="Key Areas of Expertise"
               title="What I deliver end to end"
@@ -188,12 +189,12 @@ export function About() {
             />
           </ScrollReveal>
 
-          <div className="flex flex-col gap-4">
+          <div className="flex h-full min-h-0 flex-col gap-4">
             <ScrollReveal delay={0.05} y={20}>
               <div className="rounded-sm border border-border-muted bg-surface-raised p-5 shadow-card">
                 <div className="flex items-center gap-3">
-                  <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary">
-                    <Sparkles size={18} aria-hidden />
+                  <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary">
+                    <Sparkles size={16} aria-hidden />
                   </span>
                   <div className="min-w-0">
                     <Eyebrow className="mb-0 tracking-[0.14em]">
@@ -211,13 +212,17 @@ export function About() {
               </div>
             </ScrollReveal>
 
-            <ScrollReveal delay={0.1} y={20}>
-              <div className="rounded-sm border border-border-muted bg-surface-raised p-5 shadow-card">
+            <ScrollReveal
+              delay={0.1}
+              y={20}
+              className="flex min-h-0 flex-col lg:flex-1"
+            >
+              <div className="flex min-h-0 flex-col rounded-sm border border-border-muted bg-surface-raised p-5 shadow-card lg:h-full lg:flex-1">
                 <Eyebrow className="mb-0 tracking-[0.14em]">Top Skills</Eyebrow>
                 <ChipGroup items={[...about.topSkills]} className="mt-3 gap-2" />
                 <Quote
                   cite={site.brand}
-                  className="mt-4 border-l-2 border-action-primary pl-3 text-sm leading-snug"
+                  className="mt-5 border-l-2 border-action-primary pt-4 pl-3 text-sm leading-snug lg:mt-auto"
                 >
                   {site.connect}
                 </Quote>

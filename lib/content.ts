@@ -16,6 +16,9 @@ export const site = {
   phone: "9634308605",
   phoneLabel: "Work",
   whatsapp: "https://wa.me/919634308605",
+  /** Direct download — file lives in public/pdfs */
+  resume: "/pdfs/Divyanshu_resume.pdf",
+  resumeDownloadName: "Divyanshu_resume.pdf",
   github: "https://github.com/Lucky-Kashyap",
   githubUser: "Lucky-Kashyap",
   linkedin: "https://www.linkedin.com/in/divyanshu-kashyap-b09138171/",
@@ -40,47 +43,100 @@ export const site = {
    */
   heroAvatarVideo: "/media/hero-avatar.mp4",
   heroAvatarPoster: "/media/hero-avatar-poster.jpg",
-  /** Face crop for landscape talking-head in portrait frame */
+  /** Face + upper torso crop — leave room for gesture/hand in frame */
   heroAvatarObjectPosition: "50% 22%",
   aboutAvatarVideo: "/media/hero-avatar.mp4",
   aboutAvatarPoster: "/media/hero-avatar-poster.jpg",
   /** Photo avatar (about / meta) */
   avatar: "/profile/divyanshu-kashyap-frontend-developer-jaipur.webp",
   /**
-   * Full spoken intro (also used as fallback caption).
-   * Prefer `avatarIntroChapters` for timed AI-style narration.
+   * Full spoken intro (English hero fallback / captions).
+   * Prefer `heroSpeechChapters` / `aboutSpeechChapters` for timed narration.
    */
   avatarIntro:
-    "Hey! I'm Divyanshu Kashyap, a Frontend Engineer based in Jaipur. I craft fast, accessible interfaces with React, Next.js, and TypeScript. I offer frontend development services — React and Next.js apps, UI architecture, API integration, motion design, Lighthouse performance, and SEO analytics. Explore my work, and let's build something extraordinary together.",
-  /** Timed AI narration chapters — spoken on avatar unmute (Hindi) */
-  avatarIntroChapters: [
+    "Hey! I'm Divyanshu Kashyap, a Frontend Engineer and Frontend Developer based in Jaipur. I build with React.js, Next.js, and TypeScript — UI development, website development, WordPress, SEO, and performance. I also ship AI-based products with fewer API calls, smarter caching, code splitting, and optimization. Explore my work, and let's build something extraordinary together.",
+  /** Hero unmute — English narration */
+  heroSpeechChapters: [
+    {
+      id: "hello",
+      label: "Intro",
+      text: "Hey! I'm Divyanshu Kashyap — a Frontend Engineer and Frontend Developer based in Jaipur. Welcome to my portfolio.",
+    },
+    {
+      id: "roles",
+      label: "Roles",
+      text: "I work as a Frontend Engineer, Frontend Developer, React.js developer, Next.js builder, and UI developer — shipping clean interfaces and fast web experiences.",
+    },
+    {
+      id: "stack",
+      label: "Stack",
+      text: "My core stack is React.js, Next.js, and TypeScript. I also do website development, modern UI systems, and WordPress when clients need content-first sites.",
+    },
+    {
+      id: "seo-perf",
+      label: "SEO & Performance",
+      text: "I focus on SEO, Lighthouse performance, code splitting, and optimization — so sites load fast, rank better, and feel smooth for users.",
+    },
+    {
+      id: "ai-api",
+      label: "AI & API",
+      text: "I also build AI-based products — smart UI, fewer API calls, caching, and efficient data flow to cut network load and boost performance.",
+    },
+    {
+      id: "close",
+      label: "Connect",
+      text: "If you need product UI, a landing page, SEO, a performance upgrade, or AI product frontend — I can help. Explore the projects below, and let's build something extraordinary together.",
+    },
+  ] as const,
+  /** About unmute — Hindi narration */
+  aboutSpeechChapters: [
     {
       id: "hello",
       label: "परिचय",
-      text: "नमस्ते! मैं दिव्यांशु कश्यप हूँ — जयपुर से एक फ्रंटएंड इंजीनियर। मेरे पोर्टफोलियो में आपका स्वागत है।",
+      text: "नमस्ते! मैं दिव्यांशु कश्यप हूँ — जयपुर से एक फ्रंटएंड इंजीनियर और फ्रंटएंड डेवलपर। मेरे पोर्टफोलियो में आपका स्वागत है।",
     },
     {
-      id: "frontend",
-      label: "फ्रंटएंड",
-      text: "मैं फ्रंटएंड डेवलपमेंट में माहिर हूँ — React.js, Next.js और TypeScript से तेज़, सुंदर और स्केलेबल वेब ऐप्स बनाता हूँ।",
+      id: "roles",
+      label: "भूमिकाएँ",
+      text: "मैं फ्रंटएंड इंजीनियर, फ्रंटएंड डेवलपर, रिएक्ट जे एस डेवलपर, नेक्स्ट जे एस बिल्डर, और यूआई डेवलपर के रूप में काम करता हूँ — साफ़ इंटरफ़ेस और तेज़ वेब अनुभव बनाता हूँ।",
+    },
+    {
+      id: "stack",
+      label: "स्टैक",
+      text: "मेरा मुख्य स्टैक React.js, Next.js और TypeScript है। मैं वेबसाइट डेवलपमेंट, आधुनिक यूआई सिस्टम, और वर्डप्रेस डेवलपमेंट भी करता हूँ — जब क्लाइंट को कंटेंट-फर्स्ट साइट चाहिए।",
+    },
+    {
+      id: "seo-perf",
+      label: "SEO और परफ़ॉर्मेंस",
+      text: "मैं SEO, Lighthouse परफ़ॉर्मेंस, कोड स्प्लिटिंग, और ऑप्टिमाइज़ेशन पर फोकस करता हूँ — ताकि साइट तेज़ लोड हो, रैंकिंग बेहतर हो, और यूज़र एक्सपीरियंस स्मूद रहे।",
+    },
+    {
+      id: "ai-api",
+      label: "AI और API",
+      text: "मैं ए आई बेस्ड प्रोडक्ट्स भी बनाता हूँ — स्मार्ट यूआई, कम ए पी आई कॉल्स, कैशिंग, और कुशल डेटा फ़्लो से नेटवर्क लोड घटाकर परफ़ॉर्मेंस बढ़ाता हूँ।",
     },
     {
       id: "services",
       label: "सेवाएँ",
-      text: "मैं React और Next.js डेवलपमेंट, UI आर्किटेक्चर, API इंटीग्रेशन, GSAP और Framer Motion से मोशन डिज़ाइन, परफॉर्मेंस ऑप्टिमाइज़ेशन और SEO जैसी सेवाएँ देता हूँ।",
+      text: "मेरी सेवाओं में React और Next.js ऐप्स, यूआई आर्किटेक्चर, वेबसाइट और वर्डप्रेस डेवलपमेंट, ए पी आई इंटीग्रेशन, मोशन डिज़ाइन, परफ़ॉर्मेंस ट्यूनिंग, एस ई ओ, और कोड स्प्लिटिंग शामिल है।",
     },
     {
       id: "close",
       label: "जुड़ें",
-      text: "अगर आपको प्रोडक्ट UI, लैंडिंग पेज या परफॉर्मेंस अपग्रेड चाहिए — मैं मदद कर सकता हूँ। नीचे प्रोजेक्ट्स देखें, और मिलकर कुछ शानदार बनाते हैं।",
+      text: "अगर आपको प्रोडक्ट यूआई, लैंडिंग पेज, एस ई ओ, परफ़ॉर्मेंस अपग्रेड, या ए आई प्रोडक्ट फ़्रंटएंड चाहिए — मैं मदद कर सकता हूँ। नीचे प्रोजेक्ट्स देखें, और मिलकर कुछ शानदार बनाते हैं।",
     },
   ] as const,
   heroHeadline: "FRONTEND ENGINEER",
   heroRoles: [
     "FRONTEND ENGINEER",
-    "AI UI BUILDER",
-    "REACT DEVELOPER",
-    "NEXT.JS BUILDER",
+    "FRONTEND DEVELOPER",
+    "REACT.JS DEVELOPER",
+    "NEXT.JS DEVELOPER",
+    "UI DEVELOPER",
+    "WEBSITE DEVELOPER",
+    "SEO & PERFORMANCE",
+    "WORDPRESS DEVELOPER",
+    "AI PRODUCT BUILDER",
   ] as const,
   summary:
     "I build intelligent digital experiences combining high-performance code with striking visual design — React, Next.js, TypeScript, and motion.",
@@ -349,10 +405,6 @@ export type Project = {
   image: string;
   /** SEO-focused alt for the cover / primary screenshot */
   imageAlt: string;
-  /** Extra screenshots shown as a collage when present */
-  images?: readonly string[];
-  /** Optional per-gallery alts (falls back to imageAlt + index) */
-  imageAlts?: readonly string[];
   /** Primary link (live demo or GitHub) */
   href: string;
   /** Optional secondary GitHub repo link when href is a live demo */
@@ -411,22 +463,6 @@ export const projects: Project[] = [
       "/projects/angular-ecommerce/angular-ecommerce-products-category-filters.webp",
     imageAlt:
       "Angular 14 mini e-commerce products page with category filters by Divyanshu Kashyap",
-    images: [
-      "/projects/angular-ecommerce/angular-ecommerce-products-category-filters.webp",
-      "/projects/angular-ecommerce/angular-ecommerce-jewelery-category-hd.webp",
-      "/projects/angular-ecommerce/angular-ecommerce-shopping-cart-items-hd.webp",
-      "/projects/angular-ecommerce/angular-ecommerce-empty-cart-state-hd.webp",
-      "/projects/angular-ecommerce/angular-ecommerce-product-detail-page-hd.webp",
-      "/projects/angular-ecommerce/angular-ecommerce-login-page-hd.webp",
-    ],
-    imageAlts: [
-      "Angular e-commerce products grid with All, Fashion, Jewelery, and Electronics filters",
-      "Angular e-commerce jewelery category product listing screenshot",
-      "Angular e-commerce shopping cart with line items and live total pricing",
-      "Angular e-commerce empty cart state UI",
-      "Angular e-commerce product detail page screenshot",
-      "Angular e-commerce login page screenshot",
-    ],
     href: "https://github.com/Lucky-Kashyap/Learning-Angular-JS",
     ctaLabel: "View on GitHub",
   },

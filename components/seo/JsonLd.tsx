@@ -1,7 +1,7 @@
-import { faqJsonLd, personJsonLd, websiteJsonLd } from "@/lib/seo";
+import { allJsonLdGraphs } from "@/lib/seo";
 
 export function JsonLd() {
-  const graphs = [personJsonLd(), websiteJsonLd(), faqJsonLd()];
+  const graphs = allJsonLdGraphs();
 
   return (
     <>
@@ -9,6 +9,7 @@ export function JsonLd() {
         <script
           key={index}
           type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
         />
       ))}

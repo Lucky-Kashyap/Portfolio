@@ -112,8 +112,33 @@ body {
 }
 
 ::selection {
-  background: var(--color-surface-strong);
-  color: var(--color-text-inverse);
+  background: color-mix(in srgb, #7dd3fc 72%, #38bdf8);
+  color: #03060b;
+  -webkit-text-fill-color: #03060b;
+  -webkit-text-stroke-color: transparent;
+  text-shadow: none;
+}
+
+::-moz-selection {
+  background: color-mix(in srgb, #7dd3fc 72%, #38bdf8);
+  color: #03060b;
+  text-shadow: none;
+}
+
+/* Hollow / stroke headings (e.g. KASHYAP) — force solid fill when selected */
+.text-stroke-heading::selection,
+.text-stroke-heading *::selection {
+  background: #7dd3fc;
+  color: #03060b;
+  -webkit-text-fill-color: #03060b;
+  -webkit-text-stroke-width: 0;
+  -webkit-text-stroke-color: transparent;
+}
+
+.text-stroke-heading::-moz-selection,
+.text-stroke-heading *::-moz-selection {
+  background: #7dd3fc;
+  color: #03060b;
 }
 
 :focus {
@@ -153,9 +178,9 @@ button {
 
 .container-site {
   width: 100%;
-  max-width: var(--max-width-site, 1120px);
+  max-width: var(--max-width-site, 1200px);
   margin-inline: auto;
-  padding-inline: clamp(0.75rem, 4.2vw, 1.5rem);
+  padding-inline: clamp(0.75rem, 4vw, 1.5rem);
 }
 
 /* Ultra-narrow phones: 300–380px */
@@ -165,11 +190,11 @@ button {
   }
 
   .section-pad {
-    padding-block: clamp(3.25rem, 14vw, 4.5rem);
+    padding-block: clamp(2.25rem, 8vw, 3.25rem);
   }
 
   .section-content {
-    margin-top: clamp(1.5rem, 6vw, 2.25rem);
+    margin-top: clamp(1.15rem, 4vw, 1.75rem);
   }
 
   body {
@@ -184,7 +209,7 @@ button {
   }
 
   .section-pad {
-    padding-block: clamp(3.75rem, 12vw, 5.25rem);
+    padding-block: clamp(2.5rem, 7vw, 3.75rem);
   }
 }
 
@@ -196,12 +221,12 @@ button {
 
 @media (min-width: 768px) {
   .container-site {
-    padding-inline: var(--spacing-8);
+    padding-inline: 1.5rem;
   }
 }
 
 .section-pad {
-  padding-block: clamp(3.25rem, 8vw, 5.5rem);
+  padding-block: clamp(2.75rem, 6vw, 4.5rem);
 }
 
 /* Clear floating pill nav when jumping to section anchors */
@@ -217,13 +242,13 @@ section[id] {
 
 @media (min-width: 768px) {
   .section-pad {
-    padding-block: clamp(4.5rem, 8vw, 7rem);
+    padding-block: clamp(3.5rem, 6vw, 5.5rem);
   }
 }
 
 @media (min-width: 1024px) {
   .section-pad {
-    padding-block: clamp(4.25rem, 7vw, 6rem);
+    padding-block: clamp(4rem, 6vw, 5.75rem);
   }
 }
 
@@ -256,7 +281,13 @@ section[id] {
 
 .snap-rail > * {
   scroll-snap-align: center;
-  flex: 0 0 min(86vw, 22rem);
+  flex: 0 0 min(90vw, 20rem);
+}
+
+@media (max-width: 360px) {
+  .snap-rail > * {
+    flex-basis: min(92vw, 17.5rem);
+  }
 }
 
 @media (min-width: 400px) {

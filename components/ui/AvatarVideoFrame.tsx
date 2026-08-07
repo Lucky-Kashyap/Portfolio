@@ -15,7 +15,7 @@ type AvatarVideoFrameProps = {
 };
 
 /**
- * Polished portrait frame for marketing-style AI avatar videos.
+ * Bare avatar video plane — soft float, no hard card chrome.
  */
 export function AvatarVideoFrame({
   src,
@@ -31,44 +31,60 @@ export function AvatarVideoFrame({
   return (
     <div
       className={cn(
-        "group relative w-full overflow-hidden",
-        "rounded-2xl border border-white/14",
-        "bg-[#0a1018]",
-        "shadow-[0_28px_70px_rgba(0,0,0,0.55),0_0_0_1px_rgba(125,211,252,0.08)]",
-        "transition-[box-shadow,transform] duration-500 ease-out",
-        "hover:shadow-[0_32px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(125,211,252,0.22)]",
-        // Match scroll-morph slots (same aspect = no reshape flicker)
-        "aspect-[3/4]",
-        className,
+        "group relative h-full w-full min-h-0 overflow-hidden bg-transparent",
+        isHero ? "rounded-[1.75rem]" : "rounded-2xl",
+        "aspect-[3/4] lg:aspect-auto",
+        !isHero && className,
+        isHero && cn("motion-reduce:animate-none", className),
       )}
     >
-      {/* Atmosphere behind media */}
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_28%,rgba(125,211,252,0.14),transparent_55%)]"
-        aria-hidden
-      />
+        className={cn(
+          "absolute inset-0",
+          isHero && "animate-avatar-idle-float motion-reduce:animate-none",
+        )}
+      >
+        <AutoplayVideo
+          src={src}
+          poster={poster}
+          lazy={lazy}
+          speechOnUnmute
+          speechLocale={isHero ? "en" : "hi"}
+          tapSurfaceUnmute
+          objectFit="cover"
+          objectPosition={objectPosition ?? "50% 22%"}
+          muteControlSide="right"
+          className="absolute inset-0"
+        />
 
-      <AutoplayVideo
-        src={src}
-        poster={poster}
-        lazy={lazy}
-        speechOnUnmute
-        tapSurfaceUnmute
-        objectPosition={objectPosition ?? (isHero ? "50% 14%" : "50% 12%")}
-        muteControlSide={caption ? "right" : "left"}
-        className="absolute inset-0"
-      />
+        {isHero ? (
+          <div
+            className="pointer-events-none absolute inset-0 z-[3]"
+            aria-hidden
+          >
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_78%_28%,rgba(232,196,124,0.2),transparent_58%)]" />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_48%,rgba(3,6,11,0.5)_100%)]" />
+          </div>
+        ) : null}
 
-      {caption ? (
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] bg-[linear-gradient(180deg,transparent,rgba(8,12,20,0.95))] px-4 pb-3.5 pt-14"
-          aria-hidden
-        >
-          <p className="text-sm font-bold tracking-tight text-white uppercase md:text-base">
-            {caption}
-          </p>
-        </div>
-      ) : null}
+        {caption ? (
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] bg-[linear-gradient(180deg,transparent_10%,rgba(3,6,11,0.88))] px-4 pb-4 pt-14"
+            aria-hidden
+          >
+            <p
+              className={cn(
+                "font-bold tracking-tight text-white uppercase",
+                isHero
+                  ? "font-display text-[clamp(1.25rem,3.2vw,2.25rem)] leading-[1.05]"
+                  : "text-sm md:text-base",
+              )}
+            >
+              {caption}
+            </p>
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

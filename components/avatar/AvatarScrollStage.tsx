@@ -1,11 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { createPortal } from "react-dom";
-import { useGSAP } from "@gsap/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { AutoplayVideo } from "@/components/ui/AutoplayVideo";
-import { gsap, registerGsap, ScrollTrigger } from "@/lib/gsap";
 import { site } from "@/lib/content";
+import { setAvatarSpeechSection } from "@/lib/avatar-speech";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
 
@@ -21,150 +27,191 @@ function roundPx(n: number) {
   return Math.round(n * 2) / 2;
 }
 
+function clamp01(n: number) {
+  return Math.min(1, Math.max(0, n));
+}
+
+function FloatingHeroRole({ reduced }: { reduced: boolean }) {
+  const roles = site.heroRoles?.length
+    ? [...site.heroRoles]
+    : [site.heroHeadline];
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (reduced || roles.length < 2) return;
+    const id = window.setInterval(() => {
+      setIndex((i) => (i + 1) % roles.length);
+    }, 2800);
+    return () => window.clearInterval(id);
+  }, [reduced, roles.length]);
+
+  const active = roles[index % roles.length];
+
+  return (
+    <div className="relative min-h-[1.15em] overflow-hidden">
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={active}
+          initial={reduced ? false : { y: 18, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={reduced ? undefined : { y: -14, opacity: 0 }}
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="font-display text-[clamp(1.35rem,3.6vw,2.65rem)] font-bold leading-[1.05] tracking-tight text-white uppercase drop-shadow-[0_4px_24px_rgba(0,0,0,0.65)]"
+        >
+          {active}
+        </motion.p>
+      </AnimatePresence>
+    </div>
+  );
+}
+
 /**
- * One shared AutoplayVideo (never unmounted during morph).
- * Portaled to body for Lenis; Hero → About with identical aspect slots.
- * Slot posters stay invisible during morph so the avatar never doubles.
+ * One shared video morphs Hero → About.
+ * Slots always show the poster underneath so there is never a blank card.
+ * The floating video sits on top and moves with scroll.
  */
 export function AvatarScrollStage() {
   const reduced = usePrefersReducedMotion();
   const frameRef = useRef<HTMLDivElement>(null);
+  const heroRoleRef = useRef<HTMLDivElement>(null);
   const captionRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef(0);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  useGSAP(
-    () => {
-      if (reduced || !mounted) return;
-      registerGsap();
+  useLayoutEffect(() => {
+    if (reduced || !mounted) return;
 
-      const hero = document.querySelector('[data-avatar-slot="hero"]');
-      const about = document.querySelector('[data-avatar-slot="about"]');
-      const range = document.querySelector("[data-avatar-scroll-range]");
-      const frame = frameRef.current;
-      const caption = captionRef.current;
-      const aboutPoster = document.querySelector(
-        '[data-avatar-slot-poster="about"]',
-      ) as HTMLElement | null;
-      const heroPoster = document.querySelector(
-        '[data-avatar-slot-poster="hero"]',
-      ) as HTMLElement | null;
+    const hero = document.querySelector(
+      '[data-avatar-slot="hero"]',
+    ) as HTMLElement | null;
+    const about = document.querySelector(
+      '[data-avatar-slot="about"]',
+    ) as HTMLElement | null;
+    const frame = frameRef.current;
+    const heroRole = heroRoleRef.current;
+    const caption = captionRef.current;
+    const aboutPoster = document.querySelector(
+      '[data-avatar-slot-poster="about"]',
+    ) as HTMLElement | null;
+    const heroPoster = document.querySelector(
+      '[data-avatar-slot-poster="hero"]',
+    ) as HTMLElement | null;
 
-      if (!hero || !about || !range || !frame) return;
+    if (!hero || !about || !frame) return;
 
-      // Layout-only targets — never show a second face under the floating video
-      if (heroPoster) gsap.set(heroPoster, { opacity: 0 });
-      if (aboutPoster) gsap.set(aboutPoster, { opacity: 0 });
+    // Posters always fill slots — never show empty card holes
+    if (heroPoster) {
+      heroPoster.style.opacity = "1";
+      heroPoster.style.transition = "opacity 0.35s ease";
+    }
+    if (aboutPoster) {
+      aboutPoster.style.opacity = "1";
+      aboutPoster.style.transition = "opacity 0.35s ease";
+    }
 
-      let lastP = -1;
+    let raf = 0;
+    let running = true;
+    let parkedPast = false;
 
-      const setAboutPoster = (visible: boolean) => {
-        if (!aboutPoster) return;
-        gsap.to(aboutPoster, {
-          opacity: visible ? 1 : 0,
-          duration: 0.2,
-          overwrite: "auto",
-        });
-      };
+    const place = (
+      top: number,
+      left: number,
+      width: number,
+      height: number,
+      opacity: number,
+    ) => {
+      frame.style.transform = `translate3d(${roundPx(left)}px, ${roundPx(top)}px, 0)`;
+      frame.style.width = `${roundPx(width)}px`;
+      frame.style.height = `${roundPx(height)}px`;
+      frame.style.opacity = String(opacity);
+      frame.style.visibility = opacity > 0.02 ? "visible" : "hidden";
+      frame.style.pointerEvents = opacity > 0.5 ? "auto" : "none";
+    };
 
-      const apply = (raw?: number) => {
-        const p = easeInOutCubic(
-          gsap.utils.clamp(0, 1, raw ?? progressRef.current),
-        );
-        progressRef.current = p;
+    // Park on hero immediately (no blank first frame)
+    const boot = hero.getBoundingClientRect();
+    if (boot.width > 4) {
+      place(boot.top, boot.left, boot.width, boot.height, 1);
+    }
 
-        const from = hero.getBoundingClientRect();
-        const to = about.getBoundingClientRect();
-        if (from.width < 4 || to.width < 4) return;
+    const update = () => {
+      const from = hero.getBoundingClientRect();
+      const to = about.getBoundingClientRect();
+      if (from.width < 4 || to.width < 4) return;
 
-        if (Math.abs(p - lastP) < 0.001 && raw === undefined && p < 0.995) {
-          return;
+      const vh = window.innerHeight || 1;
+
+      // Morph while About travels through the viewport
+      const startTop = vh * 0.85;
+      const endTop = Math.min(vh * 0.28, 200);
+      const raw = 1 - (to.top - endTop) / Math.max(1, startTop - endTop);
+      const p = easeInOutCubic(clamp01(raw));
+
+      // Scrolled fully past About — leave poster, fade floating video out
+      if (to.bottom < vh * 0.08) {
+        if (!parkedPast) {
+          parkedPast = true;
+          place(to.top, to.left, to.width, to.height, 0);
         }
-        lastP = p;
+        if (caption) caption.style.opacity = "0";
+        if (heroRole) heroRole.style.opacity = "0";
+        return;
+      }
 
-        // Keep slot posters hidden while floating video is the source of truth
-        if (p < 0.98) setAboutPoster(false);
+      parkedPast = false;
 
-        gsap.set(frame, {
-          top: roundPx(lerp(from.top, to.top, p)),
-          left: roundPx(lerp(from.left, to.left, p)),
-          width: roundPx(lerp(from.width, to.width, p)),
-          height: roundPx(lerp(from.height, to.height, p)),
-          borderRadius: 16,
-          opacity: 1,
-          visibility: "visible",
-          force3D: true,
-        });
+      const top = lerp(from.top, to.top, p);
+      const left = lerp(from.left, to.left, p);
+      const width = lerp(from.width, to.width, p);
+      const height = lerp(from.height, to.height, p);
 
-        if (caption) {
-          caption.style.opacity = p > 0.88 ? "1" : "0";
-        }
-      };
+      // Keep video fully opaque while morphing — posters underneath prevent gaps
+      place(top, left, width, height, 1);
 
-      requestAnimationFrame(() => apply(0));
+      // Hero = English script; About = Hindi — never both
+      setAvatarSpeechSection(p < 0.45 ? "hero" : "about");
 
-      // Morph finishes later — avatar parks in About when the section is in view
-      const st = ScrollTrigger.create({
-        trigger: range,
-        start: "top top",
-        endTrigger: about,
-        end: "center center",
-        scrub: 0.85,
-        invalidateOnRefresh: true,
-        onUpdate: (self) => apply(self.progress),
-        onLeave: () => apply(1),
-        onLeaveBack: () => apply(0),
-        onRefresh: (self) => apply(self.progress),
-      });
+      if (heroRole) {
+        const roleOp = clamp01(1 - p / 0.45);
+        heroRole.style.opacity = String(roleOp);
+        heroRole.style.transform = `translateY(${(1 - roleOp) * 12}px)`;
+      }
 
-      const stick = ScrollTrigger.create({
-        trigger: about,
-        start: "center center",
-        end: "bottom+=60 top",
-        onUpdate: () => {
-          if (progressRef.current >= 0.995) apply(1);
-        },
-      });
+      if (caption) {
+        const cap = clamp01((p - 0.7) / 0.25);
+        caption.style.opacity = String(cap);
+        caption.style.transform = `translateY(${(1 - cap) * 8}px)`;
+      }
 
-      const hideSt = ScrollTrigger.create({
-        trigger: about,
-        start: "bottom+=10 top",
-        onEnter: () => {
-          gsap.to(frame, { opacity: 0, duration: 0.2, overwrite: "auto" });
-          setAboutPoster(true);
-        },
-        onLeaveBack: () => {
-          setAboutPoster(false);
-          apply(1);
-          gsap.to(frame, { opacity: 1, duration: 0.15, overwrite: "auto" });
-        },
-      });
+      // Softly dim the slot being left / entered so only one “face” reads
+      if (heroPoster) {
+        heroPoster.style.opacity = String(1 - p * 0.35);
+      }
+      if (aboutPoster) {
+        aboutPoster.style.opacity = String(0.65 + p * 0.35);
+      }
+    };
 
-      const refresh = () => {
-        ScrollTrigger.refresh();
-        apply(st.progress);
-      };
-      window.addEventListener("portfolio:ready", refresh);
-      window.addEventListener("resize", refresh);
-      const t1 = window.setTimeout(refresh, 150);
-      const t2 = window.setTimeout(refresh, 700);
+    const loop = () => {
+      if (!running) return;
+      update();
+      raf = requestAnimationFrame(loop);
+    };
 
-      return () => {
-        window.clearTimeout(t1);
-        window.clearTimeout(t2);
-        st.kill();
-        stick.kill();
-        hideSt.kill();
-        window.removeEventListener("portfolio:ready", refresh);
-        window.removeEventListener("resize", refresh);
-      };
-    },
-    { dependencies: [reduced, mounted] },
-  );
+    raf = requestAnimationFrame(loop);
+    window.addEventListener("portfolio:ready", update);
+    window.addEventListener("resize", update);
+
+    return () => {
+      running = false;
+      cancelAnimationFrame(raf);
+      window.removeEventListener("portfolio:ready", update);
+      window.removeEventListener("resize", update);
+    };
+  }, [reduced, mounted]);
 
   if (reduced || !mounted) return null;
 
@@ -172,45 +219,68 @@ export function AvatarScrollStage() {
     <div
       ref={frameRef}
       className={cn(
-        "pointer-events-auto fixed z-[45] overflow-hidden",
-        "border border-white/14 bg-[#070b12]",
-        "shadow-[0_28px_70px_rgba(0,0,0,0.55),0_0_0_1px_rgba(125,211,252,0.12)]",
-        "will-change-[top,left,width,height,opacity]",
+        "pointer-events-auto fixed top-0 left-0 z-[45] overflow-hidden",
+        "bg-transparent",
+        "will-change-[transform,width,height,opacity]",
         "backface-hidden transform-gpu",
       )}
-      style={{ top: 0, left: -9999, width: 1, height: 1, opacity: 0 }}
+      style={{
+        width: 1,
+        height: 1,
+        opacity: 0,
+        borderRadius: 28,
+      }}
       data-avatar-floating
     >
-      <AutoplayVideo
-        src={site.heroAvatarVideo}
-        poster={site.heroAvatarPoster}
-        lazy={false}
-        speechOnUnmute={false}
-        tapSurfaceUnmute
-        objectPosition={site.heroAvatarObjectPosition}
-        muteControlSide="left"
-        className="absolute inset-0 z-[2]"
-      />
+      <div className="absolute inset-0 animate-avatar-idle-float motion-reduce:animate-none">
+        <AutoplayVideo
+          src={site.heroAvatarVideo}
+          poster={site.heroAvatarPoster}
+          lazy={false}
+          speechOnUnmute
+          speechLocale="auto"
+          tapSurfaceUnmute
+          objectFit="cover"
+          objectPosition={site.heroAvatarObjectPosition}
+          muteControlSide="right"
+          className="absolute inset-0 z-[2]"
+        />
 
-      <div
-        ref={captionRef}
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] bg-[linear-gradient(180deg,transparent,rgba(8,12,20,0.95))] px-4 pb-3.5 pt-14 opacity-0 transition-opacity duration-300"
-        aria-hidden
-      >
-        <p className="text-sm font-bold tracking-tight text-white uppercase md:text-base">
-          Frontend Engineer
-        </p>
+        {/* Warm rim + soft float mask — cinematic edge light */}
+        <div
+          className="pointer-events-none absolute inset-0 z-[3]"
+          aria-hidden
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_78%_28%,rgba(232,196,124,0.22),transparent_58%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_50%_at_18%_72%,rgba(125,211,252,0.1),transparent_55%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_48%,rgba(3,6,11,0.55)_100%)]" />
+        </div>
+
+        {/* Hero role overlay — fades as morph begins */}
+        <div
+          ref={heroRoleRef}
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[6] px-4 pb-5 pt-16 sm:px-5 sm:pb-6 md:px-6"
+          aria-hidden
+        >
+          <FloatingHeroRole reduced={reduced} />
+        </div>
+
+        <div
+          ref={captionRef}
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] bg-[linear-gradient(180deg,transparent_20%,rgba(3,6,11,0.9))] px-4 pb-4 pt-12 opacity-0"
+          aria-hidden
+        >
+          <p className="text-sm font-bold tracking-tight text-white uppercase md:text-base">
+            {site.heroHeadline}
+          </p>
+        </div>
       </div>
     </div>,
     document.body,
   );
 }
 
-/**
- * Layout target for the floating avatar.
- * Poster is hidden during morph (no double face); About poster fades in only
- * after the floating video leaves the section.
- */
+/** Measurement slot — always filled with poster so layout never looks blank. */
 export function AvatarSlot({
   id,
   className,
@@ -220,11 +290,14 @@ export function AvatarSlot({
   className?: string;
   children?: ReactNode;
 }) {
+  const isHero = id === "hero";
+
   return (
     <div
       data-avatar-slot={id}
       className={cn(
-        "relative w-full overflow-hidden rounded-2xl border border-white/10 bg-[#070b12]",
+        "relative w-full overflow-hidden bg-transparent",
+        isHero ? "rounded-[1.75rem]" : "rounded-2xl",
         className,
       )}
       aria-hidden
@@ -234,12 +307,15 @@ export function AvatarSlot({
         data-avatar-slot-poster={id}
         src={site.heroAvatarPoster}
         alt=""
-        className="absolute inset-0 size-full object-cover opacity-0"
+        className={cn(
+          "absolute inset-0 size-full object-cover",
+          isHero ? "rounded-[1.75rem]" : "rounded-2xl",
+        )}
         style={{ objectPosition: site.heroAvatarObjectPosition }}
         draggable={false}
       />
       {children ?? (
-        <div className="relative aspect-[3/4] w-full max-h-[min(48svh,400px)]" />
+        <div className="relative aspect-[3/4] w-full lg:aspect-auto lg:h-full lg:min-h-[22rem]" />
       )}
     </div>
   );

@@ -40,7 +40,7 @@ function LetterName({
       className={cn(
         "inline-flex flex-wrap justify-start",
         outline &&
-          "text-transparent [-webkit-text-stroke:1.5px_rgba(255,255,255,0.35)]",
+          "text-stroke-heading text-transparent [-webkit-text-stroke:1.5px_rgba(255,255,255,0.55)]",
         className,
       )}
       aria-label={text}
@@ -238,7 +238,7 @@ export function Hero() {
     <section
       ref={sectionRef}
       id="top"
-      className="relative flex h-[100svh] max-h-[100svh] min-h-[100svh] items-center overflow-hidden bg-surface-base pt-10 pb-6 min-[380px]:pt-12 min-[380px]:pb-8 md:pt-14 md:pb-10"
+      className="relative flex min-h-[100svh] items-start overflow-x-clip overflow-y-visible bg-surface-base pt-[4.75rem] pb-8 min-[380px]:pt-[5.25rem] md:h-[100svh] md:max-h-[100svh] md:items-center md:overflow-hidden md:pt-16 md:pb-10 lg:pb-12"
       aria-labelledby="hero-heading"
     >
       <div
@@ -249,22 +249,23 @@ export function Hero() {
         <HeroScene />
         <div className="absolute inset-0 z-[2] bg-[radial-gradient(ellipse_60%_50%_at_75%_25%,color-mix(in_srgb,#7dd3fc_12%,transparent),transparent_58%)]" />
         <div className="absolute inset-0 z-[2] bg-[radial-gradient(ellipse_45%_40%_at_10%_85%,color-mix(in_srgb,#e8c47c_6%,transparent),transparent_55%)]" />
+        <div className="absolute inset-0 z-[2] bg-[radial-gradient(ellipse_42%_48%_at_82%_42%,color-mix(in_srgb,#e8c47c_14%,transparent),transparent_62%)]" />
         <p
           ref={creativeRef}
-          className="absolute left-1/2 top-[42%] z-[2] -translate-x-1/2 -translate-y-1/2 select-none text-center font-display text-[clamp(3.25rem,15vw,11rem)] font-bold tracking-tighter text-accent-cyan/[0.08] uppercase"
+          className="absolute right-[-4%] top-[38%] z-[2] -translate-y-1/2 select-none text-right font-display text-[clamp(3.5rem,16vw,12rem)] font-bold tracking-tighter text-transparent uppercase [-webkit-text-stroke:1.5px_rgba(125,211,252,0.14)] md:right-[2%] lg:right-[4%]"
         >
           Creative
         </p>
       </div>
 
-      <Container className="relative z-10 flex h-full w-full min-h-0 items-center">
+      <Container className="relative z-10 flex h-full w-full min-h-0 items-start md:items-center">
         <div
           ref={contentRef}
-          className="grid w-full min-h-0 items-center gap-5 will-change-transform lg:grid-cols-2 lg:gap-10 xl:gap-12"
+          className="grid w-full min-h-0 items-start gap-4 will-change-transform sm:gap-5 lg:grid-cols-2 lg:items-stretch lg:gap-8 xl:gap-10"
         >
           <div
             data-hero-copy
-            className="order-2 flex min-w-0 flex-col justify-center lg:order-1 lg:pr-2"
+            className="order-2 flex min-w-0 flex-col justify-center px-0 lg:order-1 lg:pr-2"
           >
             <motion.p
               data-hero-intro
@@ -304,7 +305,8 @@ export function Hero() {
             <div className="mt-5 flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row md:mt-6">
               <div data-hero-cta>
                 <Button
-                  className="w-full min-h-[44px] px-6 text-sm sm:w-auto md:min-h-[48px] md:text-base"
+                  size="lg"
+                  className="w-full sm:w-auto"
                   aria-label="View featured projects"
                   data-cursor-label="VIEW"
                   onClick={() => scrollToId("projects")}
@@ -315,7 +317,8 @@ export function Hero() {
               <div data-hero-cta>
                 <Button
                   variant="secondary"
-                  className="w-full min-h-[44px] px-6 text-sm sm:w-auto md:min-h-[48px] md:text-base"
+                  size="lg"
+                  className="w-full sm:w-auto"
                   aria-label="Go to contact form"
                   onClick={() => scrollToId("contact")}
                 >
@@ -331,27 +334,44 @@ export function Hero() {
             />
           </div>
 
+          {/* Mobile: full-bleed; desktop: stretch to match copy height */}
           <div
             data-hero-avatar
-            className="order-1 mx-auto flex w-full max-w-[min(100%,240px)] items-center justify-center min-[350px]:max-w-[280px] sm:max-w-[320px] lg:order-2 lg:mx-0 lg:max-w-none lg:justify-end"
+            className={cn(
+              "order-1 flex w-full items-stretch justify-center lg:order-2 lg:h-auto lg:min-h-0 lg:justify-end",
+              "max-lg:relative max-lg:left-1/2 max-lg:w-screen max-lg:max-w-[100vw] max-lg:-translate-x-1/2",
+            )}
           >
-            <div className="w-full max-w-[280px] sm:max-w-[300px] lg:max-w-[320px]">
-              {reduced ? (
-                <AvatarVideoFrame
-                  variant="hero"
-                  src={site.heroAvatarVideo}
-                  poster={site.heroAvatarPoster}
-                  lazy={false}
-                  objectPosition={site.heroAvatarObjectPosition}
-                />
-              ) : (
-                <AvatarSlot
-                  id="hero"
-                  className="mx-auto w-full max-h-[min(48svh,400px)] lg:max-h-[min(56svh,440px)]"
-                >
-                  <div className="aspect-[3/4] w-full" />
-                </AvatarSlot>
-              )}
+            <div className="relative w-full lg:h-full lg:max-w-none lg:pl-2 xl:pl-4">
+              {/* Warm rim light around the figure */}
+              <div
+                className="pointer-events-none absolute -inset-6 z-0 hidden lg:block"
+                aria-hidden
+              >
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_70%_at_70%_40%,rgba(232,196,124,0.2),transparent_68%)] blur-2xl" />
+                <div className="absolute inset-0 animate-avatar-glow-pulse bg-[radial-gradient(ellipse_40%_45%_at_75%_30%,rgba(125,211,252,0.16),transparent_70%)]" />
+              </div>
+
+              <div className="relative z-[1] h-full w-full">
+                {reduced ? (
+                  <AvatarVideoFrame
+                    variant="hero"
+                    src={site.heroAvatarVideo}
+                    poster={site.heroAvatarPoster}
+                    lazy={false}
+                    objectPosition={site.heroAvatarObjectPosition}
+                    caption={site.heroHeadline}
+                    className="max-lg:max-h-[min(42svh,340px)] lg:min-h-full"
+                  />
+                ) : (
+                  <AvatarSlot
+                    id="hero"
+                    className="mx-auto h-full w-full max-lg:max-h-[min(42svh,340px)]"
+                  >
+                    <div className="aspect-[5/4] w-full min-[400px]:aspect-[4/5] lg:aspect-auto lg:h-full lg:min-h-[26rem]" />
+                  </AvatarSlot>
+                )}
+              </div>
             </div>
           </div>
         </div>

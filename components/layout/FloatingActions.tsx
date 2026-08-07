@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useLenis } from "lenis/react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, FileDown } from "lucide-react";
 import { TextLink } from "@/components/ui";
 import { Magnetic } from "@/components/motion/Magnetic";
 import { site } from "@/lib/content";
@@ -31,9 +31,35 @@ function updateScrollMetrics(
   setShowTop(scrollY > Math.max(640, window.innerHeight * 0.85));
 }
 
-/** Shared glass FAB surface — Govind-style translucent circles */
+/** Shared glass FAB surface — translucent circles */
 const fabGlass =
   "border border-white/12 bg-black/45 text-white shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md";
+
+function FabLabel({
+  children,
+  reduced,
+}: {
+  children: ReactNode;
+  reduced: boolean;
+}) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "pointer-events-none absolute right-[calc(100%+10px)] top-1/2 z-20 -translate-y-1/2",
+        "whitespace-nowrap rounded-md border border-white/12 bg-black/80 px-2.5 py-1",
+        "text-[11px] font-medium tracking-[0.14em] text-white uppercase backdrop-blur-md",
+        "opacity-0 translate-x-2 scale-95",
+        "transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
+        "group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100",
+        "group-focus-visible:opacity-100 group-focus-visible:translate-x-0 group-focus-visible:scale-100",
+        reduced && "duration-0",
+      )}
+    >
+      {children}
+    </span>
+  );
+}
 
 export function FloatingActions() {
   const [progress, setProgress] = useState(0);
@@ -80,6 +106,8 @@ export function FloatingActions() {
     site.whatsapp ||
     (site.phone ? `https://wa.me/91${site.phone.replace(/\s/g, "")}` : "");
 
+  const resumeHref = site.resume;
+  const resumeName = site.resumeDownloadName || "Divyanshu_resume.pdf";
   const progressDeg = Math.round(progress * 360);
 
   return (
@@ -107,29 +135,31 @@ export function FloatingActions() {
                 onClick={scrollToTop}
                 aria-label="Back to top"
                 data-cursor="hover"
-                className="group/top relative inline-flex size-10 items-center justify-center rounded-full"
+                className="group relative inline-flex size-[48px] items-center justify-center rounded-full"
               >
+                <FabLabel reduced={reduced}>Back to top</FabLabel>
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute -inset-[2px] rounded-full opacity-90"
+                  className="pointer-events-none absolute -inset-1 rounded-full"
                   style={{
                     background: reduced
-                      ? "color-mix(in srgb, #7dd3fc 45%, transparent)"
-                      : `conic-gradient(from -90deg, #7dd3fc ${progressDeg}deg, rgba(255,255,255,0.14) 0deg)`,
+                      ? "color-mix(in srgb, #7dd3fc 55%, transparent)"
+                      : `conic-gradient(from -90deg, #7dd3fc ${progressDeg}deg, rgba(255,255,255,0.22) 0deg)`,
                     WebkitMask:
-                      "radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px))",
-                    mask: "radial-gradient(farthest-side, transparent calc(100% - 1.5px), #000 calc(100% - 1.5px))",
+                      "radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3.5px))",
+                    mask: "radial-gradient(farthest-side, transparent calc(100% - 3.5px), #000 calc(100% - 3.5px))",
                   }}
                 />
                 <span
                   className={cn(
-                    "relative z-10 inline-flex size-10 items-center justify-center rounded-full",
+                    "relative z-10 inline-flex size-[44px] items-center justify-center rounded-full",
                     fabGlass,
+                    "border-white/18",
                     "transition-[border-color,background-color] duration-fast",
-                    "group-hover/top:border-accent-cyan/40 group-hover/top:bg-black/60",
+                    "group-hover:border-accent-cyan/45 group-hover:bg-black/60",
                   )}
                 >
-                  <ArrowUp size={16} strokeWidth={2} aria-hidden />
+                  <ArrowUp size={18} strokeWidth={2.25} aria-hidden />
                 </span>
               </button>
             </Magnetic>
@@ -145,30 +175,56 @@ export function FloatingActions() {
             variant="muted"
             data-cursor="hover"
             aria-label="Chat on WhatsApp"
-            title="WhatsApp"
             className={cn(
-              "group/wa relative inline-flex size-10 items-center justify-center rounded-full no-underline",
+              "group relative inline-flex size-[44px] items-center justify-center rounded-full no-underline",
               fabGlass,
               "text-[#25D366] transition-[border-color,background-color,box-shadow] duration-fast",
               "hover:border-[#25D366]/45 hover:bg-black/60 hover:text-[#4ade80]",
               "hover:shadow-[0_0_0_3px_rgba(37,211,102,0.12)]",
             )}
           >
+            <FabLabel reduced={reduced}>WhatsApp</FabLabel>
             {!reduced ? (
               <span
-                className="pointer-events-none absolute inset-0 rounded-full opacity-0 group-hover/wa:animate-wa-ping"
+                className="pointer-events-none absolute inset-0 rounded-full opacity-0 group-hover:animate-wa-ping"
                 aria-hidden
               />
             ) : null}
             <span
               className={cn(
                 "relative z-10 inline-flex",
-                !reduced && "group-hover/wa:animate-wa-wiggle",
+                !reduced && "group-hover:animate-wa-wiggle",
               )}
             >
               <WhatsAppIcon size={17} />
             </span>
           </TextLink>
+        </Magnetic>
+      ) : null}
+
+      {resumeHref ? (
+        <Magnetic strength={0.35}>
+          <a
+            href={resumeHref}
+            download={resumeName}
+            data-cursor="hover"
+            aria-label="Download resume"
+            className={cn(
+              "group relative inline-flex size-[44px] items-center justify-center rounded-full no-underline",
+              fabGlass,
+              "text-white/90 transition-[border-color,background-color,box-shadow] duration-fast",
+              "hover:border-white/28 hover:bg-black/60",
+              "hover:shadow-[0_0_0_3px_rgba(255,255,255,0.08)]",
+            )}
+          >
+            <FabLabel reduced={reduced}>Download resume</FabLabel>
+            <FileDown
+              size={17}
+              strokeWidth={2.1}
+              aria-hidden
+              className="relative z-10"
+            />
+          </a>
         </Magnetic>
       ) : null}
     </motion.div>

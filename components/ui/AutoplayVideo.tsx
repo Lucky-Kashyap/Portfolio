@@ -7,13 +7,21 @@ import {
   releaseVideoAudio,
   subscribeVideoAudio,
 } from "@/lib/video-audio";
-import { playAvatarSpeech, stopAvatarSpeech } from "@/lib/avatar-speech";
+import {
+  getAvatarSpeechLocale,
+  playAvatarSpeech,
+  stopAvatarSpeech,
+  subscribeAvatarSpeechSection,
+  type AvatarSpeechLocale,
+} from "@/lib/avatar-speech";
 
 type AutoplayVideoProps = {
   src: string;
   poster?: string;
   className?: string;
   objectPosition?: string;
+  /** cover crops to fill; contain keeps full frame (no side cut) */
+  objectFit?: "cover" | "contain";
   seekTo?: number;
   lazy?: boolean;
   showMuteControl?: boolean;
@@ -23,24 +31,30 @@ type AutoplayVideoProps = {
    * Needed when the MP4 has no audio track (placeholders / GIF encodes).
    */
   speechOnUnmute?: boolean;
+  /**
+   * Force locale, or `auto` to follow hero (en) / about (hi) from scroll morph.
+   */
+  speechLocale?: AvatarSpeechLocale | "auto";
   /** Make the whole media surface toggle sound (not only the pill). */
   tapSurfaceUnmute?: boolean;
 };
 
 /**
  * Autoplay background video with tap-to-unmute.
- * Shared audio lock so only one video has sound at a time.
+ * Shared audio lock so only one video / speech track runs at a time.
  */
 export function AutoplayVideo({
   src,
   poster,
   className,
   objectPosition = "50% 50%",
+  objectFit = "cover",
   seekTo,
   lazy = true,
   showMuteControl = true,
   muteControlSide = "left",
   speechOnUnmute = true,
+  speechLocale = "auto",
   tapSurfaceUnmute = true,
 }: AutoplayVideoProps) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -50,6 +64,14 @@ export function AutoplayVideo({
   const [failed, setFailed] = useState(false);
   const [hasEmbeddedAudio, setHasEmbeddedAudio] = useState(false);
   const speakingRef = useRef(false);
+  const speechLocaleRef = useRef(speechLocale);
+  speechLocaleRef.current = speechLocale;
+
+  const resolveLocale = (): AvatarSpeechLocale => {
+    const pref = speechLocaleRef.current;
+    if (pref === "en" || pref === "hi") return pref;
+    return getAvatarSpeechLocale();
+  };
 
   const remuteAll = () => {
     const el = ref.current;
@@ -134,6 +156,18 @@ export function AutoplayVideo({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  // Hero ↔ About language switch — stop English/Hindi so they never overlap
+  useEffect(() => {
+    if (speechLocale !== "auto") return;
+    let last = getAvatarSpeechLocale();
+    return subscribeAvatarSpeechSection((locale) => {
+      if (locale === last) return;
+      last = locale;
+      remuteAll();
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [speechLocale, id]);
+
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -147,6 +181,8 @@ export function AutoplayVideo({
 
   const unmute = async () => {
     const el = ref.current;
+    // Stop any other narration before starting this one
+    stopAvatarSpeech();
     claimVideoAudio(id);
     setMuted(false);
 
@@ -161,9 +197,8 @@ export function AutoplayVideo({
     const shouldSpeak = speechOnUnmute && !hasEmbeddedAudio;
     if (shouldSpeak) {
       speakingRef.current = true;
-      await playAvatarSpeech();
+      await playAvatarSpeech(resolveLocale());
       speakingRef.current = false;
-      // Keep "Sound on" until user mutes — restart speech if they tap again later
     }
   };
 
@@ -181,7 +216,11 @@ export function AutoplayVideo({
       <img
         src={poster}
         alt=""
-        className={cn("size-full object-cover", className)}
+        className={cn(
+          "size-full",
+          objectFit === "contain" ? "object-contain" : "object-cover",
+          className,
+        )}
         style={{ objectPosition }}
       />
     ) : null;
@@ -223,16 +262,21 @@ export function AutoplayVideo({
         loop
         playsInline
         preload={lazy ? "none" : "metadata"}
-        className="absolute inset-0 size-full object-cover"
+        className={cn(
+          "absolute inset-0 size-full",
+          objectFit === "contain" ? "object-contain" : "object-cover",
+        )}
         style={{ objectPosition }}
         onError={() => setFailed(true)}
       />
 
-      {/* Soft vignette — keeps face readable without boxing the media */}
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,transparent_40%,rgba(0,0,0,0.35)_100%)]"
-        aria-hidden
-      />
+      {/* Soft vignette only when cover-cropped */}
+      {objectFit === "cover" ? (
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,transparent_40%,rgba(0,0,0,0.35)_100%)]"
+          aria-hidden
+        />
+      ) : null}
 
       {showMuteControl ? (
         <button
@@ -244,12 +288,12 @@ export function AutoplayVideo({
           aria-pressed={!muted}
           aria-label={muted ? "Unmute video" : "Mute video"}
           className={cn(
-            "absolute bottom-3 z-10 inline-flex items-center gap-2 rounded-full border border-white/20 bg-[rgba(11,18,32,0.78)] px-3 py-1.5 text-[11px] font-semibold tracking-wide text-white shadow-[0_8px_20px_rgba(0,0,0,0.35)] backdrop-blur-sm transition hover:border-accent-cyan/45 hover:bg-[rgba(11,18,32,0.92)]",
+            "absolute top-3 z-10 inline-flex items-center gap-2 rounded-full border border-white/20 bg-[rgba(11,18,32,0.78)] px-3 py-1.5 text-[11px] font-semibold tracking-wide text-white shadow-[0_8px_20px_rgba(0,0,0,0.35)] backdrop-blur-sm transition hover:border-accent-cyan/45 hover:bg-[rgba(11,18,32,0.92)]",
             muteControlSide === "right" ? "right-3" : "left-3",
             !muted && "border-accent-cyan/40 text-accent-cyan",
           )}
         >
-          {muted ? <MuteIcon /> : <UnmuteIcon />}
+          {muted ? <PlayIcon /> : <PauseIcon />}
           <span>{muted ? "Tap to unmute" : "Sound on"}</span>
         </button>
       ) : null}
@@ -257,30 +301,18 @@ export function AutoplayVideo({
   );
 }
 
-function MuteIcon() {
+function PlayIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
-      <path d="M2 6.5h2.2L7.5 4v8L4.2 9.5H2V6.5Z" fill="currentColor" />
-      <path
-        d="M10 6.2 14.2 10.4M14.2 6.2 10 10.4"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
+      <path d="M5 3.6v8.8l7.2-4.4L5 3.6Z" fill="currentColor" />
     </svg>
   );
 }
 
-function UnmuteIcon() {
+function PauseIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
-      <path d="M2 6.5h2.2L7.5 4v8L4.2 9.5H2V6.5Z" fill="currentColor" />
-      <path
-        d="M9.5 6.2c.7.6 1.1 1.4 1.1 2.3s-.4 1.7-1.1 2.3M11.4 4.5c1.3 1.1 2.1 2.7 2.1 4.5s-.8 3.4-2.1 4.5"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinecap="round"
-      />
+      <path d="M4.5 3.5h2.4v9H4.5v-9Zm4.6 0h2.4v9H9.1v-9Z" fill="currentColor" />
     </svg>
   );
 }

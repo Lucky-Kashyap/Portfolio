@@ -7,7 +7,12 @@ import {
   useState,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import { skillBubbles, skillIconUrl, type SkillBubble } from "@/lib/skills";
+import {
+  skillBubbles,
+  skillIconColorUrl,
+  skillIconUrl,
+  type SkillBubble,
+} from "@/lib/skills";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
 import { cn } from "@/lib/utils";
 
@@ -18,23 +23,81 @@ type Body = {
   vx: number;
   vy: number;
   r: number;
-  img: HTMLImageElement | null;
+  homeX: number;
+  homeY: number;
+  img: HTMLImageElement | HTMLCanvasElement | null;
 };
 
 type SkillBubblesProps = {
   className?: string;
 };
 
-const FRICTION = 0.965;
-const SPRING = 0.012;
-const REPEL_RADIUS = 150;
-const REPEL_STRENGTH = 28;
-const GRAVITY = 0.045;
-const BOUNCE = 0.62;
+const FRICTION = 0.94;
+const SPRING = 0.018;
+const REPEL_RADIUS = 260;
+const REPEL_STRENGTH = 92;
+const GRAVITY = 0.028;
+const BOUNCE = 0.68;
+const MAX_SPEED = 18;
 
 function sizeForIndex(i: number) {
-  const sizes = [52, 64, 72, 58, 80, 48, 68];
+  const sizes = [48, 56, 64, 52, 70, 46, 60, 54, 66];
   return sizes[i % sizes.length];
+}
+
+/** Load brand SVG, inject fill color, return drawable image (canvas-safe). */
+async function loadBrandIcon(skill: SkillBubble): Promise<HTMLImageElement | null> {
+  const color = skill.color === "FFFFFF" || skill.color === "ffffff" ? "E2E8F0" : skill.color;
+
+  const tryUrls = [
+    skill.iconUrl,
+    `https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/${skill.icon}.svg`,
+    skillIconUrl({ ...skill, color }),
+  ].filter(Boolean) as string[];
+
+  for (const url of tryUrls) {
+    try {
+      // Prefer fetch → blob so canvas drawImage is reliable (no CORS taint / SVG size issues)
+      if (url.includes("simple-icons") || url.endsWith(".svg") || url.includes("cdn.simpleicons.org")) {
+        const res = await fetch(url, { mode: "cors" });
+        if (!res.ok) continue;
+        let svg = await res.text();
+        if (!skill.iconUrl) {
+          // Colorize monochrome Simple Icons SVGs
+          if (svg.includes("fill=")) {
+            svg = svg.replace(/fill="(?!none)[^"]*"/g, `fill="#${color}"`);
+          } else {
+            svg = svg.replace(/<svg\b/, `<svg fill="#${color}"`);
+          }
+        }
+        const blobUrl = URL.createObjectURL(
+          new Blob([svg], { type: "image/svg+xml;charset=utf-8" }),
+        );
+        const img = await loadImage(blobUrl);
+        URL.revokeObjectURL(blobUrl);
+        if (img) return img;
+      } else {
+        const img = await loadImage(url);
+        if (img) return img;
+      }
+    } catch {
+      // try next source
+    }
+  }
+
+  // Last resort: Image element without CORS (still drawable in many browsers)
+  return loadImage(skillIconUrl({ ...skill, color }), false);
+}
+
+function loadImage(src: string, useCors = true): Promise<HTMLImageElement | null> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    if (useCors) img.crossOrigin = "anonymous";
+    img.decoding = "async";
+    img.onload = () => resolve(img.naturalWidth > 0 ? img : null);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
 }
 
 export function SkillBubbles({ className }: SkillBubblesProps) {
@@ -48,35 +111,33 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
   const [isCoarse, setIsCoarse] = useState(false);
 
   const initBodies = useCallback((width: number, height: number) => {
+    const cols = width < 640 ? 5 : width < 960 ? 7 : 9;
     const bodies: Body[] = skillBubbles.map((skill, i) => {
       const r = sizeForIndex(i) / 2;
-      const col = i % 5;
-      const row = Math.floor(i / 5);
-      const x = (width / 6) * (col + 1) + (Math.random() - 0.5) * 40;
-      const y = height * 0.35 + row * 70 + Math.random() * 30;
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = ((col + 0.5) / cols) * width + (Math.random() - 0.5) * 24;
+      const y = height * 0.28 + row * (r * 2.05) + Math.random() * 16;
+      const clampedX = Math.min(width - r - 8, Math.max(r + 8, x));
+      const clampedY = Math.min(height - r - 8, Math.max(r + 8, y));
       return {
         skill,
-        x: Math.min(width - r - 8, Math.max(r + 8, x)),
-        y: Math.min(height - r - 8, Math.max(r + 8, y)),
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: (Math.random() - 0.5) * 0.6,
+        x: clampedX,
+        y: clampedY,
+        homeX: clampedX,
+        homeY: clampedY,
+        vx: (Math.random() - 0.5) * 0.35,
+        vy: (Math.random() - 0.5) * 0.35,
         r,
         img: null,
       };
     });
 
-    bodies.forEach((body) => {
-      const img = new Image();
-      img.decoding = "async";
-      img.crossOrigin = "anonymous";
-      img.src = skillIconUrl(body.skill.icon, body.skill.color);
-      img.onload = () => {
-        body.img = img;
-      };
-      img.onerror = () => {
-        body.img = null;
-      };
-    });
+    void Promise.all(
+      bodies.map(async (body) => {
+        body.img = await loadBrandIcon(body.skill);
+      }),
+    );
 
     bodiesRef.current = bodies;
   }, []);
@@ -88,7 +149,7 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
   useEffect(() => {
     const canvas = canvasRef.current;
     const wrap = wrapRef.current;
-    if (!canvas || !wrap || reduced) return;
+    if (!canvas || !wrap || reduced || isCoarse) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -118,19 +179,21 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
     ro.observe(wrap);
 
     const drawBubble = (b: Body) => {
-      const { x, y, r } = b;
+      const { x, y, r, skill } = b;
+      const brand = `#${skill.color === "FFFFFF" ? "94A3B8" : skill.color}`;
+
+      // Soft dark glass + brand-tinted rim so colorful icons read clearly
       const g = ctx.createRadialGradient(
         x - r * 0.35,
         y - r * 0.4,
-        r * 0.1,
+        r * 0.08,
         x,
         y,
         r,
       );
-      g.addColorStop(0, "#ffffff");
-      g.addColorStop(0.45, "#f4f4f5");
-      g.addColorStop(0.85, "#d4d4d8");
-      g.addColorStop(1, "#a1a1aa");
+      g.addColorStop(0, "rgba(248,250,252,0.16)");
+      g.addColorStop(0.55, "rgba(15,23,42,0.92)");
+      g.addColorStop(1, "rgba(3,6,11,0.98)");
 
       ctx.beginPath();
       ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -138,45 +201,47 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
       ctx.fill();
 
       ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.strokeStyle = "rgba(255,255,255,0.35)";
-      ctx.lineWidth = 1.5;
+      ctx.arc(x, y, r - 0.5, 0, Math.PI * 2);
+      ctx.strokeStyle = brand;
+      ctx.globalAlpha = 0.55;
+      ctx.lineWidth = 2;
       ctx.stroke();
+      ctx.globalAlpha = 1;
 
-      const iconSize = r * 1.05;
-      if (b.img?.complete && b.img.naturalWidth > 0) {
+      const iconSize = r * 1.15;
+      const drawable =
+        b.img &&
+        (("complete" in b.img && b.img.complete && b.img.naturalWidth > 0) ||
+          ("width" in b.img && b.img.width > 0));
+
+      if (drawable && b.img) {
         ctx.save();
         ctx.beginPath();
-        ctx.arc(x, y, r * 0.72, 0, Math.PI * 2);
+        ctx.arc(x, y, r * 0.78, 0, Math.PI * 2);
         ctx.clip();
-        ctx.drawImage(
-          b.img,
-          x - iconSize / 2,
-          y - iconSize / 2,
-          iconSize,
-          iconSize,
-        );
+        ctx.drawImage(b.img, x - iconSize / 2, y - iconSize / 2, iconSize, iconSize);
         ctx.restore();
       } else {
-        ctx.fillStyle = "#18181b";
-        ctx.font = `600 ${Math.max(10, r * 0.28)}px Inter, system-ui, sans-serif`;
+        // Temporary fallback while icons load
+        ctx.fillStyle = brand;
+        ctx.font = `700 ${Math.max(11, r * 0.32)}px Syne, system-ui, sans-serif`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(b.skill.label.slice(0, 3), x, y);
+        ctx.fillText(skill.label.slice(0, 3).toUpperCase(), x, y);
       }
 
-      // soft highlight
+      // Specular highlight
       ctx.beginPath();
       ctx.ellipse(
         x - r * 0.28,
         y - r * 0.32,
-        r * 0.28,
-        r * 0.16,
+        r * 0.26,
+        r * 0.14,
         -0.4,
         0,
         Math.PI * 2,
       );
-      ctx.fillStyle = "rgba(255,255,255,0.55)";
+      ctx.fillStyle = "rgba(255,255,255,0.22)";
       ctx.fill();
     };
 
@@ -196,24 +261,41 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
           const dx = b.x - pointer.x;
           const dy = b.y - pointer.y;
           const dist = Math.hypot(dx, dy) || 0.001;
-          if (dist < REPEL_RADIUS + b.r) {
-            const force =
-              ((REPEL_RADIUS + b.r - dist) / (REPEL_RADIUS + b.r)) *
-              REPEL_STRENGTH;
-            b.vx += (dx / dist) * force * 0.08;
-            b.vy += (dy / dist) * force * 0.08;
-          }
-        }
+          const reach = REPEL_RADIUS + b.r;
 
-        // soft home spring toward lower band (stacked feel)
-        const homeY = h * 0.62 + (i % 4) * 18;
-        const homeX = ((i + 0.5) / bodies.length) * w;
-        b.vx += (homeX - b.x) * SPRING * 0.15;
-        b.vy += (homeY - b.y) * SPRING * 0.2;
-        b.vy += GRAVITY;
+          if (dist < reach) {
+            // Stronger near cursor — punchy scatter
+            const t = 1 - dist / reach;
+            const force = t * t * REPEL_STRENGTH;
+            const nx = dx / dist;
+            const ny = dy / dist;
+            b.vx += nx * force * 0.35;
+            b.vy += ny * force * 0.35;
+            // Slight tangential swirl so scatter feels organic
+            b.vx += -ny * force * 0.08;
+            b.vy += nx * force * 0.08;
+          }
+
+          // While hovering, barely pull home — let bubbles stay scattered
+          b.vx += (b.homeX - b.x) * SPRING * 0.04;
+          b.vy += (b.homeY - b.y) * SPRING * 0.04;
+          b.vy += GRAVITY * 0.35;
+        } else {
+          // Idle: settle back into cluster
+          b.vx += (b.homeX - b.x) * SPRING;
+          b.vy += (b.homeY - b.y) * SPRING;
+          b.vy += GRAVITY;
+        }
 
         b.vx *= FRICTION;
         b.vy *= FRICTION;
+
+        const speed = Math.hypot(b.vx, b.vy);
+        if (speed > MAX_SPEED) {
+          b.vx = (b.vx / speed) * MAX_SPEED;
+          b.vy = (b.vy / speed) * MAX_SPEED;
+        }
+
         b.x += b.vx;
         b.y += b.vy;
 
@@ -233,7 +315,6 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
         }
       }
 
-      // soft collisions
       for (let i = 0; i < bodies.length; i++) {
         for (let j = i + 1; j < bodies.length; j++) {
           const a = bodies[i];
@@ -250,9 +331,7 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
             a.y -= ny * overlap;
             b.x += nx * overlap;
             b.y += ny * overlap;
-            const dvx = a.vx - b.vx;
-            const dvy = a.vy - b.vy;
-            const impact = dvx * nx + dvy * ny;
+            const impact = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny;
             if (impact > 0) {
               a.vx -= impact * nx * 0.5;
               a.vy -= impact * ny * 0.5;
@@ -274,16 +353,31 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
       ro.disconnect();
       bodiesRef.current = [];
     };
-  }, [reduced, initBodies]);
+  }, [reduced, isCoarse, initBodies]);
 
   const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
     const rect = wrapRef.current?.getBoundingClientRect();
     if (!rect) return;
-    pointerRef.current = {
-      x: event.clientX - rect.left,
-      y: event.clientY - rect.top,
-      active: true,
-    };
+    const wasActive = pointerRef.current.active;
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    pointerRef.current = { x, y, active: true };
+
+    // First hover / re-enter — burst scatter impulse
+    if (!wasActive) {
+      for (const b of bodiesRef.current) {
+        const dx = b.x - x;
+        const dy = b.y - y;
+        const dist = Math.hypot(dx, dy) || 0.001;
+        const reach = REPEL_RADIUS + b.r + 40;
+        if (dist < reach) {
+          const t = 1 - dist / reach;
+          const impulse = t * 14;
+          b.vx += (dx / dist) * impulse;
+          b.vy += (dy / dist) * impulse;
+        }
+      }
+    }
   };
 
   const onPointerLeave = () => {
@@ -294,7 +388,7 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
     return (
       <ul
         className={cn(
-          "grid grid-cols-3 gap-4 sm:grid-cols-4 md:grid-cols-5",
+          "grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8",
           className,
         )}
         aria-label="Technology skills"
@@ -302,18 +396,20 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
         {skillBubbles.map((skill) => (
           <li
             key={skill.id}
-            className="flex flex-col items-center gap-2 rounded-sm border border-border-muted bg-surface-raised p-4 text-center"
+            className="flex flex-col items-center gap-2 rounded-sm border border-border-muted bg-surface-raised p-3 text-center transition-colors hover:border-accent-cyan/35 sm:p-4"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={skillIconUrl(skill.icon, skill.color)}
-              alt={`${skill.label} technology logo`}
-              width={36}
-              height={36}
-              className="size-9"
+              src={skillIconColorUrl(skill)}
+              alt=""
+              width={40}
+              height={40}
+              className="size-9 sm:size-10"
               loading="lazy"
             />
-            <span className="text-xs text-text-secondary">{skill.label}</span>
+            <span className="text-[10px] leading-tight text-text-secondary sm:text-xs">
+              {skill.label}
+            </span>
           </li>
         ))}
       </ul>
@@ -324,14 +420,14 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
     <div
       ref={wrapRef}
       className={cn(
-        "relative h-[min(70vh,560px)] w-full overflow-hidden rounded-md border border-border-muted bg-surface-base",
+        "relative h-[min(52vh,420px)] w-full overflow-hidden rounded-md border border-border-muted bg-surface-base sm:h-[min(58vh,480px)] lg:h-[min(68vh,560px)]",
         className,
       )}
       onPointerMove={onPointerMove}
       onPointerLeave={onPointerLeave}
       onPointerDown={onPointerMove}
       role="img"
-      aria-label="Interactive skill bubbles. Move your cursor to push the technology bubbles away."
+      aria-label="Interactive skill bubbles. Hover to scatter the technology icons."
     >
       <canvas
         ref={canvasRef}
@@ -342,9 +438,12 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
         <p className="absolute inset-0 flex items-center justify-center text-sm text-text-tertiary">
           Loading skills…
         </p>
-      ) : null}
+      ) : (
+        <p className="pointer-events-none absolute bottom-3 left-1/2 z-[1] -translate-x-1/2 text-[10px] tracking-[0.16em] text-text-tertiary uppercase">
+          Hover to scatter
+        </p>
+      )}
 
-      {/* Screen-reader list */}
       <ul className="sr-only">
         {skillBubbles.map((skill) => (
           <li key={skill.id}>{skill.label}</li>
