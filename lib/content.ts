@@ -36,21 +36,49 @@ export const site = {
   },
   /** Photo avatar (about / meta) */
   avatar: "/profile/divyanshu-kashyap-frontend-developer-jaipur.webp",
-  /** Photorealistic AI avatar used in the hero showcase */
-  aiAvatar: "/avatar/divyanshu-kashyap-3d-ai-avatar-frontend-engineer.webp",
-  /** Live wave GIF — face stays intact (no CSS mask crop). Prefer intro.mp4 when ready. */
+  /** Stylized 3D AI avatar (Pixar / corporate animation vibe) for hero */
+  aiAvatar: "/avatar/divyanshu-kashyap-3d-stylized-ai-avatar.webp",
+  /** Optional live GIF loop — prefer intro video when available */
   aiAvatarGif: "/avatar/divyanshu-kashyap-realistic-ai-avatar-wave.gif",
-  aiAvatarGifEnabled: true,
-  /** Anime-style AI persona used in About */
+  aiAvatarGifEnabled: false,
+  /** Anime-style AI persona (asset kept; not shown in About) */
   animeAvatar: "/avatar/divyanshu-kashyap-anime-ai-avatar-frontend-engineer.webp",
   /**
-   * Optional talking intro video (HeyGen / D-ID / Synthesia export).
-   * Drop `public/avatar/intro.mp4` (or .webm) and set `avatarVideoEnabled: true`.
+   * Talking / waving intro video (HeyGen / D-ID / Synthesia / Runway export).
+   * Drop `public/avatar/intro.mp4` and set `avatarVideoEnabled: true`.
+   * Uses AutoplayVideo + shared tap-to-unmute audio lock.
    */
   avatarVideo: "/avatar/intro.mp4",
   avatarVideoEnabled: false,
+  /**
+   * Full spoken intro (also used as fallback caption).
+   * Prefer `avatarIntroChapters` for timed AI-style narration.
+   */
   avatarIntro:
-    "Hey guys, I'm Divyanshu Kashyap — a Frontend Developer. I build fast React and Next.js experiences, craft polished UI, and ship accessible products. Welcome to my portfolio.",
+    "Hey! I'm Divyanshu Kashyap, a Frontend Engineer based in Jaipur. I craft fast, accessible interfaces with React, Next.js, and TypeScript. I offer frontend development services — React and Next.js apps, UI architecture, API integration, motion design, Lighthouse performance, and SEO analytics. Explore my work, and let's build something extraordinary together.",
+  /** Timed AI narration chapters — spoken on avatar play */
+  avatarIntroChapters: [
+    {
+      id: "hello",
+      label: "Intro",
+      text: "Hey! I'm Divyanshu Kashyap — a Frontend Engineer from Jaipur. Welcome to my portfolio.",
+    },
+    {
+      id: "frontend",
+      label: "Frontend",
+      text: "I specialize in Frontend Development — building scalable, responsive web apps with React.js, Next.js, TypeScript, and modern UI systems that feel fast and look polished.",
+    },
+    {
+      id: "services",
+      label: "Services",
+      text: "As a Frontend Developer, I offer services including React and Next.js development, UI architecture, REST API integration, motion and interaction design with GSAP and Framer Motion, Lighthouse performance optimization, and SEO with Analytics and Search Console.",
+    },
+    {
+      id: "close",
+      label: "Connect",
+      text: "Whether you need a product UI, landing experience, or performance upgrade — I can help. Explore my projects below, and let's build something extraordinary together.",
+    },
+  ] as const,
   heroHeadline: "FRONTEND ENGINEER",
   heroRoles: [
     "FRONTEND ENGINEER",

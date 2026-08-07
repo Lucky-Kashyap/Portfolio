@@ -52,7 +52,7 @@ type TextareaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
 export function Textarea({ className, invalid, ...props }: TextareaProps) {
   return (
     <textarea
-      className={cn("field min-h-[140px] resize-y", className)}
+      className={cn("field min-h-[112px] resize-y", className)}
       aria-invalid={invalid || undefined}
       {...props}
     />

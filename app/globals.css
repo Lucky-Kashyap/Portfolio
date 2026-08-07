@@ -168,6 +168,17 @@ button {
   padding-block: clamp(5.5rem, 9vw, 8.5rem);
 }
 
+/* Clear floating pill nav when jumping to section anchors */
+section[id] {
+  scroll-margin-top: 6.5rem;
+}
+
+@media (min-width: 768px) {
+  section[id] {
+    scroll-margin-top: 7.5rem;
+  }
+}
+
 @media (min-width: 768px) {
   .section-pad {
     padding-block: clamp(7rem, 11vw, 10rem);
@@ -211,33 +222,38 @@ button {
 .field {
   box-sizing: border-box;
   width: 100%;
-  min-height: 52px;
-  padding: 14px 16px;
-  border: 1.5px solid var(--color-border-muted);
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--color-border-default) 70%, transparent);
   border-radius: var(--radius-xs);
-  background: var(--color-surface-raised);
+  background: color-mix(in srgb, var(--color-surface-base) 72%, transparent);
   color: var(--color-text-primary);
   font-family: inherit;
-  font-size: var(--text-lg);
+  font-size: 0.95rem;
   line-height: 1.45;
   transition:
     border-color var(--transition-duration-fast) var(--ease-standard),
-    box-shadow var(--transition-duration-fast) var(--ease-standard);
+    box-shadow var(--transition-duration-fast) var(--ease-standard),
+    background-color var(--transition-duration-fast) var(--ease-standard);
 }
 
 .field:hover {
   border-color: var(--color-border-default);
+  background: color-mix(in srgb, var(--color-surface-base) 88%, transparent);
 }
 
 .field:focus,
 .field:focus-visible {
-  border-color: var(--color-surface-strong);
+  border-color: color-mix(in srgb, #7dd3fc 55%, var(--color-border-default));
   outline: none;
-  box-shadow: 0 0 0 3px var(--color-focus-glow);
+  background: var(--color-surface-base);
+  box-shadow: 0 0 0 3px color-mix(in srgb, #7dd3fc 18%, transparent);
 }
 
 .field::placeholder {
-  color: var(--color-text-tertiary);
+  color: color-mix(in srgb, var(--color-text-tertiary) 85%, transparent);
+  font-size: 0.9rem;
+  font-weight: 400;
   opacity: 1;
 }
 
@@ -247,24 +263,34 @@ button {
   opacity: 0.7;
 }
 
-.field[aria-invalid="true"] {
-  border-color: var(--color-state-error);
-}
-
 .field-label {
   display: block;
-  margin-bottom: 10px;
-  color: var(--color-text-primary);
-  font-size: var(--text-xs);
+  margin-bottom: 8px;
+  color: var(--color-text-secondary);
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
 .field-error {
-  margin-top: var(--spacing-2);
-  color: var(--color-state-error);
-  font-size: var(--text-sm);
+  margin-top: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  border: 1px solid color-mix(in srgb, #f87171 40%, transparent);
+  border-radius: var(--radius-xs);
+  background: color-mix(in srgb, #f87171 14%, transparent);
+  padding: 0.7rem 0.85rem;
+  color: #fecaca;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.field[aria-invalid="true"] {
+  border-color: #f87171;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #f87171 18%, transparent);
 }
 
 html.has-custom-cursor,

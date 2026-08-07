@@ -1,18 +1,28 @@
 "use client";
 
 import { FormEvent, useId, useRef, useState, type ReactNode } from "react";
-import { ArrowUpRight, Code2, Link2, Mail, MapPin, Phone } from "lucide-react";
+import Image from "next/image";
+import {
+  AlertCircle,
+  ArrowUpRight,
+  Code2,
+  Link2,
+  Mail,
+  MapPin,
+  Phone,
+} from "lucide-react";
 import { useGSAP } from "@gsap/react";
 import {
   Button,
   Container,
   Field,
   Input,
-  SectionHeader,
   Text,
   TextLink,
   Textarea,
 } from "@/components/ui";
+import { Eyebrow } from "@/components/ui/Eyebrow";
+import { ScrollWords } from "@/components/motion/ScrollHeading";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { site } from "@/lib/content";
 import { cn } from "@/lib/utils";
@@ -29,7 +39,7 @@ type ContactChannelProps = {
   external?: boolean;
 };
 
-function GithubMark({ size = 18 }: { size?: number }) {
+function GithubMark({ size = 15 }: { size?: number }) {
   return (
     <svg
       width={size}
@@ -55,25 +65,25 @@ function ContactChannel({
       href={href}
       external={external}
       className={cn(
-        "group flex items-start gap-4 rounded-sm border border-border-muted bg-surface-raised p-4 shadow-card",
-        "transition-[border-color,box-shadow,transform] duration-fast",
-        "hover:-translate-y-0.5 hover:border-border-default hover:shadow-soft",
+        "group flex items-center gap-2.5 rounded-sm border border-border-muted bg-surface-raised px-3 py-2.5 no-underline",
+        "transition-[border-color,background-color] duration-fast",
+        "hover:border-accent-cyan/40 hover:bg-surface-muted",
       )}
     >
-      <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary">
+      <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-xs border border-border-muted bg-surface-muted text-text-primary">
         {icon}
       </span>
-      <span className="min-w-0">
-        <span className="block text-xs font-medium tracking-[0.16em] text-text-tertiary uppercase">
+      <span className="min-w-0 flex-1">
+        <span className="block text-[10px] font-semibold tracking-[0.12em] text-text-tertiary uppercase">
           {label}
         </span>
-        <span className="mt-1 block truncate text-lg text-text-primary group-hover:underline">
+        <span className="mt-0.5 block truncate text-[13px] font-medium text-text-primary group-hover:text-accent-cyan">
           {value}
         </span>
       </span>
       <ArrowUpRight
-        size={16}
-        className="ml-auto mt-1 shrink-0 text-text-tertiary transition-transform duration-fast group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+        size={13}
+        className="shrink-0 text-text-tertiary transition-transform duration-fast group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent-cyan"
         aria-hidden
       />
     </TextLink>
@@ -85,6 +95,11 @@ export function Contact() {
   const formRef = useRef<HTMLFormElement>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
+  const [invalid, setInvalid] = useState({
+    name: false,
+    email: false,
+    message: false,
+  });
   const reduced = usePrefersReducedMotion();
 
   useGSAP(
@@ -96,16 +111,16 @@ export function Contact() {
       const fields = form.querySelectorAll("[data-contact-field]");
       gsap.fromTo(
         fields,
-        { opacity: 0, y: 22 },
+        { opacity: 0, y: 14 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.55,
-          stagger: 0.1,
+          duration: 0.45,
+          stagger: 0.06,
           ease: "power3.out",
           scrollTrigger: {
             trigger: form,
-            start: "top 80%",
+            start: "top 85%",
             toggleActions: "play none none none",
           },
         },
@@ -124,9 +139,16 @@ export function Contact() {
     const email = String(data.get("email") || "").trim();
     const message = String(data.get("message") || "").trim();
 
-    if (!name || !email || !message) {
+    const nextInvalid = {
+      name: !name,
+      email: !email,
+      message: !message,
+    };
+    setInvalid(nextInvalid);
+
+    if (nextInvalid.name || nextInvalid.email || nextInvalid.message) {
       setStatus("error");
-      setError("Please fill in name, email, and message.");
+      setError("Please fill in name, email, and message before sending.");
       return;
     }
 
@@ -139,38 +161,72 @@ export function Contact() {
   return (
     <section
       id="contact"
-      className="section-pad border-t border-border-muted bg-atmosphere"
+      className="scroll-mt-28 border-t border-border-muted bg-atmosphere py-16 md:scroll-mt-32 md:py-20 lg:py-24"
       aria-labelledby="contact-heading"
     >
       <Container>
-        <div className="grid w-full items-start gap-8 lg:grid-cols-2 lg:gap-10">
-          <ScrollReveal>
-            <p className="mb-4 inline-flex items-center gap-2 rounded-xl border border-border-muted bg-surface-raised px-3 py-1.5 text-xs font-medium tracking-[0.14em] text-text-secondary uppercase shadow-card">
+        {/* Full-width intro — one clear job */}
+        <ScrollReveal>
+          <div className="flex flex-wrap items-center gap-3">
+            <Eyebrow className="mb-0">Contact</Eyebrow>
+            <span className="inline-flex items-center gap-2 rounded-full border border-border-muted bg-surface-raised px-2.5 py-1 text-[10px] font-semibold tracking-[0.14em] text-text-secondary uppercase">
               <span
-                className="size-1.5 rounded-full bg-action-primary"
+                className={cn(
+                  "size-1.5 rounded-full bg-emerald-400",
+                  !reduced && "animate-pulse",
+                )}
                 aria-hidden
               />
               Available for work
-            </p>
+            </span>
+          </div>
+          <ScrollWords
+            id="contact-heading"
+            as={2}
+            text="Let's build something extraordinary together."
+            className="mt-4 max-w-2xl"
+          />
+          <Text tone="muted" className="mt-4 max-w-xl text-base leading-relaxed">
+            {site.connect}
+          </Text>
+        </ScrollReveal>
 
-            <SectionHeader
-              eyebrow="Contact"
-              title="Let's build something extraordinary together."
-              titleId="contact-heading"
-              description={site.connect}
-              titleClassName="max-w-xl"
-            />
+        {/* Equal-height columns — no sticky void under the form */}
+        <div className="mt-10 grid items-stretch gap-6 lg:mt-12 lg:grid-cols-2 lg:gap-8">
+          <ScrollReveal className="flex h-full min-h-0 flex-col gap-4">
+            <div className="relative overflow-hidden rounded-md border border-border-muted bg-surface-raised">
+              <div className="relative aspect-[2/1] w-full sm:aspect-[21/9]">
+                <Image
+                  src="/contact/contact-collab-visual.webp"
+                  alt="Stylized AI illustration of a frontend engineer collaborating over digital messages and UI panels"
+                  fill
+                  className="object-cover object-[center_30%]"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  unoptimized
+                />
+                <div
+                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-surface-base/80 via-transparent to-transparent"
+                  aria-hidden
+                />
+                <div
+                  className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(125,211,252,0.18),transparent_55%)]"
+                  aria-hidden
+                />
+              </div>
+            </div>
 
-            <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-              <div className="flex items-start gap-4 rounded-sm border border-border-muted bg-surface-raised p-4 shadow-card">
-                <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary">
-                  <MapPin size={18} aria-hidden />
+            <div className="grid flex-1 content-start gap-2 sm:grid-cols-2">
+              <div className="flex items-center gap-2.5 rounded-sm border border-border-muted bg-surface-raised px-3 py-2.5 sm:col-span-2">
+                <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-xs border border-border-muted bg-surface-muted text-text-primary">
+                  <MapPin size={15} aria-hidden />
                 </span>
-                <div>
-                  <p className="text-xs font-medium tracking-[0.16em] text-text-tertiary uppercase">
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold tracking-[0.12em] text-text-tertiary uppercase">
                     Location
                   </p>
-                  <p className="mt-1 text-lg text-text-primary">{site.location}</p>
+                  <p className="mt-0.5 text-[13px] font-medium text-text-primary">
+                    {site.location}
+                  </p>
                 </div>
               </div>
 
@@ -178,14 +234,14 @@ export function Contact() {
                 label="Email"
                 href={`mailto:${site.email}`}
                 value={site.email}
-                icon={<Mail size={18} aria-hidden />}
+                icon={<Mail size={15} aria-hidden />}
               />
               {site.phone ? (
                 <ContactChannel
                   label="Phone"
                   href={`tel:${site.phone.replace(/\s/g, "")}`}
                   value={`+91 ${site.phone}`}
-                  icon={<Phone size={18} aria-hidden />}
+                  icon={<Phone size={15} aria-hidden />}
                 />
               ) : null}
               {site.github ? (
@@ -202,7 +258,7 @@ export function Contact() {
                   label="LinkedIn"
                   href={site.linkedin}
                   value="divyanshu-kashyap"
-                  icon={<Link2 size={18} aria-hidden />}
+                  icon={<Link2 size={15} aria-hidden />}
                   external
                 />
               ) : null}
@@ -210,24 +266,24 @@ export function Contact() {
                 <ContactChannel
                   label="LeetCode"
                   href={site.leetcode}
-                  value={`@${site.leetcodeUser} · ${site.leetcodeStats.solved} solved`}
-                  icon={<Code2 size={18} aria-hidden />}
+                  value={`@${site.leetcodeUser}`}
+                  icon={<Code2 size={15} aria-hidden />}
                   external
                 />
               ) : null}
             </div>
           </ScrollReveal>
 
-          <ScrollReveal delay={0.08} className="w-full min-w-0">
-            <div className="w-full rounded-md border border-border-muted bg-surface-raised p-6 shadow-soft md:p-8">
-              <div className="mb-6">
-                <p className="text-xs font-medium tracking-[0.16em] text-text-tertiary uppercase">
+          <ScrollReveal delay={0.06} className="flex h-full min-h-0">
+            <div className="flex h-full w-full flex-col rounded-md border border-border-muted bg-surface-raised p-5 shadow-soft md:p-6">
+              <div className="mb-5">
+                <p className="text-[11px] font-semibold tracking-[0.16em] text-accent-cyan uppercase">
                   Send a message
                 </p>
-                <p className="mt-2 text-2xl font-semibold tracking-tight text-text-primary">
+                <p className="mt-1.5 text-xl font-semibold tracking-tight text-text-primary">
                   Tell me about your project
                 </p>
-                <Text tone="muted" size="sm" className="mt-2">
+                <Text tone="muted" className="mt-1.5 text-sm leading-relaxed">
                   I usually reply within 24–48 hours.
                 </Text>
               </div>
@@ -237,9 +293,9 @@ export function Contact() {
                 onSubmit={onSubmit}
                 noValidate
                 aria-describedby={error ? `${formId}-error` : undefined}
-                className="space-y-5"
+                className="flex flex-1 flex-col gap-4"
               >
-                <div className="grid gap-5 sm:grid-cols-2">
+                <div className="grid gap-4 sm:grid-cols-2">
                   <div data-contact-field>
                     <Field id={`${formId}-name`} label="Name">
                       <Input
@@ -247,8 +303,12 @@ export function Contact() {
                         name="name"
                         type="text"
                         autoComplete="name"
-                        placeholder="Your name"
+                        placeholder="Your full name"
                         required
+                        invalid={invalid.name}
+                        onChange={() =>
+                          setInvalid((prev) => ({ ...prev, name: false }))
+                        }
                       />
                     </Field>
                   </div>
@@ -261,43 +321,70 @@ export function Contact() {
                         autoComplete="email"
                         placeholder="you@company.com"
                         required
+                        invalid={invalid.email}
+                        onChange={() =>
+                          setInvalid((prev) => ({ ...prev, email: false }))
+                        }
                       />
                     </Field>
                   </div>
                 </div>
 
-                <div data-contact-field>
-                  <Field id={`${formId}-message`} label="Message">
+                <div data-contact-field className="flex min-h-0 flex-1 flex-col">
+                  <Field
+                    id={`${formId}-message`}
+                    label="Message"
+                    className="flex h-full flex-col"
+                  >
                     <Textarea
                       id={`${formId}-message`}
                       name="message"
-                      rows={6}
+                      rows={5}
                       placeholder="What are you building? Timeline, goals, or how I can help…"
                       required
+                      invalid={invalid.message}
+                      className="min-h-[140px] flex-1 lg:min-h-[180px]"
+                      onChange={() =>
+                        setInvalid((prev) => ({ ...prev, message: false }))
+                      }
                     />
                   </Field>
                 </div>
 
-                {error ? (
-                  <p id={`${formId}-error`} className="field-error" role="alert">
-                    {error}
-                  </p>
-                ) : null}
-                {status === "success" ? (
-                  <Text size="sm" role="status">
-                    Opening your email client…
-                  </Text>
-                ) : null}
+                <div className="mt-auto space-y-3 pt-1">
+                  {error ? (
+                    <p
+                      id={`${formId}-error`}
+                      className="field-error"
+                      role="alert"
+                    >
+                      <AlertCircle
+                        size={16}
+                        className="mt-0.5 shrink-0"
+                        aria-hidden
+                      />
+                      <span>{error}</span>
+                    </p>
+                  ) : null}
+                  {status === "success" ? (
+                    <p
+                      className="rounded-xs border border-accent-cyan/30 bg-accent-cyan/10 px-3 py-2.5 text-sm font-medium text-accent-cyan"
+                      role="status"
+                    >
+                      Opening your email client…
+                    </p>
+                  ) : null}
 
-                <div data-contact-field>
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    loading={status === "loading"}
-                  >
-                    Send Message
-                    <ArrowUpRight size={16} aria-hidden />
-                  </Button>
+                  <div data-contact-field>
+                    <Button
+                      type="submit"
+                      className="w-full min-h-11"
+                      loading={status === "loading"}
+                    >
+                      Send Message
+                      <ArrowUpRight size={16} aria-hidden />
+                    </Button>
+                  </div>
                 </div>
               </form>
             </div>

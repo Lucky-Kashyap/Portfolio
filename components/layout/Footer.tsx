@@ -9,7 +9,7 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative overflow-hidden border-t border-border-muted py-12 md:py-16">
+    <footer className="relative overflow-hidden border-t border-border-muted py-10 md:py-12">
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_60%_at_50%_120%,color-mix(in_srgb,#7dd3fc_10%,transparent),transparent_70%)]"
         aria-hidden

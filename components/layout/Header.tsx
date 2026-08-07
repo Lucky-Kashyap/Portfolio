@@ -233,7 +233,7 @@ export function Header() {
                   }
                 }}
               >
-                <BrandMark size={18} className="rounded-xs" title="" />
+                <BrandMark size={22} className="rounded-full" title="" />
                 <span className="hidden text-[10px] tracking-[0.14em] sm:inline">
                   {site.mark}
                 </span>

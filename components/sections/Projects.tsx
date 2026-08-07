@@ -15,9 +15,9 @@ export function Projects() {
         />
       </ScrollReveal>
 
-      <Grid as="ul" cols={3} gap="md" className="section-content items-stretch">
+      <Grid as="ul" cols={2} gap="md" className="section-content items-stretch">
         {projects.map((project, index) => (
-          <li key={project.title} className="flex h-full min-h-0">
+          <li key={project.title} className="flex h-full min-h-0 w-full">
             <ProjectCard project={project} index={index} />
           </li>
         ))}

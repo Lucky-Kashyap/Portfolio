@@ -2,7 +2,6 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
 import { useGSAP } from "@gsap/react";
 import { Code2, Sparkles } from "lucide-react";
 import {
@@ -192,58 +191,20 @@ export function About() {
             <StatCounters />
           </div>
 
-          <div className="mx-auto flex w-full max-w-[220px] flex-col items-center gap-5 lg:mx-0 lg:max-w-[240px]">
+          <div className="mx-auto flex w-full max-w-[220px] flex-col items-center lg:mx-0 lg:max-w-[240px]">
             <div
               ref={imageRef}
               className="relative aspect-square w-40 overflow-hidden rounded-full border border-border-muted shadow-soft will-change-transform lg:w-44"
             >
               <Image
-                src={site.avatar}
-                alt="Divyanshu Kashyap, Frontend Engineer based in Jaipur, professional portrait photo"
+                src="/svgs/brand-mark.webp"
+                alt="Divyanshu Kashyap anime coding brand mark — Frontend Engineer"
                 fill
                 className="object-cover"
                 sizes="176px"
+                unoptimized
               />
             </div>
-
-            <ScrollReveal delay={0.08} y={28} className="w-full">
-              <div className="relative overflow-hidden rounded-md border border-border-muted bg-surface-raised shadow-card">
-                <div className="relative aspect-square w-full">
-                  <Image
-                    src={site.animeAvatar}
-                    alt="Divyanshu Kashyap anime AI persona coding at a desk — Frontend Engineer illustration"
-                    fill
-                    className="object-cover object-[center_28%]"
-                    sizes="240px"
-                  />
-                  {!reduced ? (
-                    <motion.div
-                      className="pointer-events-none absolute inset-x-[18%] bottom-[6%] h-[18%] rounded-full bg-accent-cyan/10 blur-md"
-                      aria-hidden
-                      animate={{ opacity: [0.25, 0.7, 0.25], scaleX: [0.92, 1.06, 0.92] }}
-                      transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
-                    />
-                  ) : null}
-                  {!reduced ? (
-                    <motion.span
-                      className="pointer-events-none absolute bottom-3 left-3 rounded-xs border border-white/10 bg-black/55 px-2 py-1 text-[10px] font-medium tracking-[0.16em] text-accent-cyan uppercase backdrop-blur-sm"
-                      aria-hidden
-                      animate={{ opacity: [0.65, 1, 0.65] }}
-                      transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-                    >
-                      typing…
-                    </motion.span>
-                  ) : (
-                    <span className="absolute bottom-3 left-3 rounded-xs border border-white/10 bg-black/55 px-2 py-1 text-[10px] font-medium tracking-[0.16em] text-accent-cyan uppercase backdrop-blur-sm">
-                      AI persona
-                    </span>
-                  )}
-                </div>
-                <p className="border-t border-border-muted px-3 py-2 text-center text-[11px] tracking-[0.14em] text-text-tertiary uppercase">
-                  Anime AI avatar
-                </p>
-              </div>
-            </ScrollReveal>
           </div>
         </div>
 

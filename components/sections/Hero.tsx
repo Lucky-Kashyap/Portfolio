@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useGSAP } from "@gsap/react";
 import { Button, Container } from "@/components/ui";
 import { HeroAvatar } from "@/components/motion/HeroAvatar";
@@ -18,6 +19,41 @@ function splitName(full: string) {
   const parts = full.trim().split(/\s+/);
   if (parts.length < 2) return { first: full, last: "" };
   return { first: parts[0], last: parts.slice(1).join(" ") };
+}
+
+function AnimatedHeroRoles({ reduced }: { reduced: boolean }) {
+  const roles = site.heroRoles?.length
+    ? [...site.heroRoles]
+    : [site.heroHeadline];
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (reduced || roles.length < 2) return;
+    const id = window.setInterval(() => {
+      setIndex((i) => (i + 1) % roles.length);
+    }, 2800);
+    return () => window.clearInterval(id);
+  }, [reduced, roles.length]);
+
+  const active = roles[index % roles.length];
+
+  return (
+    <div className="relative mt-2 min-h-[1.35em] overflow-hidden md:mt-3">
+      <AnimatePresence mode="wait">
+        <motion.h1
+          key={active}
+          id="hero-heading"
+          initial={reduced ? false : { y: 22, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={reduced ? undefined : { y: -18, opacity: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          className="text-[clamp(1.15rem,2.4vw,1.85rem)] font-bold tracking-tight text-accent-cyan uppercase"
+        >
+          {active}
+        </motion.h1>
+      </AnimatePresence>
+    </div>
+  );
 }
 
 export function Hero() {
@@ -53,21 +89,20 @@ export function Hero() {
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
       gsap.set(bgRef.current, { opacity: 0 });
-      gsap.set(intro, { opacity: 0, y: 24 });
-      // No clipPath — it was cropping the last letter of the name
-      gsap.set(nameRef.current, { opacity: 0, y: 22 });
-      gsap.set(ctas, { opacity: 0, y: 18 });
-      gsap.set(social, { opacity: 0, y: 14 });
-      gsap.set(avatar, { opacity: 0, y: 32, scale: 0.97 });
+      gsap.set(intro, { opacity: 0, y: 18 });
+      gsap.set(nameRef.current, { opacity: 0, y: 16 });
+      gsap.set(ctas, { opacity: 0, y: 14 });
+      gsap.set(social, { opacity: 0, y: 12 });
+      gsap.set(avatar, { opacity: 0, y: 20, scale: 0.98 });
       gsap.set(scrollRef.current, { opacity: 0 });
 
-      tl.to(bgRef.current, { opacity: 1, duration: 0.9 }, 0)
-        .to(intro, { opacity: 1, y: 0, duration: 0.65, stagger: 0.07 }, 0.1)
-        .to(nameRef.current, { opacity: 1, y: 0, duration: 0.8 }, 0.2)
-        .to(avatar, { opacity: 1, y: 0, scale: 1, duration: 0.9 }, 0.15)
-        .to(ctas, { opacity: 1, y: 0, duration: 0.5, stagger: 0.08 }, 0.55)
-        .to(social, { opacity: 1, y: 0, duration: 0.4, stagger: 0.05 }, 0.7)
-        .to(scrollRef.current, { opacity: 1, duration: 0.45 }, 0.9);
+      tl.to(bgRef.current, { opacity: 1, duration: 0.8 }, 0)
+        .to(intro, { opacity: 1, y: 0, duration: 0.55, stagger: 0.06 }, 0.08)
+        .to(nameRef.current, { opacity: 1, y: 0, duration: 0.7 }, 0.15)
+        .to(avatar, { opacity: 1, y: 0, scale: 1, duration: 0.8 }, 0.12)
+        .to(ctas, { opacity: 1, y: 0, duration: 0.45, stagger: 0.07 }, 0.45)
+        .to(social, { opacity: 1, y: 0, duration: 0.35, stagger: 0.04 }, 0.58)
+        .to(scrollRef.current, { opacity: 1, duration: 0.4 }, 0.75);
 
       const scrub = gsap.timeline({
         scrollTrigger: {
@@ -81,14 +116,14 @@ export function Hero() {
       scrub
         .to(
           contentRef.current,
-          { y: 60, scale: 0.98, opacity: 0.4, ease: "none" },
+          { y: 40, scale: 0.985, opacity: 0.45, ease: "none" },
           0,
         )
-        .to(bgRef.current, { y: 80, ease: "none" }, 0);
+        .to(bgRef.current, { y: 60, ease: "none" }, 0);
 
       if (scrollRef.current) {
         gsap.to(scrollRef.current.querySelector("[data-scroll-arrow]"), {
-          y: 6,
+          y: 5,
           repeat: -1,
           yoyo: true,
           duration: 0.9,
@@ -109,7 +144,7 @@ export function Hero() {
     <section
       ref={sectionRef}
       id="top"
-      className="relative flex min-h-[100svh] items-center justify-center overflow-x-clip overflow-y-visible bg-surface-base pt-14 pb-12 md:pt-16 md:pb-16"
+      className="relative flex h-[100svh] max-h-[100svh] min-h-[100svh] items-center overflow-hidden bg-surface-base pt-12 pb-8 md:pt-14 md:pb-10"
       aria-labelledby="hero-heading"
     >
       <div
@@ -119,31 +154,30 @@ export function Hero() {
       >
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_70%_20%,color-mix(in_srgb,#7dd3fc_12%,transparent),transparent_60%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_15%_80%,color-mix(in_srgb,#ffffff_6%,transparent),transparent_55%)]" />
-        <p className="absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 select-none text-[clamp(4rem,18vw,14rem)] font-bold tracking-tighter text-text-primary/[0.04] uppercase">
+        <p className="absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 select-none text-[clamp(3.5rem,16vw,12rem)] font-bold tracking-tighter text-text-primary/[0.035] uppercase">
           Creative
         </p>
       </div>
 
-      <Container className="relative z-10 w-full">
+      <Container className="relative z-10 flex h-full w-full min-h-0 items-center">
         <div
           ref={contentRef}
-          className="grid w-full items-start gap-8 will-change-transform lg:grid-cols-2 lg:gap-12 xl:gap-16"
+          className="grid w-full min-h-0 items-center gap-5 will-change-transform lg:grid-cols-2 lg:gap-10 xl:gap-12"
         >
-          {/* Left — top-aligned with avatar (not vertically centered) */}
-          <div className="min-w-0 order-2 lg:order-1 lg:pr-2 lg:pt-1">
+          {/* Left — same vertical center as avatar */}
+          <div className="min-w-0 order-2 flex flex-col justify-center lg:order-1 lg:pr-2">
             <p
               data-hero-intro
-              className="mb-2 text-xs font-medium tracking-[0.22em] text-accent-cyan uppercase md:text-sm"
+              className="mb-1.5 text-[11px] font-medium tracking-[0.22em] text-accent-cyan uppercase md:mb-2 md:text-xs"
             >
               Hello! I&apos;m
             </p>
 
-            {/* overflow-visible so last letter never clips */}
             <div ref={nameRef} className="will-change-transform">
               <p
                 className={cn(
                   "font-bold tracking-[-0.03em] text-text-primary uppercase",
-                  "text-[clamp(2.35rem,5.8vw,4.25rem)] leading-[1.02]",
+                  "text-[clamp(1.85rem,4.6vw,3.35rem)] leading-[1.02]",
                   !reduced && "animate-hero-name-pulse",
                 )}
               >
@@ -156,26 +190,22 @@ export function Hero() {
               </p>
             </div>
 
-            {/* Single H1 for SEO — role keyword */}
-            <h1
-              id="hero-heading"
-              data-hero-intro
-              className="mt-3 text-[clamp(1.35rem,2.8vw,2.15rem)] font-bold tracking-tight text-accent-cyan uppercase md:mt-4"
-            >
-              {site.heroHeadline}
-            </h1>
+            {/* Animated roles visible in first viewport (no scroll needed) */}
+            <div data-hero-intro>
+              <AnimatedHeroRoles reduced={reduced} />
+            </div>
 
             <p
               data-hero-intro
-              className="mt-4 max-w-lg text-[clamp(1rem,1.5vw,1.25rem)] leading-relaxed text-text-secondary md:mt-5"
+              className="mt-3 max-w-md text-[clamp(0.9rem,1.35vw,1.05rem)] leading-relaxed text-text-secondary md:mt-4"
             >
               {site.summary}
             </p>
 
-            <div className="mt-7 flex w-full flex-col gap-3 sm:w-auto sm:flex-row md:mt-8">
+            <div className="mt-5 flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row md:mt-6">
               <div data-hero-cta>
                 <Button
-                  className="w-full min-h-[48px] px-7 text-base sm:w-auto md:min-h-[52px]"
+                  className="w-full min-h-[44px] px-6 text-sm sm:w-auto md:min-h-[48px] md:text-base"
                   aria-label="View featured projects"
                   onClick={() => scrollToId("projects")}
                 >
@@ -185,7 +215,7 @@ export function Hero() {
               <div data-hero-cta>
                 <Button
                   variant="secondary"
-                  className="w-full min-h-[48px] px-7 text-base sm:w-auto md:min-h-[52px]"
+                  className="w-full min-h-[44px] px-6 text-sm sm:w-auto md:min-h-[48px] md:text-base"
                   aria-label="Go to contact form"
                   onClick={() => scrollToId("contact")}
                 >
@@ -195,18 +225,20 @@ export function Hero() {
             </div>
 
             <SocialMagneticIcons
-              className="mt-7"
-              size="md"
+              className="mt-5"
+              size="sm"
               itemAttr="data-hero-social"
             />
           </div>
 
-          {/* Right — equal column, full-width avatar */}
+          {/* Right — equal column, height capped to first viewport */}
           <div
             data-hero-avatar
-            className="order-1 mx-auto w-full max-w-[320px] sm:max-w-[380px] lg:order-2 lg:mx-0 lg:max-w-none"
+            className="order-1 mx-auto flex w-full max-w-[260px] items-center justify-center sm:max-w-[300px] lg:order-2 lg:mx-0 lg:max-w-none lg:justify-end"
           >
-            <HeroAvatar />
+            <div className="w-full max-h-[min(52svh,420px)] lg:max-h-[min(68svh,520px)]">
+              <HeroAvatar compact />
+            </div>
           </div>
         </div>
       </Container>
@@ -214,11 +246,11 @@ export function Hero() {
       <button
         ref={scrollRef}
         type="button"
-        className="absolute bottom-4 left-1/2 hidden -translate-x-1/2 items-center justify-center text-text-tertiary md:inline-flex"
+        className="absolute bottom-3 left-1/2 z-20 hidden -translate-x-1/2 items-center justify-center text-text-tertiary md:inline-flex"
         onClick={() => scrollToId("about")}
         aria-label="Scroll to about section"
       >
-        <span data-scroll-arrow aria-hidden className="text-lg">
+        <span data-scroll-arrow aria-hidden className="text-base">
           ↓
         </span>
       </button>

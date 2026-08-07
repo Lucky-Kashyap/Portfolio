@@ -43,10 +43,10 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
   };
 
   return (
-    <ScrollReveal className="h-full" y={36} x={0} delay={0.05 * (index % 3)}>
+    <ScrollReveal className="h-full w-full" y={36} x={0} delay={0.05 * (index % 2)}>
       <Card
         variant="interactive"
-        className="flex h-full flex-col"
+        className="flex h-full w-full flex-col"
         aria-label={`${project.title} project`}
         data-cursor="hover"
       >
@@ -65,7 +65,7 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
                 alt={activeAlt}
                 fill
                 className="object-cover object-top"
-                sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
+                sizes="(max-width: 768px) 100vw, 50vw"
                 quality={90}
                 loading="lazy"
                 decoding="async"

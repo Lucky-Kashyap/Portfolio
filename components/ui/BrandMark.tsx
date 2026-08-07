@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 type BrandMarkProps = {
@@ -6,29 +7,26 @@ type BrandMarkProps = {
   title?: string;
 };
 
-/** Inline D mark — reliable in loader/header (avoids Next/Image SVG gaps). */
+/**
+ * Site brand mark — anime coding illustration
+ * (from portfolio-alpha-lime-53.vercel.app/svgs/favicon.svg).
+ */
 export function BrandMark({
   className,
   size = 40,
-  title = "D",
+  title = "Divyanshu Kashyap",
 }: BrandMarkProps) {
   const labelled = Boolean(title);
 
   return (
-    <svg
+    <Image
+      src="/svgs/brand-mark.webp"
+      alt={labelled ? title : ""}
       width={size}
       height={size}
-      viewBox="0 0 32 32"
-      role={labelled ? "img" : "presentation"}
-      aria-label={labelled ? title : undefined}
+      className={cn("shrink-0 rounded-sm object-cover", className)}
       aria-hidden={labelled ? undefined : true}
-      className={cn("shrink-0", className)}
-    >
-      <rect width="32" height="32" rx="8" fill="#ffffff" />
-      <path
-        fill="#000000"
-        d="M9 7h7.2c4.85 0 8.3 3.35 8.3 9s-3.45 9-8.3 9H9V7zm3.4 3.2v11.6h3.7c2.95 0 4.9-2.05 4.9-5.8s-1.95-5.8-4.9-5.8H12.4z"
-      />
-    </svg>
+      unoptimized
+    />
   );
 }

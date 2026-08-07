@@ -34,34 +34,41 @@ export const seo = {
 
 export const faqs = [
   {
+    id: "specialize",
     question: "What kind of frontend work do you specialize in?",
     answer:
       "I specialize in scalable React.js and Next.js applications with TypeScript — reusable UI architecture, REST API integration, performance optimization, accessibility, and responsive interfaces across devices and browsers.",
   },
   {
+    id: "stack",
     question: "Which technologies do you use day to day?",
     answer:
       "React.js, Next.js, Angular, TypeScript, JavaScript, Tailwind CSS, Bootstrap, WordPress, Redux Toolkit, React Query, GSAP, Framer Motion, Locomotive Scroll, Shery.js, Lighthouse, Google Analytics, Google Search Console, Screaming Frog / SEO Spider link audits, REST APIs, Git, GitHub, Bitbucket, and Jira.",
   },
   {
+    id: "experience",
     question: "How much experience do you have?",
     answer:
       "I have 2.5+ years of frontend engineering experience, currently working as an Associate Software Engineer at Helios Web Services in Jaipur (full-time, on-site) since January 2024.",
   },
   {
+    id: "opportunities",
     question: "Are you open to new opportunities or collaborations?",
     answer:
       "Yes. I am open to connecting with developers, recruiters, and technology leaders interested in web engineering, product development, and AI-powered frontend experiences.",
   },
   {
+    id: "contact",
     question: "Where are you based, and how can I contact you?",
-    answer: `I am based in Gokul Vatika, Jaipur, Rajasthan. Email ${site.email}, call +91 ${site.phone}, or reach me on GitHub (${site.github}), LinkedIn (${site.linkedin}), and LeetCode (${site.leetcode}).`,
+    answer: `I am based in Gokul Vatika, Jaipur, Rajasthan. Email ${site.email}, call +91 ${site.phone}, or reach me on GitHub, LinkedIn, and LeetCode.`,
   },
   {
+    id: "leetcode",
     question: "Do you practice problem solving / DSA?",
     answer: `Yes. I practice on LeetCode (@${site.leetcodeUser}) with ${site.leetcodeStats.solved}+ problems solved across Easy (${site.leetcodeStats.easy}) and Medium (${site.leetcodeStats.medium}), mainly in C++ and JavaScript.`,
   },
   {
+    id: "performance",
     question: "Do you focus on performance and SEO?",
     answer:
       "Yes. I use Lighthouse and Core Web Vitals to guide performance work, and SEO tooling like Google Search Console, Google Analytics, Screaming Frog / SEO Spider, and broken or dead link checks to keep sites crawlable and healthy — including WordPress-friendly frontend SEO hygiene.",

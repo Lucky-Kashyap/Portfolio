@@ -1,3 +1,4 @@
+export { AutoplayVideo } from "./AutoplayVideo";
 export { Badge, Chip, ChipGroup } from "./Badge";
 export { BrandMark } from "./BrandMark";
 export { Button } from "./Button";
