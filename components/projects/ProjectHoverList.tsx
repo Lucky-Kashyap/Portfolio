@@ -130,6 +130,7 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
   const mouseNormRef = useRef({ x: 0.5, y: 0.5 });
   const lastPointer = useRef({ x: 0, y: 0, t: 0 });
   const mixRaf = useRef<number | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
 
   const active = hovered != null ? projects[hovered] : null;
   const showDesktopHover = finePointer && !reduced;
@@ -246,6 +247,47 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
     return () => cancelAnimationFrame(id);
   }, [showDesktopHover]);
 
+  const hidePreview = useCallback(() => {
+    setHovered(null);
+    setPreviewVisible(false);
+    velocityRef.current = 0;
+  }, []);
+
+  // Wheel/scroll does not fire mouseleave while the cursor stays put — close the
+  // fixed portal preview so it cannot stick over later sections (e.g. FAQ).
+  useEffect(() => {
+    if (!showDesktopHover || !previewVisible) return;
+
+    const onScrollOrWheel = () => hidePreview();
+    window.addEventListener("scroll", onScrollOrWheel, {
+      capture: true,
+      passive: true,
+    });
+    window.addEventListener("wheel", onScrollOrWheel, { passive: true });
+    window.addEventListener("touchmove", onScrollOrWheel, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScrollOrWheel, true);
+      window.removeEventListener("wheel", onScrollOrWheel);
+      window.removeEventListener("touchmove", onScrollOrWheel);
+    };
+  }, [showDesktopHover, previewVisible, hidePreview]);
+
+  useEffect(() => {
+    if (!showDesktopHover) return;
+    const root = listRef.current;
+    if (!root) return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) hidePreview();
+      },
+      { threshold: 0.05 },
+    );
+    io.observe(root);
+    return () => io.disconnect();
+  }, [showDesktopHover, hidePreview]);
+
   const preview =
     mounted && showDesktopHover
       ? createPortal(
@@ -318,14 +360,11 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
       {preview}
 
       <div
+        ref={listRef}
         data-project-list
         className="relative"
         onMouseMove={showDesktopHover ? onListMove : undefined}
-        onMouseLeave={() => {
-          setHovered(null);
-          setPreviewVisible(false);
-          velocityRef.current = 0;
-        }}
+        onMouseLeave={hidePreview}
       >
         <ul className="m-0 list-none divide-y divide-border-muted border-y border-border-muted p-0">
           {projects.map((project, index) => {
@@ -433,7 +472,7 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
                           }
                           animate={{ y: 0, opacity: 1, scale: 1 }}
                           transition={{ duration: 0.45, ease: EASE_OUT }}
-                          className="relative aspect-[16/10] overflow-hidden border border-border-muted bg-[#070b12]"
+                          className="relative aspect-[16/10] overflow-hidden border border-border-muted bg-[#070b12] transition-[border-color,box-shadow] duration-fast hover:border-accent-cyan/40 hover:shadow-soft"
                         >
                           <Image
                             src={project.image}

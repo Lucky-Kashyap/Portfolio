@@ -170,7 +170,7 @@ function DesktopServices({ reduced }: { reduced: boolean }) {
       </ul>
 
       <div className="relative flex min-h-0 h-full">
-        <div className="relative flex h-full w-full flex-col overflow-hidden border border-border-muted bg-surface-base p-5 md:p-6">
+        <div className="relative flex h-full w-full flex-col overflow-hidden border border-border-muted bg-surface-base p-5 transition-[border-color,box-shadow] duration-fast hover:border-accent-cyan/40 hover:shadow-soft md:p-6">
           <div
             className="pointer-events-none absolute -right-8 -top-8 size-40 rounded-full bg-[radial-gradient(circle,rgba(125,211,252,0.18),transparent_70%)]"
             aria-hidden

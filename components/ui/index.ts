@@ -3,7 +3,7 @@ export { AvatarVideoFrame } from "./AvatarVideoFrame";
 export { ChipGroup } from "./Badge";
 export { BrandMark } from "./BrandMark";
 export { Button } from "./Button";
-export { Card } from "./Card";
+export { Card, cardSurfaceClass } from "./Card";
 export { Container } from "./Container";
 export { Eyebrow } from "./Eyebrow";
 export { Field, Input, Textarea } from "./Field";

@@ -19,6 +19,7 @@ import {
   Text,
   TextLink,
   Textarea,
+  cardSurfaceClass,
 } from "@/components/ui";
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { ScrollWords } from "@/components/motion/ScrollHeading";
@@ -164,7 +165,12 @@ export function Contact() {
         {/* Contact channels + form — stretch so bottoms align on desktop */}
         <div className="mt-8 grid gap-6 lg:mt-10 lg:grid-cols-2 lg:items-stretch lg:gap-8">
           <ScrollReveal className="flex h-full flex-col gap-4">
-            <div className="relative overflow-hidden rounded-md border border-border-muted bg-surface-raised">
+            <div
+              className={cn(
+                "relative overflow-hidden rounded-md",
+                cardSurfaceClass,
+              )}
+            >
               <div className="relative aspect-[2/1] w-full sm:aspect-[21/9]">
                 <Image
                   src="/contact/contact-collab-visual.webp"
@@ -186,7 +192,12 @@ export function Contact() {
             </div>
 
             <div className="grid flex-1 content-start gap-2 sm:grid-cols-2">
-              <div className="flex items-center gap-2.5 rounded-sm border border-border-muted bg-surface-raised px-3 py-2.5 sm:col-span-2">
+              <div
+                className={cn(
+                  "flex items-center gap-2.5 rounded-sm px-3 py-2.5 sm:col-span-2",
+                  cardSurfaceClass,
+                )}
+              >
                 <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-xs border border-border-muted bg-surface-muted text-text-primary">
                   <MapPin size={15} aria-hidden />
                 </span>
@@ -247,7 +258,12 @@ export function Contact() {
           </ScrollReveal>
 
           <ScrollReveal delay={0.06} className="flex h-full min-h-0">
-            <div className="flex h-full w-full flex-col rounded-md border border-border-muted bg-surface-raised p-5 shadow-soft md:p-6">
+            <div
+              className={cn(
+                "flex h-full w-full flex-col rounded-md p-5 md:p-6",
+                cardSurfaceClass,
+              )}
+            >
               <div className="mb-5 shrink-0">
                 <p className="text-[11px] font-semibold tracking-[0.16em] text-accent-cyan uppercase">
                   Send a message

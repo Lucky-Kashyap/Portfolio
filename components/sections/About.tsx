@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Code2, Sparkles } from "lucide-react";
 import {
   EducationCard,
@@ -11,6 +12,7 @@ import {
   StackGroupCard,
 } from "@/components/cards/EducationCard";
 import {
+  Card,
   ChipGroup,
   Container,
   Eyebrow,
@@ -25,30 +27,90 @@ import { gsap, registerGsap } from "@/lib/gsap";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
 
-function AboutAvatarVisual({ className }: { className?: string }) {
+const ABOUT_HELP_LINES = [
+  "Get to know the engineer behind the UI",
+  "React · Next.js · TypeScript in production",
+  "Motion, performance, and accessible craft",
+  "Based in Jaipur — open to collaborate",
+  "Scroll down for experience & projects",
+] as const;
+
+function AboutHelpTicker({ reduced }: { reduced: boolean }) {
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (reduced) return;
+    const id = window.setInterval(() => {
+      setIndex((i) => (i + 1) % ABOUT_HELP_LINES.length);
+    }, 3200);
+    return () => window.clearInterval(id);
+  }, [reduced]);
+
+  const line = ABOUT_HELP_LINES[index % ABOUT_HELP_LINES.length];
+
   return (
-    <div className={cn("relative w-full", className)}>
+    <div className="pointer-events-none absolute right-3 bottom-4 z-[3] max-w-[52%] text-right sm:right-4 sm:bottom-5">
+      <p
+        className="text-[9px] font-semibold tracking-[0.16em] text-accent-cyan uppercase"
+        style={{ textShadow: "0 1px 10px rgba(0,0,0,0.75)" }}
+      >
+        About
+      </p>
+      <div className="relative mt-1 min-h-[2.85em] overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={line}
+            initial={reduced ? false : { y: 14, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={reduced ? undefined : { y: -10, opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            className="text-sm leading-snug font-medium text-white sm:text-[0.95rem]"
+            style={{ textShadow: "0 2px 14px rgba(0,0,0,0.85)" }}
+          >
+            {line}
+          </motion.p>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+function AboutAvatarVisual({ className }: { className?: string }) {
+  const reduced = usePrefersReducedMotion();
+
+  return (
+    <div className={cn("relative mx-auto w-full max-w-[22rem] lg:mx-0 lg:max-w-none", className)}>
       <div
-        className="pointer-events-none absolute -inset-4 z-0 sm:-inset-5"
+        className="pointer-events-none absolute -inset-3 z-0 sm:-inset-4"
         aria-hidden
       >
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_55%_40%,rgba(232,196,124,0.16),transparent_68%)] blur-2xl" />
-        <div className="absolute inset-0 animate-avatar-glow-pulse motion-reduce:animate-none bg-[radial-gradient(ellipse_45%_50%_at_70%_28%,rgba(125,211,252,0.14),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_55%_40%,rgba(232,196,124,0.14),transparent_68%)] blur-xl" />
+        <div className="absolute inset-0 animate-avatar-glow-pulse motion-reduce:animate-none bg-[radial-gradient(ellipse_45%_50%_at_70%_28%,rgba(125,211,252,0.12),transparent_70%)]" />
       </div>
 
-      {/* Portrait frame — show full avatar (CREATIVE + face), do not stretch-crop */}
-      <figure className="relative z-[1] mx-auto w-full max-w-[22rem] overflow-hidden rounded-[1.35rem] border border-border-muted bg-[#05070c] sm:rounded-[1.5rem] lg:ml-auto lg:max-w-none">
-        <div className="relative aspect-[3/4] w-full overflow-hidden">
+      {/* Compact frame — full regenerated image (CREATIVE + face + hand) */}
+      <figure className="relative z-[1] aspect-[3/4] w-full max-h-[24rem] overflow-hidden rounded-[1.25rem] border border-border-muted bg-[#05070c] sm:max-h-[26rem] sm:rounded-[1.4rem] lg:ml-auto lg:h-[26rem] lg:max-h-[26rem] lg:w-full lg:max-w-[22rem] lg:aspect-auto">
+        <motion.div
+          className="absolute inset-0"
+          animate={reduced ? undefined : { y: [0, -6, 0] }}
+          transition={
+            reduced
+              ? undefined
+              : { duration: 5.5, repeat: Infinity, ease: "easeInOut" }
+          }
+        >
           <Image
-            src={site.aboutVisual}
+            src={`${site.aboutVisual}?v=final`}
             alt={`${site.brand} — stylized AI avatar`}
             fill
-            className="object-contain object-center animate-avatar-idle-float motion-reduce:animate-none"
-            sizes="(max-width: 1024px) 22rem, 40vw"
+            className="object-contain object-center"
+            sizes="(max-width: 1024px) 22rem, 22rem"
             quality={92}
-            priority={false}
+            priority
           />
-        </div>
+        </motion.div>
+
+        <AboutHelpTicker reduced={reduced} />
       </figure>
     </div>
   );
@@ -96,9 +158,11 @@ function StatCounters() {
       aria-label="Career highlights"
     >
       {about.stats.map((stat) => (
-        <div
+        <Card
           key={stat.label}
-          className="rounded-sm border border-border-muted bg-surface-raised px-4 py-4 shadow-card"
+          variant="raised"
+          padding="none"
+          className="px-4 py-4"
         >
           <p
             className="text-2xl font-semibold tracking-tight text-text-primary md:text-3xl"
@@ -110,7 +174,7 @@ function StatCounters() {
           <p className="mt-1.5 text-[11px] tracking-[0.14em] text-text-tertiary uppercase">
             {stat.label}
           </p>
-        </div>
+        </Card>
       ))}
     </div>
   );
@@ -127,7 +191,7 @@ export function About() {
       aria-labelledby="about-heading"
     >
       <Container>
-        <div className="mt-6 grid items-center gap-6 lg:mt-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.9fr)] lg:gap-8 xl:gap-10">
+        <div className="mt-6 grid items-center gap-6 lg:mt-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-8 xl:gap-10">
           <div className="order-2 min-w-0 lg:order-1">
             <ScrollReveal y={28}>
               <p className="text-[11px] font-semibold tracking-[0.2em] text-text-tertiary uppercase">
@@ -186,13 +250,9 @@ export function About() {
             </ScrollReveal>
           </div>
 
-          <ScrollReveal
-            delay={0.1}
-            y={24}
-            className="order-1 w-full max-lg:mx-auto max-lg:max-w-[20rem] lg:order-2"
-          >
+          <div className="order-1 w-full lg:order-2 lg:flex lg:justify-end">
             <AboutAvatarVisual />
-          </ScrollReveal>
+          </div>
         </div>
 
         <StatCounters />
@@ -211,7 +271,7 @@ export function About() {
 
           <div className="flex h-full min-h-0 flex-col gap-4">
             <ScrollReveal delay={0.05} y={20}>
-              <div className="rounded-sm border border-border-muted bg-surface-raised p-5 shadow-card">
+              <Card variant="raised" padding="none" className="p-5">
                 <div className="flex items-center gap-3">
                   <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary">
                     <Sparkles size={16} aria-hidden />
@@ -229,7 +289,7 @@ export function About() {
                   items={[...about.learning]}
                   className="mt-4 gap-2"
                 />
-              </div>
+              </Card>
             </ScrollReveal>
 
             <ScrollReveal
@@ -237,7 +297,11 @@ export function About() {
               y={20}
               className="flex min-h-0 flex-col lg:flex-1"
             >
-              <div className="flex min-h-0 flex-col rounded-sm border border-border-muted bg-surface-raised p-5 shadow-card lg:h-full lg:flex-1">
+              <Card
+                variant="raised"
+                padding="none"
+                className="flex min-h-0 flex-col p-5 lg:h-full lg:flex-1"
+              >
                 <Eyebrow className="mb-0 tracking-[0.14em]">Top Skills</Eyebrow>
                 <ChipGroup items={[...about.topSkills]} className="mt-3 gap-2" />
                 <Quote
@@ -246,19 +310,23 @@ export function About() {
                 >
                   {site.connect}
                 </Quote>
-              </div>
+              </Card>
             </ScrollReveal>
           </div>
 
           <ScrollReveal delay={0.08} className="lg:col-span-2" y={28}>
-            <div className="rounded-sm border border-border-muted bg-surface-raised p-5 shadow-card md:p-6">
+            <Card
+              variant="raised"
+              padding="none"
+              className="p-5 md:p-6"
+            >
               <Eyebrow className="mb-0 tracking-[0.14em]">Technologies</Eyebrow>
               <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {Object.entries(about.stack).map(([group, items]) => (
                   <StackGroupCard key={group} title={group} items={items} />
                 ))}
               </div>
-            </div>
+            </Card>
           </ScrollReveal>
         </div>
       </Container>

@@ -10,7 +10,7 @@ import {
   ShieldCheck,
   Wrench,
 } from "lucide-react";
-import { Card, Eyebrow, Text } from "@/components/ui";
+import { Card, ChipGroup, Eyebrow, Text } from "@/components/ui";
 import type { ExperienceItem } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
@@ -135,16 +135,11 @@ export function ExperienceCard({ item }: ExperienceCardProps) {
         {item.location} · {item.workMode}
       </Text>
       {item.skills?.length ? (
-        <div className="mt-6 flex flex-wrap gap-2">
-          {item.skills.map((skill) => (
-            <span
-              key={skill}
-              className="rounded-xs border border-border-muted bg-surface-muted px-3 py-2 text-xs tracking-wide text-text-secondary"
-            >
-              {skill}
-            </span>
-          ))}
-        </div>
+        <ChipGroup
+          items={item.skills}
+          size="sm"
+          className="mt-6"
+        />
       ) : null}
     </Card>
   );
@@ -186,16 +181,7 @@ export function EducationCard({
         {period}
       </Text>
       {skills?.length ? (
-        <div className="mt-6 flex flex-wrap gap-2">
-          {skills.map((skill) => (
-            <span
-              key={skill}
-              className="rounded-xs border border-border-muted bg-surface-muted px-3 py-2 text-xs tracking-wide text-text-secondary"
-            >
-              {skill}
-            </span>
-          ))}
-        </div>
+        <ChipGroup items={skills} size="sm" className="mt-6" />
       ) : null}
     </Card>
   );

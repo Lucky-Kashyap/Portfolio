@@ -421,7 +421,7 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
         {skillBubbles.map((skill) => (
           <li
             key={skill.id}
-            className="flex flex-col items-center gap-2 rounded-sm border border-border-muted bg-surface-raised p-3 text-center transition-colors hover:border-accent-cyan/35 sm:p-4"
+            className="flex flex-col items-center gap-2 rounded-sm border border-border-muted bg-surface-raised p-3 text-center transition-[border-color,box-shadow] duration-fast hover:border-accent-cyan/40 hover:shadow-soft sm:p-4"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -445,7 +445,7 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
     <div
       ref={wrapRef}
       className={cn(
-        "relative h-[min(52vh,420px)] w-full overflow-hidden rounded-md border border-border-muted bg-surface-base sm:h-[min(58vh,480px)] lg:h-[min(68vh,560px)]",
+        "relative h-[min(52vh,420px)] w-full overflow-hidden rounded-md border border-border-muted bg-surface-base transition-[border-color,box-shadow] duration-fast hover:border-accent-cyan/40 hover:shadow-soft sm:h-[min(58vh,480px)] lg:h-[min(68vh,560px)]",
         className,
       )}
       onPointerMove={onPointerMove}
