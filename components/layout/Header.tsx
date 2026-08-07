@@ -147,7 +147,7 @@ export function Header() {
               : "border-b border-transparent bg-transparent",
           )}
         >
-          <div className="mx-auto flex h-8 max-w-site items-center justify-between gap-2 px-3 md:px-5">
+          <div className="container-site flex h-8 items-center justify-between gap-2">
             <div className="flex min-w-0 items-center gap-2 sm:gap-3">
               <a
                 href={mailHref}
@@ -188,99 +188,62 @@ export function Header() {
                 ))}
               </ul>
 
-              {/* Mobile menu on first view (float nav is hidden in hero) */}
-              {!scrolled ? (
-                <IconButton
-                  className="!size-8 !min-h-8 !min-w-8 md:hidden"
-                  size="md"
-                  label={open ? "Close menu" : "Open menu"}
-                  aria-expanded={open}
-                  aria-controls={menuId}
-                  onClick={() => setOpen((v) => !v)}
-                >
-                  {open ? <X size={16} aria-hidden /> : <Menu size={16} aria-hidden />}
-                </IconButton>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      </motion.header>
-
-      {/* Compact floating section nav — only after leaving hero */}
-      <AnimatePresence>
-        {scrolled ? (
-          <motion.div
-            key="float-nav"
-            className="pointer-events-none fixed inset-x-0 top-9 z-50 flex justify-center px-3"
-            initial={reduced ? false : { y: -12, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={reduced ? undefined : { y: -10, opacity: 0 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="pointer-events-auto flex max-w-full items-center gap-1 rounded-full border border-white/10 bg-surface-base/75 px-1.5 py-1 shadow-soft backdrop-blur-xl md:gap-2 md:px-2">
-              <TextLink
-                href="#top"
-                variant="brand"
-                className="brand-mark-wrap inline-flex shrink-0 items-center gap-1.5 rounded-full px-1.5 py-1 no-underline"
-                data-cursor="hover"
-                onClick={(event) => {
-                  event.preventDefault();
-                  close();
-                  if (window.__lenis) {
-                    window.__lenis.scrollTo(0, { duration: 1.1 });
-                  } else {
-                    window.scrollTo({ top: 0, behavior: "smooth" });
-                  }
-                }}
-              >
-                <BrandMark size={22} className="rounded-full" title="" />
-                <span className="hidden text-[10px] tracking-[0.14em] sm:inline">
-                  {site.mark}
-                </span>
-              </TextLink>
-
-              <span
-                className="mx-0.5 hidden h-4 w-px bg-white/10 md:block"
-                aria-hidden
-              />
-
-              <nav aria-label="Primary" className="hidden md:block">
-                <IconNavLinks items={navItems} activeId={active} />
-              </nav>
-
+              {/* Mobile menu lives in the strip — float nav is desktop-only */}
               <IconButton
-                className="!size-8 !min-h-8 !min-w-8 md:hidden"
+                className="!size-7 !min-h-7 !min-w-7 md:hidden"
                 size="md"
                 label={open ? "Close menu" : "Open menu"}
                 aria-expanded={open}
                 aria-controls={menuId}
                 onClick={() => setOpen((v) => !v)}
               >
-                <span className="relative inline-flex size-4 items-center justify-center">
-                  <AnimatePresence mode="wait" initial={false}>
-                    <motion.span
-                      key={open ? "close" : "open"}
-                      initial={
-                        reduced ? false : { opacity: 0, rotate: -40, scale: 0.7 }
-                      }
-                      animate={{ opacity: 1, rotate: 0, scale: 1 }}
-                      exit={
-                        reduced
-                          ? undefined
-                          : { opacity: 0, rotate: 40, scale: 0.7 }
-                      }
-                      transition={{ duration: 0.2 }}
-                      className="absolute inset-0 inline-flex items-center justify-center"
-                    >
-                      {open ? (
-                        <X size={16} aria-hidden />
-                      ) : (
-                        <Menu size={16} aria-hidden />
-                      )}
-                    </motion.span>
-                  </AnimatePresence>
-                </span>
+                {open ? <X size={15} aria-hidden /> : <Menu size={15} aria-hidden />}
               </IconButton>
+            </div>
+          </div>
+        </div>
+      </motion.header>
+
+      {/* Floating section nav — desktop only, after leaving hero */}
+      <AnimatePresence>
+        {scrolled ? (
+          <motion.div
+            key="float-nav"
+            className="pointer-events-none fixed inset-x-0 top-9 z-50 hidden justify-center md:flex"
+            initial={reduced ? false : { y: -12, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={reduced ? undefined : { y: -10, opacity: 0 }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="container-site pointer-events-none flex justify-center">
+              <div className="pointer-events-auto flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-surface-base/75 px-2 py-1 shadow-soft backdrop-blur-xl">
+                <TextLink
+                  href="#top"
+                  variant="brand"
+                  className="brand-mark-wrap inline-flex shrink-0 items-center gap-1.5 rounded-full px-1.5 py-1 no-underline"
+                  data-cursor="hover"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    close();
+                    if (window.__lenis) {
+                      window.__lenis.scrollTo(0, { duration: 1.1 });
+                    } else {
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }
+                  }}
+                >
+                  <BrandMark size={22} className="rounded-full" title="" />
+                  <span className="text-[10px] tracking-[0.14em]">
+                    {site.mark}
+                  </span>
+                </TextLink>
+
+                <span className="mx-0.5 h-4 w-px bg-white/10" aria-hidden />
+
+                <nav aria-label="Primary">
+                  <IconNavLinks items={navItems} activeId={active} />
+                </nav>
+              </div>
             </div>
           </motion.div>
         ) : null}
@@ -296,19 +259,18 @@ export function Header() {
             animate={{ opacity: 1, y: 0 }}
             exit={reduced ? undefined : { opacity: 0, y: -8 }}
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            className={cn(
-              "fixed inset-x-3 z-50 overflow-hidden rounded-md border border-border-muted/70 bg-surface-base/95 shadow-soft backdrop-blur-xl md:hidden",
-              scrolled ? "top-[4.75rem]" : "top-10",
-            )}
+            className="container-site fixed inset-x-0 top-10 z-50 md:hidden"
           >
-            <nav aria-label="Mobile primary" className="px-2 py-3">
-              <NavLinks
-                items={navItems}
-                variant="navMobile"
-                activeId={active}
-                onNavigate={close}
-              />
-            </nav>
+            <div className="overflow-hidden rounded-md border border-border-muted/70 bg-surface-base/95 shadow-soft backdrop-blur-xl">
+              <nav aria-label="Mobile primary" className="px-2 py-3">
+                <NavLinks
+                  items={navItems}
+                  variant="navMobile"
+                  activeId={active}
+                  onNavigate={close}
+                />
+              </nav>
+            </div>
           </motion.div>
         ) : null}
       </AnimatePresence>

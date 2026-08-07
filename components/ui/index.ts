@@ -1,17 +1,14 @@
 export { AutoplayVideo } from "./AutoplayVideo";
 export { AvatarVideoFrame } from "./AvatarVideoFrame";
-export { Badge, Chip, ChipGroup } from "./Badge";
+export { ChipGroup } from "./Badge";
 export { BrandMark } from "./BrandMark";
 export { Button } from "./Button";
 export { Card } from "./Card";
 export { Container } from "./Container";
 export { Eyebrow } from "./Eyebrow";
 export { Field, Input, Textarea } from "./Field";
-export { Grid, Stack } from "./Grid";
 export { Heading } from "./Heading";
 export { IconButton } from "./IconButton";
 export { Quote } from "./Quote";
-export { Section } from "./Section";
-export { SectionHeader } from "./SectionHeader";
 export { Text } from "./Text";
 export { TextLink } from "./TextLink";

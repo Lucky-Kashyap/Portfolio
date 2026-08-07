@@ -7,13 +7,6 @@ import {
   releaseVideoAudio,
   subscribeVideoAudio,
 } from "@/lib/video-audio";
-import {
-  getAvatarSpeechLocale,
-  playAvatarSpeech,
-  stopAvatarSpeech,
-  subscribeAvatarSpeechSection,
-  type AvatarSpeechLocale,
-} from "@/lib/avatar-speech";
 
 type AutoplayVideoProps = {
   src: string;
@@ -22,26 +15,16 @@ type AutoplayVideoProps = {
   objectPosition?: string;
   /** cover crops to fill; contain keeps full frame (no side cut) */
   objectFit?: "cover" | "contain";
-  seekTo?: number;
   lazy?: boolean;
   showMuteControl?: boolean;
   muteControlSide?: "left" | "right";
-  /**
-   * When true (default), unmute also plays Web Speech intro chapters.
-   * Needed when the MP4 has no audio track (placeholders / GIF encodes).
-   */
-  speechOnUnmute?: boolean;
-  /**
-   * Force locale, or `auto` to follow hero (en) / about (hi) from scroll morph.
-   */
-  speechLocale?: AvatarSpeechLocale | "auto";
-  /** Make the whole media surface toggle sound (not only the pill). */
+  /** Whole media surface toggles play (not only the icon). */
   tapSurfaceUnmute?: boolean;
 };
 
 /**
- * Autoplay background video with tap-to-unmute.
- * Shared audio lock so only one video / speech track runs at a time.
+ * Autoplay muted video. Play icon unmutes / activates — only one instance
+ * active at a time (shared audio lock).
  */
 export function AutoplayVideo({
   src,
@@ -49,42 +32,61 @@ export function AutoplayVideo({
   className,
   objectPosition = "50% 50%",
   objectFit = "cover",
-  seekTo,
   lazy = true,
   showMuteControl = true,
   muteControlSide = "left",
-  speechOnUnmute = true,
-  speechLocale = "auto",
   tapSurfaceUnmute = true,
 }: AutoplayVideoProps) {
   const ref = useRef<HTMLVideoElement>(null);
   const id = useId();
-  const [muted, setMuted] = useState(true);
+  const [active, setActive] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [hasEmbeddedAudio, setHasEmbeddedAudio] = useState(false);
-  const speakingRef = useRef(false);
-  const speechLocaleRef = useRef(speechLocale);
-  speechLocaleRef.current = speechLocale;
+  const userPausedRef = useRef(false);
 
-  const resolveLocale = (): AvatarSpeechLocale => {
-    const pref = speechLocaleRef.current;
-    if (pref === "en" || pref === "hi") return pref;
-    return getAvatarSpeechLocale();
-  };
-
-  const remuteAll = () => {
+  const muteAmbient = () => {
     const el = ref.current;
-    setMuted(true);
+    setActive(false);
     if (el) {
       el.muted = true;
       el.defaultMuted = true;
-    }
-    if (speakingRef.current) {
-      stopAvatarSpeech();
-      speakingRef.current = false;
+      el.volume = 0;
+      el.loop = true;
     }
     releaseVideoAudio(id);
+  };
+
+  const pause = () => {
+    const el = ref.current;
+    userPausedRef.current = true;
+    setActive(false);
+    if (el) {
+      el.pause();
+      el.muted = true;
+      el.defaultMuted = true;
+      el.volume = 0;
+    }
+    releaseVideoAudio(id);
+  };
+
+  const play = () => {
+    const el = ref.current;
+    userPausedRef.current = false;
+    claimVideoAudio(id);
+    setActive(true);
+    if (el) {
+      el.muted = false;
+      el.defaultMuted = false;
+      el.volume = 1;
+      el.loop = false;
+      el.currentTime = 0;
+      el.play().catch(() => {});
+    }
+  };
+
+  const toggle = () => {
+    if (active) pause();
+    else play();
   };
 
   useEffect(() => {
@@ -100,28 +102,10 @@ export function AutoplayVideo({
     el.muted = true;
     el.defaultMuted = true;
 
-    const onMeta = () => {
-      if (seekTo != null && el.currentTime < seekTo) el.currentTime = seekTo;
-      // Best-effort: detect audio track (Chromium / Firefox quirks)
-      const anyEl = el as HTMLVideoElement & {
-        mozHasAudio?: boolean;
-        webkitAudioDecodedByteCount?: number;
-        audioTracks?: { length: number };
-      };
-      const detected =
-        (anyEl.audioTracks && anyEl.audioTracks.length > 0) ||
-        anyEl.mozHasAudio === true ||
-        (typeof anyEl.webkitAudioDecodedByteCount === "number" &&
-          anyEl.webkitAudioDecodedByteCount > 0);
-      if (detected) setHasEmbeddedAudio(true);
-    };
-    el.addEventListener("loadedmetadata", onMeta);
-
     if (!lazy) {
       el.play().catch(() => {});
       return () => {
-        el.removeEventListener("loadedmetadata", onMeta);
-        remuteAll();
+        muteAmbient();
       };
     }
 
@@ -129,10 +113,14 @@ export function AutoplayVideo({
       (entries) => {
         for (const e of entries) {
           if (e.isIntersecting) {
-            el.play().catch(() => {});
+            if (!userPausedRef.current) {
+              el.muted = true;
+              el.loop = true;
+              el.play().catch(() => {});
+            }
           } else {
             el.pause();
-            remuteAll();
+            muteAmbient();
           }
         }
       },
@@ -141,74 +129,46 @@ export function AutoplayVideo({
     io.observe(el);
     return () => {
       io.disconnect();
-      el.removeEventListener("loadedmetadata", onMeta);
-      remuteAll();
+      muteAmbient();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seekTo, lazy, id, src]);
+  }, [lazy, id, src]);
 
   useEffect(() => {
     return subscribeVideoAudio((activeId) => {
       if (activeId !== id && activeId !== null) {
-        remuteAll();
+        // Another video took audio — mute us, keep ambient motion
+        muteAmbient();
+        const el = ref.current;
+        if (el && !userPausedRef.current && el.paused) {
+          el.loop = true;
+          el.play().catch(() => {});
+        }
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  // Hero ↔ About language switch — stop English/Hindi so they never overlap
-  useEffect(() => {
-    if (speechLocale !== "auto") return;
-    let last = getAvatarSpeechLocale();
-    return subscribeAvatarSpeechSection((locale) => {
-      if (locale === last) return;
-      last = locale;
-      remuteAll();
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [speechLocale, id]);
-
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    el.muted = muted;
-    el.defaultMuted = muted;
-    if (!muted) {
-      el.volume = 1;
-      el.play().catch(() => {});
-    }
-  }, [muted]);
-
-  const unmute = async () => {
-    const el = ref.current;
-    // Stop any other narration before starting this one
-    stopAvatarSpeech();
-    claimVideoAudio(id);
-    setMuted(false);
-
-    if (el) {
+    if (active) {
       el.muted = false;
       el.defaultMuted = false;
       el.volume = 1;
-      el.currentTime = 0;
+      el.loop = false;
       el.play().catch(() => {});
+      const onEnded = () => {
+        userPausedRef.current = false;
+        muteAmbient();
+        el.currentTime = 0;
+        el.play().catch(() => {});
+      };
+      el.addEventListener("ended", onEnded);
+      return () => el.removeEventListener("ended", onEnded);
     }
-
-    const shouldSpeak = speechOnUnmute && !hasEmbeddedAudio;
-    if (shouldSpeak) {
-      speakingRef.current = true;
-      await playAvatarSpeech(resolveLocale());
-      speakingRef.current = false;
-    }
-  };
-
-  const toggleMute = () => {
-    if (muted) {
-      void unmute();
-    } else {
-      remuteAll();
-    }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active]);
 
   if (reduceMotion || failed) {
     return poster ? (
@@ -233,13 +193,13 @@ export function AutoplayVideo({
         tapSurfaceUnmute && "cursor-pointer",
         className,
       )}
-      onClick={tapSurfaceUnmute ? toggleMute : undefined}
+      onClick={tapSurfaceUnmute ? toggle : undefined}
       onKeyDown={
         tapSurfaceUnmute
           ? (e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
-                toggleMute();
+                toggle();
               }
             }
           : undefined
@@ -248,9 +208,9 @@ export function AutoplayVideo({
       tabIndex={tapSurfaceUnmute ? 0 : undefined}
       aria-label={
         tapSurfaceUnmute
-          ? muted
-            ? "Play avatar introduction with sound"
-            : "Mute avatar"
+          ? active
+            ? "Pause avatar video"
+            : "Play avatar video"
           : undefined
       }
     >
@@ -270,7 +230,6 @@ export function AutoplayVideo({
         onError={() => setFailed(true)}
       />
 
-      {/* Soft vignette only when cover-cropped */}
       {objectFit === "cover" ? (
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,transparent_40%,rgba(0,0,0,0.35)_100%)]"
@@ -283,18 +242,18 @@ export function AutoplayVideo({
           type="button"
           onClick={(e) => {
             e.stopPropagation();
-            toggleMute();
+            toggle();
           }}
-          aria-pressed={!muted}
-          aria-label={muted ? "Unmute video" : "Mute video"}
+          aria-pressed={active}
+          aria-label={active ? "Pause" : "Play"}
+          title={active ? "Pause" : "Play"}
           className={cn(
-            "absolute top-3 z-10 inline-flex items-center gap-2 rounded-full border border-white/20 bg-[rgba(11,18,32,0.78)] px-3 py-1.5 text-[11px] font-semibold tracking-wide text-white shadow-[0_8px_20px_rgba(0,0,0,0.35)] backdrop-blur-sm transition hover:border-accent-cyan/45 hover:bg-[rgba(11,18,32,0.92)]",
+            "absolute top-3 z-10 inline-flex size-9 items-center justify-center rounded-full border border-white/20 bg-[rgba(11,18,32,0.78)] text-white shadow-[0_8px_20px_rgba(0,0,0,0.35)] backdrop-blur-sm transition hover:border-accent-cyan/45 hover:bg-[rgba(11,18,32,0.92)] sm:size-10",
             muteControlSide === "right" ? "right-3" : "left-3",
-            !muted && "border-accent-cyan/40 text-accent-cyan",
+            active && "border-accent-cyan/40 text-accent-cyan",
           )}
         >
-          {muted ? <PlayIcon /> : <PauseIcon />}
-          <span>{muted ? "Tap to unmute" : "Sound on"}</span>
+          {active ? <PauseIcon /> : <PlayIcon />}
         </button>
       ) : null}
     </div>
@@ -312,7 +271,10 @@ function PlayIcon() {
 function PauseIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
-      <path d="M4.5 3.5h2.4v9H4.5v-9Zm4.6 0h2.4v9H9.1v-9Z" fill="currentColor" />
+      <path
+        d="M4.5 3.5h2.4v9H4.5v-9Zm4.6 0h2.4v9H9.1v-9Z"
+        fill="currentColor"
+      />
     </svg>
   );
 }

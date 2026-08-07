@@ -10,7 +10,6 @@ import {
   StackGroupCard,
 } from "@/components/cards/EducationCard";
 import {
-  AvatarVideoFrame,
   ChipGroup,
   Container,
   Eyebrow,
@@ -18,7 +17,6 @@ import {
   Quote,
   Text,
 } from "@/components/ui";
-import { AvatarSlot } from "@/components/avatar/AvatarScrollStage";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { TextGradientScroll } from "@/components/motion/TextGradientScroll";
 import { about, education, experience, site } from "@/lib/content";
@@ -99,80 +97,62 @@ export function About() {
       aria-labelledby="about-heading"
     >
       <Container>
-        <div className="mt-6 grid items-start gap-5 lg:mt-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.15fr)] lg:items-stretch lg:gap-8 xl:gap-10">
-          <div className="order-1 flex w-full min-w-0 lg:h-auto lg:min-h-0">
-            <div className="relative w-full max-lg:mx-auto max-lg:max-w-[280px] lg:h-full lg:max-w-none">
-              {reduced ? (
-                <AvatarVideoFrame
-                  variant="about"
-                  src={site.aboutAvatarVideo}
-                  poster={site.aboutAvatarPoster}
-                  lazy
-                  objectPosition={site.heroAvatarObjectPosition}
-                  caption="Frontend Engineer"
-                  className="lg:min-h-full"
-                />
-              ) : (
-                <AvatarSlot id="about" className="h-full w-full">
-                  <div className="aspect-[3/4] w-full lg:aspect-auto lg:h-full lg:min-h-[24rem]" />
-                </AvatarSlot>
-              )}
-            </div>
+        <div className="mt-6 max-w-3xl lg:mt-8">
+          <ScrollReveal y={28}>
+            <p className="text-[11px] font-semibold tracking-[0.2em] text-text-tertiary uppercase">
+              Get to know me
+            </p>
+            <Eyebrow className="mt-3 mb-0">About</Eyebrow>
+            <Heading
+              id="about-heading"
+              as={2}
+              size="display-sm"
+              className="mt-3 max-w-xl text-[clamp(1.65rem,3.2vw,2.75rem)] leading-[1.12]"
+            >
+              {about.headline}
+            </Heading>
+          </ScrollReveal>
+
+          <div className="mt-5 max-w-xl md:mt-6">
+            <TextGradientScroll
+              text={about.specialize}
+              className="text-[clamp(1.05rem,2.2vw,1.35rem)] font-medium leading-snug tracking-tight text-text-primary"
+              shadowOpacity={0.16}
+            />
           </div>
 
-          <div className="order-2 flex min-w-0 flex-col justify-center">
-            <ScrollReveal y={28}>
-              <p className="text-[11px] font-semibold tracking-[0.2em] text-text-tertiary uppercase">
-                Get to know me
-              </p>
-              <Eyebrow className="mt-3 mb-0">About</Eyebrow>
-              <Heading
-                id="about-heading"
-                as={2}
-                size="display-sm"
-                className="mt-3 max-w-xl text-[clamp(1.65rem,3.2vw,2.75rem)] leading-[1.12]"
-              >
-                {about.headline}
-              </Heading>
-            </ScrollReveal>
-
-            <div className="mt-5 max-w-xl md:mt-6">
-              <TextGradientScroll
-                text={about.specialize}
-                className="text-[clamp(1.05rem,2.2vw,1.35rem)] font-medium leading-snug tracking-tight text-text-primary"
-                shadowOpacity={0.16}
-                offset={["start 0.95", "end 0.55"]}
-              />
-            </div>
-
-            <ScrollReveal delay={0.06} y={18}>
-              <Text tone="muted" className="mt-4 max-w-md text-sm leading-relaxed">
-                {about.lead}
-              </Text>
-              <ChipGroup
-                items={[...about.highlightStack]}
-                className="mt-5 gap-2"
-              />
-            </ScrollReveal>
-
-            <ScrollReveal delay={0.08} y={20}>
-              <a
-                href={site.leetcode}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-6 inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-secondary transition-colors duration-fast hover:text-text-primary"
-                data-cursor="hover"
-              >
-                <span className="font-semibold tracking-[0.14em] text-accent-cyan uppercase">
-                  LeetCode
-                </span>
-                <span>@{site.leetcodeUser}</span>
-                <span className="text-text-tertiary">
-                  {site.leetcodeStats.solved} solved
-                </span>
-              </a>
-            </ScrollReveal>
+          <div className="mt-4 max-w-md">
+            <TextGradientScroll
+              text={about.lead}
+              className="text-sm leading-relaxed text-text-secondary"
+              shadowOpacity={0.2}
+            />
           </div>
+
+          <ScrollReveal delay={0.06} y={18}>
+            <ChipGroup
+              items={[...about.highlightStack]}
+              className="mt-5 gap-2"
+            />
+          </ScrollReveal>
+
+          <ScrollReveal delay={0.08} y={20}>
+            <a
+              href={site.leetcode}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-secondary transition-colors duration-fast hover:text-text-primary"
+              data-cursor="hover"
+            >
+              <span className="font-semibold tracking-[0.14em] text-accent-cyan uppercase">
+                LeetCode
+              </span>
+              <span>@{site.leetcodeUser}</span>
+              <span className="text-text-tertiary">
+                {site.leetcodeStats.solved} solved
+              </span>
+            </a>
+          </ScrollReveal>
         </div>
 
         <StatCounters />

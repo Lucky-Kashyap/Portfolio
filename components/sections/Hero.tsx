@@ -355,7 +355,6 @@ export function Hero() {
               <div className="relative z-[1] h-full w-full">
                 {reduced ? (
                   <AvatarVideoFrame
-                    variant="hero"
                     src={site.heroAvatarVideo}
                     poster={site.heroAvatarPoster}
                     lazy={false}

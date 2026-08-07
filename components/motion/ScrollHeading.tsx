@@ -1,84 +1,11 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
-import { useGSAP } from "@gsap/react";
+import { useEffect, useRef } from "react";
 import { gsap, registerGsap } from "@/lib/gsap";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
 import { cn } from "@/lib/utils";
 
-type ScrollHeadingProps = {
-  id?: string;
-  as?: 1 | 2 | 3;
-  children: ReactNode;
-  className?: string;
-};
-
-/**
- * Clip-path + rise reveal for section titles (GSAP ScrollTrigger).
- */
-export function ScrollHeading({
-  id,
-  as = 2,
-  children,
-  className,
-}: ScrollHeadingProps) {
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const reduced = usePrefersReducedMotion();
-  const Tag = `h${as}` as const;
-
-  useGSAP(
-    () => {
-      registerGsap();
-      const wrap = wrapRef.current;
-      if (!wrap || reduced) return;
-      const heading = wrap.querySelector("[data-scroll-heading]");
-      if (!heading) return;
-
-      gsap.set(heading, {
-        y: 48,
-        opacity: 0,
-        clipPath: "inset(0 0 100% 0)",
-      });
-
-      const tween = gsap.to(heading, {
-        y: 0,
-        opacity: 1,
-        clipPath: "inset(0 0 0% 0)",
-        duration: 1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: wrap,
-          start: "top 85%",
-          toggleActions: "play none none none",
-        },
-      });
-
-      return () => {
-        tween.scrollTrigger?.kill();
-        tween.kill();
-      };
-    },
-    { dependencies: [reduced] },
-  );
-
-  return (
-    <div ref={wrapRef} className="overflow-hidden">
-      <Tag
-        id={id}
-        data-scroll-heading
-        className={cn(
-          "text-display-sm font-bold leading-tight tracking-tight text-text-primary",
-          className,
-        )}
-        style={reduced ? undefined : { opacity: 0 }}
-      >
-        {children}
-      </Tag>
-    </div>
-  );
-}
-
-/** Optional word-by-word stagger for longer headlines */
+/** Word-by-word stagger for section headlines */
 export function ScrollWords({
   text,
   className,

@@ -162,16 +162,6 @@ const config = {
           "0%": { opacity: "1" },
           "100%": { opacity: "0" },
         },
-        "hero-name-pulse": {
-          "0%, 100%": { transform: "translateY(0)", filter: "brightness(1)" },
-          "50%": { transform: "translateY(-4px)", filter: "brightness(1.08)" },
-        },
-        "avatar-hand-wave": {
-          "0%, 100%": { transform: "rotate(0deg)" },
-          "25%": { transform: "rotate(-11deg)" },
-          "50%": { transform: "rotate(8deg)" },
-          "75%": { transform: "rotate(-7deg)" },
-        },
         "avatar-idle-float": {
           "0%, 100%": { transform: "translate3d(0, 0, 0)" },
           "50%": { transform: "translate3d(0, -10px, 0)" },
@@ -179,10 +169,6 @@ const config = {
         "avatar-glow-pulse": {
           "0%, 100%": { opacity: "0.45" },
           "50%": { opacity: "0.85" },
-        },
-        "avatar-scan": {
-          "0%": { transform: "translateY(-120%)" },
-          "100%": { transform: "translateY(220%)" },
         },
         "wa-wiggle": {
           "0%, 100%": { transform: "rotate(0deg) scale(1)" },
@@ -204,11 +190,8 @@ const config = {
         "loader-progress":
           "loader-progress 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards",
         "loader-fade-out": "loader-fade-out 0.45s ease forwards",
-        "hero-name-pulse": "hero-name-pulse 2.4s ease-in-out infinite",
-        "avatar-hand-wave": "avatar-hand-wave 2.4s ease-in-out infinite",
         "avatar-idle-float": "avatar-idle-float 5.5s ease-in-out infinite",
         "avatar-glow-pulse": "avatar-glow-pulse 3.2s ease-in-out infinite",
-        "avatar-scan": "avatar-scan 4.5s linear infinite",
         "wa-wiggle": "wa-wiggle 0.7s ease-in-out infinite",
         "wa-ping": "wa-ping 0.9s cubic-bezier(0, 0, 0.2, 1) infinite",
         "wa-ring": "wa-ring 0.9s cubic-bezier(0, 0, 0.2, 1) infinite",
