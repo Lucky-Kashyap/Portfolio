@@ -42,7 +42,7 @@ export function Skills() {
         />
 
         <TextGradientScroll
-          text="Hover the playground — packed with the technologies I ship with every day."
+          text="A living playground of the technologies I ship with every day — scroll in, then move your cursor to scatter them."
           className="mt-4 max-w-2xl text-base leading-relaxed text-text-secondary sm:mt-5 sm:text-lg"
           shadowOpacity={0.2}
           offset={["start 0.95", "start 0.5"]}

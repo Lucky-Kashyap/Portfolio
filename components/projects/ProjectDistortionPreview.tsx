@@ -4,6 +4,7 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
   type MutableRefObject,
 } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
@@ -95,6 +96,8 @@ type DistortionMeshProps = {
   mix: number;
   velocityRef: MutableRefObject<number>;
   mouseRef: MutableRefObject<{ x: number; y: number }>;
+  onReady?: () => void;
+  onError?: () => void;
 };
 
 function DistortionMesh({
@@ -103,11 +106,13 @@ function DistortionMesh({
   mix,
   velocityRef,
   mouseRef,
+  onReady,
+  onError,
 }: DistortionMeshProps) {
   const matRef = useRef<THREE.ShaderMaterial>(null);
   const cache = useRef<Map<string, THREE.Texture>>(new Map());
   const { gl } = useThree();
-  const planeAspect = 2 / 2.77;
+  const planeAspect = 3.2 / 2;
   const placeholder = useMemo(() => {
     const data = new Uint8Array([7, 11, 18, 255]);
     const tex = new THREE.DataTexture(data, 1, 1);
@@ -157,22 +162,29 @@ function DistortionMesh({
       });
     };
 
-    void Promise.all([load(src), load(nextSrc)]).then(([a, b]) => {
-      if (cancelled || !matRef.current) return;
-      const coverA = coverParams(a, planeAspect);
-      const coverB = coverParams(b, planeAspect);
-      matRef.current.uniforms.uTexture.value = a;
-      matRef.current.uniforms.uNextTexture.value = b;
-      matRef.current.uniforms.uScale.value.copy(coverA.scale);
-      matRef.current.uniforms.uOffset.value.copy(coverA.offset);
-      matRef.current.uniforms.uNextScale.value.copy(coverB.scale);
-      matRef.current.uniforms.uNextOffset.value.copy(coverB.offset);
-      gl.toneMapping = THREE.NoToneMapping;
-    });
+    void Promise.all([load(src), load(nextSrc)])
+      .then(([a, b]) => {
+        if (cancelled || !matRef.current) return;
+        const coverA = coverParams(a, planeAspect);
+        const coverB = coverParams(b, planeAspect);
+        matRef.current.uniforms.uTexture.value = a;
+        matRef.current.uniforms.uNextTexture.value = b;
+        matRef.current.uniforms.uScale.value.copy(coverA.scale);
+        matRef.current.uniforms.uOffset.value.copy(coverA.offset);
+        matRef.current.uniforms.uNextScale.value.copy(coverB.scale);
+        matRef.current.uniforms.uNextOffset.value.copy(coverB.offset);
+        gl.toneMapping = THREE.NoToneMapping;
+        onReady?.();
+      })
+      .catch(() => {
+        if (!cancelled) onError?.();
+      });
 
     return () => {
       cancelled = true;
     };
+    // Intentionally omit onReady/onError — parent may pass inline fns
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src, nextSrc, planeAspect, gl]);
 
   useFrame((state) => {
@@ -203,7 +215,7 @@ function DistortionMesh({
 
   return (
     <mesh>
-      <planeGeometry args={[2, 2.77]} />
+      <planeGeometry args={[3.2, 2]} />
       <shaderMaterial
         ref={matRef}
         uniforms={uniforms}
@@ -224,6 +236,8 @@ export type ProjectDistortionPreviewProps = {
   velocityRef: MutableRefObject<number>;
   mouseRef: MutableRefObject<{ x: number; y: number }>;
   className?: string;
+  onReady?: () => void;
+  onError?: () => void;
 };
 
 /** WebGL plane that warps the active project image from mouse velocity. */
@@ -234,18 +248,27 @@ export function ProjectDistortionPreview({
   velocityRef,
   mouseRef,
   className,
+  onReady,
+  onError,
 }: ProjectDistortionPreviewProps) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed) return null;
+
   return (
     <div className={className} aria-hidden>
       <Canvas
         dpr={[1, 1.5]}
-        camera={{ position: [0, 0, 3.35], fov: 45 }}
+        camera={{ position: [0, 0, 2.45], fov: 45 }}
         gl={{
           antialias: true,
           alpha: true,
           powerPreference: "high-performance",
         }}
         style={{ width: "100%", height: "100%" }}
+        onCreated={({ gl }) => {
+          gl.setClearColor(0x000000, 0);
+        }}
       >
         <DistortionMesh
           src={src}
@@ -253,6 +276,11 @@ export function ProjectDistortionPreview({
           mix={mix}
           velocityRef={velocityRef}
           mouseRef={mouseRef}
+          onReady={onReady}
+          onError={() => {
+            setFailed(true);
+            onError?.();
+          }}
         />
       </Canvas>
     </div>

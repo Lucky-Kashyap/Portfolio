@@ -106,9 +106,29 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
   const bodiesRef = useRef<Body[]>([]);
   const pointerRef = useRef({ x: -9999, y: -9999, active: false });
   const rafRef = useRef(0);
+  const scrollBurstDoneRef = useRef(false);
   const reduced = usePrefersReducedMotion();
   const [ready, setReady] = useState(false);
   const [isCoarse, setIsCoarse] = useState(false);
+
+  const burstScatter = useCallback((cx: number, cy: number, strength = 14) => {
+    for (const b of bodiesRef.current) {
+      const dx = b.x - cx;
+      const dy = b.y - cy;
+      const dist = Math.hypot(dx, dy) || 0.001;
+      const reach = REPEL_RADIUS + b.r + 40;
+      if (dist < reach) {
+        const t = 1 - dist / reach;
+        const impulse = t * strength;
+        b.vx += (dx / dist) * impulse;
+        b.vy += (dy / dist) * impulse;
+      } else {
+        // Soft outward kick for distant bubbles so the whole field reacts
+        b.vx += (dx / dist) * strength * 0.12;
+        b.vy += (dy / dist) * strength * 0.12;
+      }
+    }
+  }, []);
 
   const initBodies = useCallback((width: number, height: number) => {
     const cols = width < 640 ? 5 : width < 960 ? 7 : 9;
@@ -348,12 +368,28 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
 
     rafRef.current = requestAnimationFrame(step);
 
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting || scrollBurstDoneRef.current) continue;
+          if (bodiesRef.current.length === 0) continue;
+          scrollBurstDoneRef.current = true;
+          const rect = wrap.getBoundingClientRect();
+          burstScatter(rect.width * 0.5, rect.height * 0.45, 16);
+        }
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(wrap);
+
     return () => {
       cancelAnimationFrame(rafRef.current);
       ro.disconnect();
+      io.disconnect();
       bodiesRef.current = [];
+      scrollBurstDoneRef.current = false;
     };
-  }, [reduced, isCoarse, initBodies]);
+  }, [reduced, isCoarse, initBodies, burstScatter]);
 
   const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
     const rect = wrapRef.current?.getBoundingClientRect();
@@ -365,18 +401,7 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
 
     // First hover / re-enter — burst scatter impulse
     if (!wasActive) {
-      for (const b of bodiesRef.current) {
-        const dx = b.x - x;
-        const dy = b.y - y;
-        const dist = Math.hypot(dx, dy) || 0.001;
-        const reach = REPEL_RADIUS + b.r + 40;
-        if (dist < reach) {
-          const t = 1 - dist / reach;
-          const impulse = t * 14;
-          b.vx += (dx / dist) * impulse;
-          b.vy += (dy / dist) * impulse;
-        }
-      }
+      burstScatter(x, y, 14);
     }
   };
 
@@ -427,7 +452,7 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
       onPointerLeave={onPointerLeave}
       onPointerDown={onPointerMove}
       role="img"
-      aria-label="Interactive skill bubbles. Hover to scatter the technology icons."
+      aria-label="Interactive skill bubbles. Icons scatter when the section scrolls into view and when you move the cursor."
     >
       <canvas
         ref={canvasRef}
@@ -438,11 +463,7 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
         <p className="absolute inset-0 flex items-center justify-center text-sm text-text-tertiary">
           Loading skills…
         </p>
-      ) : (
-        <p className="pointer-events-none absolute bottom-3 left-1/2 z-[1] -translate-x-1/2 text-[10px] tracking-[0.16em] text-text-tertiary uppercase">
-          Hover to scatter
-        </p>
-      )}
+      ) : null}
 
       <ul className="sr-only">
         {skillBubbles.map((skill) => (

@@ -7,6 +7,7 @@ import {
   useState,
   type MouseEvent as ReactMouseEvent,
 } from "react";
+import { createPortal } from "react-dom";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import {
@@ -34,9 +35,9 @@ type ProjectHoverListProps = {
   className?: string;
 };
 
-/** Portrait float — matches the classic list + mouse-image-distortion reference */
-const PREVIEW_W = 260;
-const PREVIEW_H = 360;
+/** Large landscape float — project UIs stay fully readable on hover */
+const PREVIEW_W = 480;
+const PREVIEW_H = 300;
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
 function usePointerFine() {
@@ -90,36 +91,40 @@ function ProjectMeta({ project }: { project: Project }) {
   );
 }
 
+/** Keep preview near the cursor, flipped left when near the right edge */
 function clampPreviewPos(clientX: number, clientY: number) {
-  const offsetX = 36;
-  const offsetY = -PREVIEW_H * 0.45;
-  const maxX = window.innerWidth - PREVIEW_W - 20;
-  const maxY = window.innerHeight - PREVIEW_H - 20;
+  const gap = 28;
+  const preferRight = clientX + gap + PREVIEW_W < window.innerWidth - 16;
+  const x = preferRight ? clientX + gap : clientX - gap - PREVIEW_W;
+  // Center vertically on the cursor so the full frame stays on-screen
+  const y = clientY - PREVIEW_H * 0.5;
   return {
-    x: Math.min(maxX, Math.max(16, clientX + offsetX)),
-    y: Math.min(maxY, Math.max(16, clientY + offsetY)),
+    x: Math.min(window.innerWidth - PREVIEW_W - 16, Math.max(16, x)),
+    y: Math.min(window.innerHeight - PREVIEW_H - 16, Math.max(16, y)),
   };
 }
 
 /**
  * Line-by-line project index.
- * Desktop: floating portrait preview with mouse-image-distortion (WebGL).
+ * Desktop: floating landscape preview (full UI visible + optional WebGL distortion).
  * Touch: tap to expand image + details.
  */
 export function ProjectHoverList({ projects, className }: ProjectHoverListProps) {
   const reduced = usePrefersReducedMotion();
   const finePointer = usePointerFine();
+  const [mounted, setMounted] = useState(false);
   const [hovered, setHovered] = useState<number | null>(null);
   const [expanded, setExpanded] = useState<number | null>(null);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [displayIndex, setDisplayIndex] = useState(0);
   const [prevIndex, setPrevIndex] = useState(0);
   const [mix, setMix] = useState(0);
+  const [glReady, setGlReady] = useState(false);
 
-  const rawX = useMotionValue(-9999);
-  const rawY = useMotionValue(-9999);
-  const x = useSpring(rawX, { stiffness: 120, damping: 20, mass: 0.9 });
-  const y = useSpring(rawY, { stiffness: 120, damping: 20, mass: 0.9 });
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const x = useSpring(rawX, { stiffness: 380, damping: 32, mass: 0.45 });
+  const y = useSpring(rawY, { stiffness: 380, damping: 32, mass: 0.45 });
 
   const velocityRef = useRef(0);
   const mouseNormRef = useRef({ x: 0.5, y: 0.5 });
@@ -128,11 +133,16 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
 
   const active = hovered != null ? projects[hovered] : null;
   const showDesktopHover = finePointer && !reduced;
-  // Shader mix: prev (0) → display (1)
   const fromSrc = projects[prevIndex]?.image ?? projects[0]?.image ?? "";
   const toSrc = projects[displayIndex]?.image ?? fromSrc;
+  // Always prefer the hovered project's cover for the reliable Image layer
+  const previewSrc = active?.image ?? toSrc;
+  const previewAlt = active?.imageAlt ?? projects[displayIndex]?.imageAlt ?? "";
 
-  // Preload covers for instant swaps
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   useEffect(() => {
     if (!showDesktopHover) return;
     projects.forEach((p) => {
@@ -140,6 +150,10 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
       img.src = p.image;
     });
   }, [projects, showDesktopHover]);
+
+  useEffect(() => {
+    setGlReady(false);
+  }, [fromSrc, toSrc]);
 
   const crossfadeTo = useCallback(
     (index: number, instant = false) => {
@@ -156,7 +170,7 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
       setMix(0);
       if (mixRaf.current) cancelAnimationFrame(mixRaf.current);
       const start = performance.now();
-      const duration = 420;
+      const duration = 320;
       const tick = (now: number) => {
         const t = Math.min(1, (now - start) / duration);
         const eased = 1 - Math.pow(1 - t, 3);
@@ -190,11 +204,9 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
       const dx = clientX - lastPointer.current.x;
       const dy = clientY - lastPointer.current.y;
       const speed = Math.sqrt(dx * dx + dy * dy) / dt;
-      // Feed distortion strength (capped)
       velocityRef.current = Math.min(2.6, speed * 18);
       lastPointer.current = { x: clientX, y: clientY, t: now };
 
-      // Mouse in preview UV space (approx — enough for radial warp)
       mouseNormRef.current = {
         x: ((clientX - pos.x) / PREVIEW_W + 0.5) * 0.5 + 0.25,
         y: ((clientY - pos.y) / PREVIEW_H + 0.5) * 0.5 + 0.25,
@@ -218,13 +230,11 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
       setHovered(index);
       setPreviewVisible(true);
       crossfadeTo(index, !previewVisible);
-      // Burst of distortion on enter
       velocityRef.current = Math.max(velocityRef.current, 1.4);
     },
     [showDesktopHover, trackPointer, previewVisible, crossfadeTo],
   );
 
-  // Decay velocity when idle
   useEffect(() => {
     if (!showDesktopHover) return;
     let id = 0;
@@ -236,49 +246,76 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
     return () => cancelAnimationFrame(id);
   }, [showDesktopHover]);
 
+  const preview =
+    mounted && showDesktopHover
+      ? createPortal(
+          <motion.div
+            aria-hidden
+            className="pointer-events-none fixed z-[80] overflow-hidden rounded-[4px] border border-border-muted bg-[#070b12] shadow-accent"
+            style={{
+              left: x,
+              top: y,
+              width: PREVIEW_W,
+              height: PREVIEW_H,
+            }}
+            initial={false}
+            animate={{
+              opacity: previewVisible && active ? 1 : 0,
+              scale: previewVisible && active ? 1 : 0.96,
+            }}
+            transition={{
+              opacity: { duration: 0.2, ease: EASE_OUT },
+              scale: { type: "spring", stiffness: 320, damping: 26, mass: 0.55 },
+            }}
+          >
+            <div className="relative h-full w-full">
+              {previewSrc ? (
+                <Image
+                  src={previewSrc}
+                  alt={previewAlt}
+                  fill
+                  sizes={`${PREVIEW_W}px`}
+                  quality={90}
+                  className="object-contain object-center"
+                  priority={false}
+                />
+              ) : null}
+
+              {/* Soft distortion wash — does not hide the full screenshot */}
+              {fromSrc ? (
+                <ProjectDistortionPreview
+                  src={fromSrc}
+                  nextSrc={toSrc}
+                  mix={mix}
+                  velocityRef={velocityRef}
+                  mouseRef={mouseNormRef}
+                  onReady={() => setGlReady(true)}
+                  onError={() => setGlReady(false)}
+                  className={cn(
+                    "pointer-events-none absolute inset-0 h-full w-full mix-blend-soft-light transition-opacity duration-200",
+                    glReady ? "opacity-50" : "opacity-0",
+                  )}
+                />
+              ) : null}
+
+              <div
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#03060b]/85 via-transparent to-transparent"
+                aria-hidden
+              />
+              {active ? (
+                <p className="absolute right-3 bottom-3 left-3 truncate font-display text-xs font-bold tracking-tight text-text-primary drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)]">
+                  {active.title}
+                </p>
+              ) : null}
+            </div>
+          </motion.div>,
+          document.body,
+        )
+      : null;
+
   return (
     <div className={cn("relative", className)}>
-      {showDesktopHover ? (
-        <motion.div
-          aria-hidden
-          className="pointer-events-none fixed top-0 left-0 z-40 overflow-hidden rounded-[4px] border border-border-muted bg-[#070b12] shadow-accent"
-          style={{
-            x,
-            y,
-            width: PREVIEW_W,
-            height: PREVIEW_H,
-          }}
-          initial={false}
-          animate={{
-            opacity: previewVisible && active ? 1 : 0,
-            scale: previewVisible && active ? 1 : 0.94,
-          }}
-          transition={{
-            opacity: { duration: 0.3, ease: EASE_OUT },
-            scale: { type: "spring", stiffness: 240, damping: 22, mass: 0.75 },
-          }}
-        >
-          {fromSrc ? (
-            <ProjectDistortionPreview
-              src={fromSrc}
-              nextSrc={toSrc}
-              mix={mix}
-              velocityRef={velocityRef}
-              mouseRef={mouseNormRef}
-              className="absolute inset-0 h-full w-full"
-            />
-          ) : null}
-          <div
-            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#03060b]/70 via-transparent to-[#03060b]/20"
-            aria-hidden
-          />
-          {active ? (
-            <p className="absolute right-3 bottom-3 left-3 truncate font-display text-xs font-bold tracking-tight text-text-primary">
-              {active.title}
-            </p>
-          ) : null}
-        </motion.div>
-      ) : null}
+      {preview}
 
       <div
         data-project-list
@@ -302,9 +339,11 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
                 <button
                   type="button"
                   className={cn(
-                    "group flex w-full items-center gap-3 py-4 text-left transition-colors duration-300 sm:gap-5 sm:py-5 md:py-6",
+                    "group flex w-full items-center gap-3 py-3 text-left transition-colors duration-300 sm:gap-4 sm:py-3.5 md:py-4",
                     "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base",
-                    isActive ? "bg-surface-raised/40" : "hover:bg-surface-raised/25",
+                    isActive
+                      ? "bg-surface-raised/40"
+                      : "hover:bg-surface-raised/25",
                   )}
                   aria-expanded={!showDesktopHover ? isOpen : undefined}
                   aria-controls={
@@ -333,7 +372,7 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
                     <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                       <span
                         className={cn(
-                          "font-display text-lg font-bold tracking-tight transition-colors duration-300 sm:text-xl md:text-2xl",
+                          "font-display text-base font-bold tracking-tight transition-colors duration-300 sm:text-lg md:text-xl",
                           isActive ? "text-accent-cyan" : "text-text-primary",
                         )}
                       >
@@ -341,13 +380,17 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
                       </span>
                       {typeof project.stars === "number" && showDesktopHover ? (
                         <span className="hidden items-center gap-1 text-[11px] text-text-tertiary sm:inline-flex">
-                          <Star size={10} className="text-accent-amber" aria-hidden />
+                          <Star
+                            size={10}
+                            className="text-accent-amber"
+                            aria-hidden
+                          />
                           {project.stars}
                         </span>
                       ) : null}
                     </div>
 
-                    <ul className="mt-1.5 flex flex-wrap gap-x-2.5 gap-y-1">
+                    <ul className="mt-1 flex flex-wrap gap-x-2.5 gap-y-1">
                       {project.tags
                         .slice(0, showDesktopHover ? 5 : 3)
                         .map((tag) => (
@@ -420,11 +463,11 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
       </div>
 
       {showDesktopHover ? (
-        <p className="mt-4 text-[11px] tracking-[0.14em] text-text-tertiary uppercase">
+        <p className="mt-3 text-[11px] tracking-[0.14em] text-text-tertiary uppercase">
           Hover a line to preview · click to open
         </p>
       ) : (
-        <p className="mt-4 text-[11px] tracking-[0.14em] text-text-tertiary uppercase">
+        <p className="mt-3 text-[11px] tracking-[0.14em] text-text-tertiary uppercase">
           Tap a project to expand
         </p>
       )}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from "react";
+import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { Code2, Sparkles } from "lucide-react";
 import {
@@ -21,7 +22,37 @@ import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { TextGradientScroll } from "@/components/motion/TextGradientScroll";
 import { about, education, experience, site } from "@/lib/content";
 import { gsap, registerGsap } from "@/lib/gsap";
+import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
+
+function AboutAvatarVisual({ className }: { className?: string }) {
+  return (
+    <div className={cn("relative w-full", className)}>
+      <div
+        className="pointer-events-none absolute -inset-4 z-0 sm:-inset-5"
+        aria-hidden
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_55%_40%,rgba(232,196,124,0.16),transparent_68%)] blur-2xl" />
+        <div className="absolute inset-0 animate-avatar-glow-pulse motion-reduce:animate-none bg-[radial-gradient(ellipse_45%_50%_at_70%_28%,rgba(125,211,252,0.14),transparent_70%)]" />
+      </div>
+
+      {/* Portrait frame — show full avatar (CREATIVE + face), do not stretch-crop */}
+      <figure className="relative z-[1] mx-auto w-full max-w-[22rem] overflow-hidden rounded-[1.35rem] border border-border-muted bg-[#05070c] sm:rounded-[1.5rem] lg:ml-auto lg:max-w-none">
+        <div className="relative aspect-[3/4] w-full overflow-hidden">
+          <Image
+            src={site.aboutVisual}
+            alt={`${site.brand} — stylized AI avatar`}
+            fill
+            className="object-contain object-center animate-avatar-idle-float motion-reduce:animate-none"
+            sizes="(max-width: 1024px) 22rem, 40vw"
+            quality={92}
+            priority={false}
+          />
+        </div>
+      </figure>
+    </div>
+  );
+}
 
 function StatCounters() {
   const ref = useRef<HTMLDivElement>(null);
@@ -87,7 +118,6 @@ function StatCounters() {
 
 export function About() {
   const sectionRef = useRef<HTMLElement>(null);
-  const reduced = usePrefersReducedMotion();
 
   return (
     <section
@@ -97,61 +127,71 @@ export function About() {
       aria-labelledby="about-heading"
     >
       <Container>
-        <div className="mt-6 max-w-3xl lg:mt-8">
-          <ScrollReveal y={28}>
-            <p className="text-[11px] font-semibold tracking-[0.2em] text-text-tertiary uppercase">
-              Get to know me
-            </p>
-            <Eyebrow className="mt-3 mb-0">About</Eyebrow>
-            <Heading
-              id="about-heading"
-              as={2}
-              size="display-sm"
-              className="mt-3 max-w-xl text-[clamp(1.65rem,3.2vw,2.75rem)] leading-[1.12]"
-            >
-              {about.headline}
-            </Heading>
-          </ScrollReveal>
+        <div className="mt-6 grid items-center gap-6 lg:mt-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.9fr)] lg:gap-8 xl:gap-10">
+          <div className="order-2 min-w-0 lg:order-1">
+            <ScrollReveal y={28}>
+              <p className="text-[11px] font-semibold tracking-[0.2em] text-text-tertiary uppercase">
+                Get to know me
+              </p>
+              <Eyebrow className="mt-3 mb-0">About</Eyebrow>
+              <Heading
+                id="about-heading"
+                as={2}
+                size="display-sm"
+                className="mt-3 max-w-xl text-[clamp(1.65rem,3.2vw,2.75rem)] leading-[1.12]"
+              >
+                {about.headline}
+              </Heading>
+            </ScrollReveal>
 
-          <div className="mt-5 max-w-xl md:mt-6">
-            <TextGradientScroll
-              text={about.specialize}
-              className="text-[clamp(1.05rem,2.2vw,1.35rem)] font-medium leading-snug tracking-tight text-text-primary"
-              shadowOpacity={0.16}
-            />
+            <div className="mt-5 max-w-xl md:mt-6">
+              <TextGradientScroll
+                text={about.specialize}
+                className="text-[clamp(1.05rem,2.2vw,1.35rem)] font-medium leading-snug tracking-tight text-text-primary"
+                shadowOpacity={0.16}
+              />
+            </div>
+
+            <div className="mt-4 max-w-md">
+              <TextGradientScroll
+                text={about.lead}
+                className="text-sm leading-relaxed text-text-secondary"
+                shadowOpacity={0.2}
+              />
+            </div>
+
+            <ScrollReveal delay={0.06} y={18}>
+              <ChipGroup
+                items={[...about.highlightStack]}
+                className="mt-5 gap-2"
+              />
+            </ScrollReveal>
+
+            <ScrollReveal delay={0.08} y={20}>
+              <a
+                href={site.leetcode}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-secondary transition-colors duration-fast hover:text-text-primary"
+                data-cursor="hover"
+              >
+                <span className="font-semibold tracking-[0.14em] text-accent-cyan uppercase">
+                  LeetCode
+                </span>
+                <span>@{site.leetcodeUser}</span>
+                <span className="text-text-tertiary">
+                  {site.leetcodeStats.solved} solved
+                </span>
+              </a>
+            </ScrollReveal>
           </div>
 
-          <div className="mt-4 max-w-md">
-            <TextGradientScroll
-              text={about.lead}
-              className="text-sm leading-relaxed text-text-secondary"
-              shadowOpacity={0.2}
-            />
-          </div>
-
-          <ScrollReveal delay={0.06} y={18}>
-            <ChipGroup
-              items={[...about.highlightStack]}
-              className="mt-5 gap-2"
-            />
-          </ScrollReveal>
-
-          <ScrollReveal delay={0.08} y={20}>
-            <a
-              href={site.leetcode}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-secondary transition-colors duration-fast hover:text-text-primary"
-              data-cursor="hover"
-            >
-              <span className="font-semibold tracking-[0.14em] text-accent-cyan uppercase">
-                LeetCode
-              </span>
-              <span>@{site.leetcodeUser}</span>
-              <span className="text-text-tertiary">
-                {site.leetcodeStats.solved} solved
-              </span>
-            </a>
+          <ScrollReveal
+            delay={0.1}
+            y={24}
+            className="order-1 w-full max-lg:mx-auto max-lg:max-w-[20rem] lg:order-2"
+          >
+            <AboutAvatarVisual />
           </ScrollReveal>
         </div>
 

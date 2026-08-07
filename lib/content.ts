@@ -37,13 +37,95 @@ export const site = {
       { name: "Java", solved: 3 },
     ],
   },
-  /** Hero AI avatar video (muted autoplay + tap unmute). */
+  /**
+   * Marketing AI avatar video (muted autoplay + tap unmute).
+   * Hero only — About uses a separate craft visual.
+   */
   heroAvatarVideo: "/media/hero-avatar.mp4",
   heroAvatarPoster: "/media/hero-avatar-poster.jpg",
   /** Face + upper torso crop — leave room for gesture/hand in frame */
   heroAvatarObjectPosition: "50% 22%",
+  /** About section — stylized AI avatar (face-based, not the hero suit clip) */
+  aboutVisual: "/about/about-ai-avatar.png",
   /** Photo avatar (meta / OG) */
   avatar: "/profile/divyanshu-kashyap-frontend-developer-jaipur.webp",
+  /**
+   * Full spoken intro (English hero fallback / captions).
+   * Prefer `heroSpeechChapters` / `aboutSpeechChapters` for timed narration.
+   */
+  avatarIntro:
+    "Hey! I'm Divyanshu Kashyap, a Frontend Engineer and Frontend Developer based in Jaipur. I build with React.js, Next.js, and TypeScript — UI development, website development, WordPress, SEO, and performance. I also ship AI-based products with fewer API calls, smarter caching, code splitting, and optimization. Explore my work, and let's build something extraordinary together.",
+  /** Hero unmute — English narration */
+  heroSpeechChapters: [
+    {
+      id: "hello",
+      label: "Intro",
+      text: "Hey! I'm Divyanshu Kashyap — a Frontend Engineer and Frontend Developer based in Jaipur. Welcome to my portfolio.",
+    },
+    {
+      id: "roles",
+      label: "Roles",
+      text: "I work as a Frontend Engineer, Frontend Developer, React.js developer, Next.js builder, and UI developer — shipping clean interfaces and fast web experiences.",
+    },
+    {
+      id: "stack",
+      label: "Stack",
+      text: "My core stack is React.js, Next.js, and TypeScript. I also do website development, modern UI systems, and WordPress when clients need content-first sites.",
+    },
+    {
+      id: "seo-perf",
+      label: "SEO & Performance",
+      text: "I focus on SEO, Lighthouse performance, code splitting, and optimization — so sites load fast, rank better, and feel smooth for users.",
+    },
+    {
+      id: "ai-api",
+      label: "AI & API",
+      text: "I also build AI-based products — smart UI, fewer API calls, caching, and efficient data flow to cut network load and boost performance.",
+    },
+    {
+      id: "close",
+      label: "Connect",
+      text: "If you need product UI, a landing page, SEO, a performance upgrade, or AI product frontend — I can help. Explore the projects below, and let's build something extraordinary together.",
+    },
+  ] as const,
+  /** About unmute — Hindi narration */
+  aboutSpeechChapters: [
+    {
+      id: "hello",
+      label: "परिचय",
+      text: "नमस्ते! मैं दिव्यांशु कश्यप हूँ — जयपुर से एक फ्रंटएंड इंजीनियर और फ्रंटएंड डेवलपर। मेरे पोर्टफोलियो में आपका स्वागत है।",
+    },
+    {
+      id: "roles",
+      label: "भूमिकाएँ",
+      text: "मैं फ्रंटएंड इंजीनियर, फ्रंटएंड डेवलपर, रिएक्ट जे एस डेवलपर, नेक्स्ट जे एस बिल्डर, और यूआई डेवलपर के रूप में काम करता हूँ — साफ़ इंटरफ़ेस और तेज़ वेब अनुभव बनाता हूँ।",
+    },
+    {
+      id: "stack",
+      label: "स्टैक",
+      text: "मेरा मुख्य स्टैक React.js, Next.js और TypeScript है। मैं वेबसाइट डेवलपमेंट, आधुनिक यूआई सिस्टम, और वर्डप्रेस डेवलपमेंट भी करता हूँ — जब क्लाइंट को कंटेंट-फर्स्ट साइट चाहिए।",
+    },
+    {
+      id: "seo-perf",
+      label: "SEO और परफ़ॉर्मेंस",
+      text: "मैं SEO, Lighthouse परफ़ॉर्मेंस, कोड स्प्लिटिंग, और ऑप्टिमाइज़ेशन पर फोकस करता हूँ — ताकि साइट तेज़ लोड हो, रैंकिंग बेहतर हो, और यूज़र एक्सपीरियंस स्मूद रहे।",
+    },
+    {
+      id: "ai-api",
+      label: "AI और API",
+      text: "मैं ए आई बेस्ड प्रोडक्ट्स भी बनाता हूँ — स्मार्ट यूआई, कम ए पी आई कॉल्स, कैशिंग, और कुशल डेटा फ़्लो से नेटवर्क लोड घटाकर परफ़ॉर्मेंस बढ़ाता हूँ।",
+    },
+    {
+      id: "services",
+      label: "सेवाएँ",
+      text: "मेरी सेवाओं में React और Next.js ऐप्स, यूआई आर्किटेक्चर, वेबसाइट और वर्डप्रेस डेवलपमेंट, ए पी आई इंटीग्रेशन, मोशन डिज़ाइन, परफ़ॉर्मेंस ट्यूनिंग, एस ई ओ, और कोड स्प्लिटिंग शामिल है।",
+    },
+    {
+      id: "close",
+      label: "जुड़ें",
+      text: "अगर आपको प्रोडक्ट यूआई, लैंडिंग पेज, एस ई ओ, परफ़ॉर्मेंस अपग्रेड, या ए आई प्रोडक्ट फ़्रंटएंड चाहिए — मैं मदद कर सकता हूँ। नीचे प्रोजेक्ट्स देखें, और मिलकर कुछ शानदार बनाते हैं।",
+    },
+  ] as const,
   heroHeadline: "FRONTEND ENGINEER",
   heroRoles: [
     "FRONTEND ENGINEER",
@@ -245,7 +327,8 @@ export const certifications: Certification[] = [
       "React JS",
       "Scroll Trigger",
     ],
-    image: "/certificates/sheryians-front-end-domination-certificate-divyanshu-kashyap.webp",
+    image:
+      "/certificates/sheryians-front-end-domination-certificate-divyanshu-kashyap.webp",
     note: "Course has covered in depth knowledge of HTML, CSS, Animations, JS, GSAP, Locomotive, Scroll Trigger, Shery.js, Modern web development and Design thinking. Approach, Modern, Design.",
   },
   {
@@ -265,7 +348,8 @@ export const certifications: Certification[] = [
     credentialId: "HTT1408DK166",
     credentialUrl: "http://hinditechtutorials.com/verify",
     skills: ["Web Development"],
-    image: "/certificates/hindi-tech-web-development-certificate-divyanshu-kashyap.webp",
+    image:
+      "/certificates/hindi-tech-web-development-certificate-divyanshu-kashyap.webp",
     note: "Completed 50+ Hour of Web Development Online Course on Hindi Tech Tutorials.",
   },
 ];
@@ -338,15 +422,9 @@ export const projects: Project[] = [
     title: "Front-End Domination",
     description:
       "Open-source learning hub from Sheryians Coding School’s Front-End Domination course — HTML, CSS, JavaScript fundamentals, responsive UI, GSAP + ScrollTrigger + Locomotive animations, and React (Hooks, Router, Context). 128★ on GitHub.",
-    tags: [
-      "JavaScript",
-      "HTML",
-      "CSS",
-      "React",
-      "GSAP",
-      "ScrollTrigger",
-    ],
-    image: "/projects/front-end-domination-javascript-react-gsap-sheryians.webp",
+    tags: ["JavaScript", "HTML", "CSS", "React", "GSAP", "ScrollTrigger"],
+    image:
+      "/projects/front-end-domination-javascript-react-gsap-sheryians.webp",
     imageAlt:
       "Front-End Domination open-source course hub by Divyanshu Kashyap — JavaScript, React, GSAP, and ScrollTrigger projects from Sheryians Coding School",
     href: "https://github.com/Lucky-Kashyap/Front-End-Domination-Create-Anything-with-Code",
@@ -369,14 +447,7 @@ export const projects: Project[] = [
     title: "Angular Mini E-commerce",
     description:
       "Mini e-commerce app in Angular 14 with routing (Home, Products, Product Details, Login, Register), mock Products API, add/remove cart with live total pricing, empty-cart state, and category filters (All, Fashion, Jewelery, Electronics). Clean UI — more features in progress.",
-    tags: [
-      "Angular 14",
-      "TypeScript",
-      "Cart",
-      "Filters",
-      "Routing",
-      "API",
-    ],
+    tags: ["Angular 14", "TypeScript", "Cart", "Filters", "Routing", "API"],
     image:
       "/projects/angular-ecommerce/angular-ecommerce-products-category-filters.webp",
     imageAlt:
@@ -410,13 +481,7 @@ export const projects: Project[] = [
     title: "Web Cam Photo Gallery",
     description:
       "Vanilla JS webcam gallery with live MediaStream feed, Canvas capture, MediaRecorder video, image/video filters, download & delete, and IndexedDB persistence for blobs. Responsive UI — live on Netlify.",
-    tags: [
-      "Vanilla JS",
-      "MediaRecorder",
-      "Canvas",
-      "IndexedDB",
-      "Web APIs",
-    ],
+    tags: ["Vanilla JS", "MediaRecorder", "Canvas", "IndexedDB", "Web APIs"],
     image: "/projects/webcam-gallery/vanilla-js-webcam-photo-gallery-app.webp",
     imageAlt:
       "Vanilla JavaScript webcam photo gallery app with MediaRecorder and IndexedDB by Divyanshu Kashyap",
@@ -442,13 +507,7 @@ export const projects: Project[] = [
     title: "Jira Ticket Management Clone",
     description:
       "Vanilla JS ticket board inspired by Jira — generate tickets via modal, assign priority colors (default grey), filter by color, remove tickets, lock/unlock for editing, and persist everything with localStorage. Responsive layout.",
-    tags: [
-      "Vanilla JS",
-      "localStorage",
-      "DOM",
-      "Modal",
-      "CRUD",
-    ],
+    tags: ["Vanilla JS", "localStorage", "DOM", "Modal", "CRUD"],
     image: "/projects/jira-clone/vanilla-js-jira-ticket-management-clone.webp",
     imageAlt:
       "Vanilla JavaScript Jira-style ticket management board with priority filters by Divyanshu Kashyap",

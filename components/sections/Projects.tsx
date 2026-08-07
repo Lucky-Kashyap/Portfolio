@@ -17,7 +17,7 @@ export function Projects() {
     <section
       id="projects"
       aria-labelledby="projects-heading"
-      className="section-pad relative scroll-mt-28 overflow-x-clip bg-atmosphere md:scroll-mt-32"
+      className="relative scroll-mt-28 overflow-x-clip bg-atmosphere py-10 md:scroll-mt-32 md:py-14 lg:py-16"
     >
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent-cyan/40 to-transparent"
@@ -56,7 +56,7 @@ export function Projects() {
           </div>
         </ScrollReveal>
 
-        <div className="section-content">
+        <div className="mt-6 md:mt-8">
           <ProjectHoverList projects={projects} />
         </div>
       </Container>
