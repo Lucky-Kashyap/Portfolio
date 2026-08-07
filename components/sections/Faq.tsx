@@ -2,11 +2,11 @@
 
 import { useId, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import { Button, Container, Eyebrow, Text, TextLink } from "@/components/ui";
 import { ScrollWords } from "@/components/motion/ScrollHeading";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
-import { site } from "@/lib/content";
+import { about, site } from "@/lib/content";
 import { faqs } from "@/lib/seo";
 import { scrollToId } from "@/lib/scroll";
 import { cn } from "@/lib/utils";
@@ -24,7 +24,13 @@ function FaqAnswer({
 }) {
   let body: ReactNode = fallback;
 
-  if (id === "contact") {
+  if (id === "specialize") {
+    body = (
+      <>
+        {about.specialize} {about.narrative}
+      </>
+    );
+  } else if (id === "contact") {
     body = (
       <>
         I am based in Gokul Vatika, Jaipur, Rajasthan. Email{" "}
@@ -90,6 +96,8 @@ function FaqAnswer({
         mainly in C++ and JavaScript.
       </>
     );
+  } else if (id === "opportunities") {
+    body = <>{about.passion}</>;
   }
 
   return (
@@ -108,38 +116,59 @@ export function Faq() {
     <section
       id="faq"
       aria-labelledby="faq-heading"
-      className="section-pad scroll-mt-28 border-y border-border-muted bg-surface-base md:scroll-mt-32"
+      className="relative section-pad scroll-mt-28 overflow-hidden border-y border-border-muted bg-surface-base cv-auto md:scroll-mt-32"
     >
-      <Container>
-        <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.25fr)] lg:gap-14 xl:gap-20">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.35]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(125,211,252,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(125,211,252,0.06) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }}
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute -top-24 right-0 size-[28rem] rounded-full bg-[radial-gradient(circle,rgba(125,211,252,0.12),transparent_65%)]"
+        aria-hidden
+      />
+
+      <Container className="relative z-10">
+        <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.28fr)] lg:gap-8 xl:gap-10">
           <ScrollReveal className="lg:sticky lg:top-28">
-            <Eyebrow className="mb-4">FAQ</Eyebrow>
+            <Eyebrow className="mb-3">FAQ</Eyebrow>
             <ScrollWords
               id="faq-heading"
               as={2}
-              text="Common questions"
-              className="mt-2"
+              text="Ask before you ping"
+              className="mt-2 text-[clamp(1.35rem,5.5vw,2.5rem)]"
             />
             <Text
               tone="muted"
-              className="mt-5 max-w-md text-base leading-relaxed md:text-lg"
+              className="mt-3 max-w-sm text-sm leading-relaxed sm:text-base"
             >
-              Quick answers about experience, stack, availability, and how to
-              get in touch — open one at a time.
+              Stack, experience, availability — tap a question. Still stuck?
+              Jump to contact.
             </Text>
-            <div className="mt-8">
+            <div className="mt-5 flex flex-wrap gap-2 sm:gap-3">
               <Button
                 variant="secondary"
-                className="min-h-11 px-5"
+                className="min-h-10 px-4 text-sm sm:min-h-11 sm:px-5"
                 onClick={() => scrollToId("contact")}
               >
-                Still have a question?
+                Contact me
+              </Button>
+              <Button
+                variant="ghost"
+                className="min-h-10 px-4 text-sm sm:min-h-11 sm:px-5"
+                onClick={() => scrollToId("services")}
+              >
+                View services
               </Button>
             </div>
           </ScrollReveal>
 
           <ScrollReveal delay={0.06} y={28}>
-            <ul className="divide-y divide-border-muted rounded-md border border-border-muted bg-surface-raised/60">
+            <ul className="flex list-none flex-col gap-2 p-0 sm:gap-3">
               {faqs.map((item, index) => {
                 const isOpen = openIndex === index;
                 const panelId = `${baseId}-panel-${index}`;
@@ -147,7 +176,15 @@ export function Faq() {
                 const num = String(index + 1).padStart(2, "0");
 
                 return (
-                  <li key={item.id}>
+                  <li
+                    key={item.id}
+                    className={cn(
+                      "overflow-hidden border transition-[border-color,background-color] duration-fast",
+                      isOpen
+                        ? "border-accent-cyan/40 bg-surface-raised"
+                        : "border-border-muted bg-surface-raised/40 hover:border-white/20",
+                    )}
+                  >
                     <h3 className="m-0">
                       <button
                         type="button"
@@ -160,34 +197,37 @@ export function Faq() {
                             prev === index ? null : index,
                           )
                         }
-                        className={cn(
-                          "flex w-full items-start gap-3 px-4 py-3.5 text-left transition-colors duration-fast md:gap-4 md:px-5 md:py-4",
-                          isOpen
-                            ? "bg-surface-raised text-text-primary"
-                            : "text-text-secondary hover:bg-white/[0.03] hover:text-text-primary",
-                        )}
+                        className="flex w-full items-center gap-3 px-3 py-3.5 text-left sm:gap-4 sm:px-4 sm:py-4 md:gap-5 md:px-5 md:py-5"
                       >
                         <span
                           className={cn(
-                            "mt-0.5 shrink-0 font-mono text-[11px] tracking-wider tabular-nums",
-                            isOpen ? "text-accent-cyan" : "text-text-tertiary",
+                            "font-mono text-xl font-light tabular-nums sm:text-2xl md:text-3xl",
+                            isOpen ? "text-accent-cyan" : "text-white/15",
                           )}
                           aria-hidden
                         >
                           {num}
                         </span>
-                        <span className="min-w-0 flex-1 text-[0.95rem] font-medium leading-snug tracking-tight md:text-base">
+                        <span
+                          className={cn(
+                            "min-w-0 flex-1 text-sm font-semibold leading-snug tracking-tight sm:text-base md:text-lg",
+                            isOpen
+                              ? "text-text-primary"
+                              : "text-text-secondary",
+                          )}
+                        >
                           {item.question}
                         </span>
                         <span
                           className={cn(
-                            "mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-full border border-border-muted text-text-tertiary transition-[transform,color,border-color,background-color] duration-fast",
-                            isOpen &&
-                              "rotate-180 border-accent-cyan/40 bg-accent-cyan/10 text-accent-cyan",
+                            "inline-flex size-8 shrink-0 items-center justify-center border transition-colors duration-fast sm:size-9",
+                            isOpen
+                              ? "border-accent-cyan/50 bg-accent-cyan/10 text-accent-cyan"
+                              : "border-border-muted text-text-tertiary",
                           )}
                           aria-hidden
                         >
-                          <ChevronDown size={14} strokeWidth={2.25} />
+                          {isOpen ? <Minus size={15} /> : <Plus size={15} />}
                         </span>
                       </button>
                     </h3>
@@ -213,7 +253,7 @@ export function Faq() {
                           }}
                           className="overflow-hidden"
                         >
-                          <div className="border-t border-border-muted/70 px-4 pb-4 pt-3 md:px-5 md:pb-5 md:pl-[3.25rem]">
+                          <div className="border-t border-border-muted/80 px-4 pb-5 pt-1 md:px-5 md:pl-[4.25rem]">
                             <FaqAnswer id={item.id} fallback={item.answer} />
                           </div>
                         </motion.div>

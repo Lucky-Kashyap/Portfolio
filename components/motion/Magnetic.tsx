@@ -1,6 +1,12 @@
 "use client";
 
-import { useRef, useState, type MouseEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +21,7 @@ type MagneticProps = {
 };
 
 /**
- * Framer Motion magnetic wrapper — cursor offset spring (desktop / fine pointer).
+ * Framer Motion magnetic wrapper — desktop / fine pointer only.
  */
 export function Magnetic({
   children,
@@ -26,9 +32,18 @@ export function Magnetic({
   const ref = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [finePointer, setFinePointer] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: fine)");
+    const update = () => setFinePointer(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
   const handleMouse = (e: MouseEvent<HTMLDivElement>) => {
-    if (disabled || reduceMotion || !ref.current) return;
+    if (disabled || reduceMotion || !finePointer || !ref.current) return;
     const { clientX, clientY } = e;
     const { height, width, left, top } = ref.current.getBoundingClientRect();
     const middleX = (clientX - (left + width / 2)) * strength;
@@ -38,7 +53,7 @@ export function Magnetic({
 
   const reset = () => setPosition({ x: 0, y: 0 });
 
-  if (disabled || reduceMotion) {
+  if (disabled || reduceMotion || !finePointer) {
     return <div className={cn("relative inline-flex", className)}>{children}</div>;
   }
 
@@ -50,7 +65,7 @@ export function Magnetic({
       onMouseMove={handleMouse}
       onMouseLeave={reset}
       animate={{ x: position.x, y: position.y }}
-      transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
+      transition={{ type: "spring", stiffness: 160, damping: 16, mass: 0.12 }}
     >
       {children}
     </motion.div>

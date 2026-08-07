@@ -50,6 +50,10 @@ type InfoCardProps = {
   items: readonly string[];
   className?: string;
   icon?: ReactNode;
+  /** Compact checklist — tighter spacing for shorter side panels */
+  dense?: boolean;
+  /** Split checklist into two columns from this breakpoint */
+  columns?: 1 | 2;
 };
 
 export function InfoListCard({
@@ -58,29 +62,49 @@ export function InfoListCard({
   items,
   className,
   icon,
+  dense = false,
+  columns = 1,
 }: InfoCardProps) {
   return (
-    <Card padding="lg" className={cn("h-full", className)}>
-      <div className="flex items-start gap-4">
+    <Card
+      padding={dense ? "md" : "lg"}
+      className={className}
+    >
+      <div className={cn("flex items-start", dense ? "gap-3" : "gap-4")}>
         {icon ? (
-          <span className="inline-flex size-[44px] shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary">
+          <span
+            className={cn(
+              "inline-flex shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary",
+              dense ? "size-10" : "size-[44px]",
+            )}
+          >
             {icon}
           </span>
         ) : null}
         <div className="min-w-0">
           <Eyebrow className="mb-0 tracking-[0.14em]">{eyebrow}</Eyebrow>
-          <p className="mt-3 text-xl font-semibold tracking-tight text-text-primary">
+          <p
+            className={cn(
+              "font-semibold tracking-tight text-text-primary",
+              dense ? "mt-2 text-lg" : "mt-3 text-xl",
+            )}
+          >
             {title}
           </p>
         </div>
       </div>
-      <ul className="mt-6 space-y-3">
+      <ul
+        className={cn(
+          dense ? "mt-4 space-y-2.5" : "mt-5 space-y-2.5",
+          columns === 2 && "sm:grid sm:grid-cols-2 sm:gap-x-4 sm:gap-y-2.5 sm:space-y-0",
+        )}
+      >
         {items.map((item) => (
-          <li key={item} className="flex items-start gap-3">
+          <li key={item} className="flex items-start gap-2.5">
             <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-surface-muted text-text-primary">
               <Check size={12} strokeWidth={2.5} aria-hidden />
             </span>
-            <Text tone="muted" size="sm" className="leading-relaxed">
+            <Text tone="muted" size="sm" className="leading-snug">
               {item}
             </Text>
           </li>

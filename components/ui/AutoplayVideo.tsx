@@ -7,6 +7,25 @@ import {
   releaseVideoAudio,
   subscribeVideoAudio,
 } from "@/lib/video-audio";
+import { playAvatarSpeech, stopAvatarSpeech } from "@/lib/avatar-speech";
+
+type AutoplayVideoProps = {
+  src: string;
+  poster?: string;
+  className?: string;
+  objectPosition?: string;
+  seekTo?: number;
+  lazy?: boolean;
+  showMuteControl?: boolean;
+  muteControlSide?: "left" | "right";
+  /**
+   * When true (default), unmute also plays Web Speech intro chapters.
+   * Needed when the MP4 has no audio track (placeholders / GIF encodes).
+   */
+  speechOnUnmute?: boolean;
+  /** Make the whole media surface toggle sound (not only the pill). */
+  tapSurfaceUnmute?: boolean;
+};
 
 /**
  * Autoplay background video with tap-to-unmute.
@@ -20,20 +39,31 @@ export function AutoplayVideo({
   seekTo,
   lazy = true,
   showMuteControl = true,
-}: {
-  src: string;
-  poster?: string;
-  className?: string;
-  objectPosition?: string;
-  seekTo?: number;
-  lazy?: boolean;
-  /** Decorative / non-interactive embeds can hide the unmute control. */
-  showMuteControl?: boolean;
-}) {
+  muteControlSide = "left",
+  speechOnUnmute = true,
+  tapSurfaceUnmute = true,
+}: AutoplayVideoProps) {
   const ref = useRef<HTMLVideoElement>(null);
   const id = useId();
   const [muted, setMuted] = useState(true);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [hasEmbeddedAudio, setHasEmbeddedAudio] = useState(false);
+  const speakingRef = useRef(false);
+
+  const remuteAll = () => {
+    const el = ref.current;
+    setMuted(true);
+    if (el) {
+      el.muted = true;
+      el.defaultMuted = true;
+    }
+    if (speakingRef.current) {
+      stopAvatarSpeech();
+      speakingRef.current = false;
+    }
+    releaseVideoAudio(id);
+  };
 
   useEffect(() => {
     const el = ref.current;
@@ -45,21 +75,31 @@ export function AutoplayVideo({
     setReduceMotion(!!reduce);
     if (reduce) return;
 
-    const applySeek = () => {
-      if (seekTo != null && el.currentTime < seekTo) el.currentTime = seekTo;
-    };
-    el.addEventListener("loadedmetadata", applySeek, { once: true });
+    el.muted = true;
+    el.defaultMuted = true;
 
-    const remute = () => {
-      setMuted(true);
-      releaseVideoAudio(id);
+    const onMeta = () => {
+      if (seekTo != null && el.currentTime < seekTo) el.currentTime = seekTo;
+      // Best-effort: detect audio track (Chromium / Firefox quirks)
+      const anyEl = el as HTMLVideoElement & {
+        mozHasAudio?: boolean;
+        webkitAudioDecodedByteCount?: number;
+        audioTracks?: { length: number };
+      };
+      const detected =
+        (anyEl.audioTracks && anyEl.audioTracks.length > 0) ||
+        anyEl.mozHasAudio === true ||
+        (typeof anyEl.webkitAudioDecodedByteCount === "number" &&
+          anyEl.webkitAudioDecodedByteCount > 0);
+      if (detected) setHasEmbeddedAudio(true);
     };
+    el.addEventListener("loadedmetadata", onMeta);
 
     if (!lazy) {
       el.play().catch(() => {});
       return () => {
-        el.removeEventListener("loadedmetadata", applySeek);
-        remute();
+        el.removeEventListener("loadedmetadata", onMeta);
+        remuteAll();
       };
     }
 
@@ -70,7 +110,7 @@ export function AutoplayVideo({
             el.play().catch(() => {});
           } else {
             el.pause();
-            remute();
+            remuteAll();
           }
         }
       },
@@ -79,16 +119,19 @@ export function AutoplayVideo({
     io.observe(el);
     return () => {
       io.disconnect();
-      el.removeEventListener("loadedmetadata", applySeek);
-      remute();
+      el.removeEventListener("loadedmetadata", onMeta);
+      remuteAll();
     };
-  }, [seekTo, lazy, id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seekTo, lazy, id, src]);
 
-  // Another video claimed audio — remute this one.
   useEffect(() => {
     return subscribeVideoAudio((activeId) => {
-      if (activeId !== id) setMuted(true);
+      if (activeId !== id && activeId !== null) {
+        remuteAll();
+      }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useEffect(() => {
@@ -98,33 +141,41 @@ export function AutoplayVideo({
     el.defaultMuted = muted;
     if (!muted) {
       el.volume = 1;
-      const play = el.play();
-      if (play) play.catch(() => {});
+      el.play().catch(() => {});
     }
   }, [muted]);
 
-  const toggleMute = () => {
+  const unmute = async () => {
     const el = ref.current;
-    if (muted) {
-      claimVideoAudio(id);
-      if (el) {
-        el.muted = false;
-        el.defaultMuted = false;
-        el.volume = 1;
-        el.play().catch(() => {});
-      }
-      setMuted(false);
-    } else {
-      releaseVideoAudio(id);
-      if (el) {
-        el.muted = true;
-        el.defaultMuted = true;
-      }
-      setMuted(true);
+    claimVideoAudio(id);
+    setMuted(false);
+
+    if (el) {
+      el.muted = false;
+      el.defaultMuted = false;
+      el.volume = 1;
+      el.currentTime = 0;
+      el.play().catch(() => {});
+    }
+
+    const shouldSpeak = speechOnUnmute && !hasEmbeddedAudio;
+    if (shouldSpeak) {
+      speakingRef.current = true;
+      await playAvatarSpeech();
+      speakingRef.current = false;
+      // Keep "Sound on" until user mutes — restart speech if they tap again later
     }
   };
 
-  if (reduceMotion) {
+  const toggleMute = () => {
+    if (muted) {
+      void unmute();
+    } else {
+      remuteAll();
+    }
+  };
+
+  if (reduceMotion || failed) {
     return poster ? (
       // eslint-disable-next-line @next/next/no-img-element
       <img
@@ -137,25 +188,66 @@ export function AutoplayVideo({
   }
 
   return (
-    <div className={cn("relative size-full overflow-hidden", className)}>
+    <div
+      className={cn(
+        "relative size-full overflow-hidden",
+        tapSurfaceUnmute && "cursor-pointer",
+        className,
+      )}
+      onClick={tapSurfaceUnmute ? toggleMute : undefined}
+      onKeyDown={
+        tapSurfaceUnmute
+          ? (e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                toggleMute();
+              }
+            }
+          : undefined
+      }
+      role={tapSurfaceUnmute ? "button" : undefined}
+      tabIndex={tapSurfaceUnmute ? 0 : undefined}
+      aria-label={
+        tapSurfaceUnmute
+          ? muted
+            ? "Play avatar introduction with sound"
+            : "Mute avatar"
+          : undefined
+      }
+    >
       <video
         ref={ref}
         src={src}
         poster={poster}
-        muted={muted}
+        muted
         loop
         playsInline
         preload={lazy ? "none" : "metadata"}
         className="absolute inset-0 size-full object-cover"
         style={{ objectPosition }}
+        onError={() => setFailed(true)}
       />
+
+      {/* Soft vignette — keeps face readable without boxing the media */}
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_35%,transparent_40%,rgba(0,0,0,0.35)_100%)]"
+        aria-hidden
+      />
+
       {showMuteControl ? (
         <button
           type="button"
-          onClick={toggleMute}
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleMute();
+          }}
           aria-pressed={!muted}
           aria-label={muted ? "Unmute video" : "Mute video"}
-          className="absolute bottom-3 left-3 z-10 inline-flex items-center gap-2 rounded-full border border-white/20 bg-[rgba(11,18,48,0.72)] px-3 py-1.5 text-[11px] font-semibold tracking-wide text-white shadow-[0_8px_20px_rgba(0,0,0,0.35)] backdrop-blur-sm transition hover:border-accent-cyan/50 hover:bg-[rgba(11,18,48,0.88)]"
+          className={cn(
+            "absolute bottom-3 z-10 inline-flex items-center gap-2 rounded-full border border-white/20 bg-[rgba(11,18,32,0.78)] px-3 py-1.5 text-[11px] font-semibold tracking-wide text-white shadow-[0_8px_20px_rgba(0,0,0,0.35)] backdrop-blur-sm transition hover:border-accent-cyan/45 hover:bg-[rgba(11,18,32,0.92)]",
+            muteControlSide === "right" ? "right-3" : "left-3",
+            !muted && "border-accent-cyan/40 text-accent-cyan",
+          )}
         >
           {muted ? <MuteIcon /> : <UnmuteIcon />}
           <span>{muted ? "Tap to unmute" : "Sound on"}</span>

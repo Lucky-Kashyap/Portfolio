@@ -1,4 +1,5 @@
 export { AutoplayVideo } from "./AutoplayVideo";
+export { AvatarVideoFrame } from "./AvatarVideoFrame";
 export { Badge, Chip, ChipGroup } from "./Badge";
 export { BrandMark } from "./BrandMark";
 export { Button } from "./Button";

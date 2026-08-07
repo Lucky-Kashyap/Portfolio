@@ -1,13 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { Pause, Play } from "lucide-react";
 import { AutoplayVideo } from "@/components/ui/AutoplayVideo";
+import { AvatarCanvas } from "@/components/motion/AvatarCanvas";
 import { site } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
+import { useIsCompactViewport } from "@/hooks/useMediaQuery";
+
+const Avatar3D = dynamic(
+  () => import("@/components/motion/Avatar3D").then((m) => m.Avatar3D),
+  { ssr: false },
+);
 
 type HeroAvatarProps = {
   className?: string;
@@ -39,10 +47,16 @@ export function HeroAvatar({ className, compact = false }: HeroAvatarProps) {
   const [progress, setProgress] = useState(0);
   const [roleIndex, setRoleIndex] = useState(0);
   const reduced = usePrefersReducedMotion();
+  const compactViewport = useIsCompactViewport();
   const hasVideo = site.avatarVideoEnabled;
-  const useGif = site.aiAvatarGifEnabled && !reduced && !hasVideo;
+  /** Skip WebGL only on very small phones — shader portrait is lightweight */
+  const use3d =
+    site.aiAvatar3dEnabled && !reduced && !hasVideo && !compactViewport;
+  const useGif =
+    !use3d && site.aiAvatarGifEnabled && !reduced && !hasVideo;
   const roles = site.heroRoles?.length ? [...site.heroRoles] : [site.heroHeadline];
   const activeRole = roles[roleIndex % roles.length];
+  const poster3d = site.aiAvatar3d ?? site.aiAvatar;
   const poster = site.aiAvatar;
   const chapters = site.avatarIntroChapters;
   const cancelRef = useRef(false);
@@ -169,19 +183,28 @@ export function HeroAvatar({ className, compact = false }: HeroAvatarProps) {
         className,
       )}
     >
-      <div className="group relative block w-full max-h-full overflow-hidden rounded-md bg-[#0c1118] text-left shadow-accent-lg outline-none transition-[box-shadow] duration-fast hover:shadow-[0_0_0_1px_rgba(125,211,252,0.35)]">
+      <div
+        className={cn(
+          "group relative block w-full max-h-full overflow-hidden text-left outline-none transition-[box-shadow] duration-fast",
+          use3d
+            ? "rounded-none bg-transparent shadow-none"
+            : "rounded-md bg-[#0c1118] shadow-accent-lg hover:shadow-[0_0_0_1px_rgba(125,211,252,0.35)]",
+        )}
+      >
         <div
           className={cn(
             "relative w-full",
             compact
-              ? "aspect-[3/4] max-h-[min(52svh,420px)] lg:max-h-[min(68svh,520px)]"
+              ? "aspect-[3/4] max-h-[min(56svh,460px)] lg:max-h-[min(72svh,560px)]"
               : "aspect-[4/5] sm:aspect-[3/4]",
           )}
         >
-          <div
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,#152033_0%,#0c1118_70%)]"
-            aria-hidden
-          />
+          {!use3d ? (
+            <div
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,#152033_0%,#0c1118_70%)]"
+              aria-hidden
+            />
+          ) : null}
 
           {hasVideo ? (
             <AutoplayVideo
@@ -209,29 +232,36 @@ export function HeroAvatar({ className, compact = false }: HeroAvatarProps) {
               }
               className="absolute inset-0 block size-full text-left outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan/60 focus-visible:ring-inset"
             >
-              <Image
-                src={useGif ? site.aiAvatarGif : poster}
-                alt="Divyanshu Kashyap stylized 3D AI avatar — Frontend Engineer specializing in React and Next.js"
-                fill
-                priority
-                unoptimized={useGif}
-                sizes="(max-width: 1024px) 90vw, 50vw"
-                className={cn(
-                  "object-cover object-[center_12%] transition-transform duration-slow",
-                  speaking && !reduced && "scale-[1.03]",
+              <div className="absolute inset-0 overflow-hidden">
+                {use3d ? (
+                  <Avatar3D faceUrl={poster3d} speaking={speaking} />
+                ) : useGif ? (
+                  <AvatarCanvas
+                    src={site.aiAvatarGif}
+                    poster={poster}
+                    focusY={0.08}
+                  />
+                ) : (
+                  <Image
+                    src={poster}
+                    alt="Divyanshu Kashyap realistic AI avatar waving — Frontend Engineer specializing in React and Next.js"
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 90vw, 50vw"
+                    className={cn(
+                      "object-cover object-[center_10%] transition-transform duration-slow",
+                      speaking && !reduced && "scale-[1.03]",
+                    )}
+                  />
                 )}
-              />
+              </div>
 
-              <div
-                className={cn(
-                  "pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_40%_25%,rgba(125,211,252,0.16),transparent_55%)]",
-                  !reduced && "animate-avatar-glow-pulse",
-                )}
-                aria-hidden
-              />
-              {!reduced ? (
+              {!useGif && !use3d ? (
                 <div
-                  className="pointer-events-none absolute inset-x-0 top-0 h-1/5 animate-avatar-scan bg-gradient-to-b from-transparent via-accent-cyan/14 to-transparent"
+                  className={cn(
+                    "pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_40%_25%,rgba(125,211,252,0.16),transparent_55%)]",
+                    !reduced && "animate-avatar-glow-pulse",
+                  )}
                   aria-hidden
                 />
               ) : null}
@@ -289,80 +319,74 @@ export function HeroAvatar({ className, compact = false }: HeroAvatarProps) {
             </button>
           )}
 
-          <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black via-black/55 to-transparent"
-            aria-hidden
-          />
-
-          {/* Progress while AI intro speaks */}
-          {speaking ? (
+          {!use3d ? (
             <div
-              className="absolute inset-x-0 bottom-0 z-20 h-1 bg-white/10"
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-black via-black/55 to-transparent"
               aria-hidden
-            >
-              <motion.div
-                className="h-full bg-accent-cyan"
-                style={{ width: `${Math.round(progress * 100)}%` }}
-              />
-            </div>
-          ) : null}
+            />
+          ) : (
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-surface-base/80 to-transparent"
+              aria-hidden
+            />
+          )}
 
-          <div
-            className={cn(
-              "pointer-events-none absolute left-3 right-3 z-10 min-h-[1.5rem] overflow-hidden md:left-4 md:right-4",
-              hasVideo ? "bottom-14 md:bottom-16" : "bottom-3 md:bottom-4",
-              speaking && "bottom-5 md:bottom-6",
-            )}
-          >
-            {/* Roles live on the left hero copy when compact; only show chapter while speaking */}
-            {speaking || !compact ? (
+          {/* Non-compact: rotating role on the media */}
+          {!speaking && !compact ? (
+            <div className="pointer-events-none absolute bottom-3 left-3 right-3 z-10 md:bottom-4 md:left-4 md:right-4">
               <AnimatePresence mode="wait">
                 <motion.p
-                  key={speaking ? chapterLabel || "talking" : activeRole}
+                  key={activeRole}
                   initial={reduced ? false : { y: 18, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={reduced ? undefined : { y: -14, opacity: 0 }}
                   transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  className={cn(
-                    "font-bold tracking-tight text-text-primary uppercase",
-                    compact
-                      ? "text-base md:text-lg"
-                      : "text-xl md:text-2xl lg:text-3xl",
-                  )}
+                  className="font-bold tracking-tight text-text-primary uppercase text-xl md:text-2xl lg:text-3xl"
                   aria-live="polite"
                 >
-                  {speaking
-                    ? chapterLabel
-                      ? `${chapterLabel}`
-                      : "AI INTRO"
-                    : activeRole}
+                  {activeRole}
                 </motion.p>
               </AnimatePresence>
-            ) : (
-              <p className="text-[10px] font-medium tracking-[0.14em] text-text-tertiary uppercase md:text-[11px]">
-                Tap to play AI intro
-              </p>
-            )}
-          </div>
+            </div>
+          ) : null}
+
+          {/* Speaking: caption + progress inside frame */}
+          {speaking ? (
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 px-3 pb-3 pt-10 md:px-4 md:pb-4">
+              <div className="rounded-sm border border-white/10 bg-black/70 px-3 py-2.5 backdrop-blur-md">
+                <p className="text-[10px] font-semibold tracking-[0.16em] text-accent-cyan uppercase">
+                  {chapterLabel || "AI intro"}
+                </p>
+                {caption ? (
+                  <p className="mt-1 line-clamp-2 text-xs leading-snug text-text-secondary md:text-sm">
+                    {caption}
+                  </p>
+                ) : null}
+              </div>
+              <div className="mt-2.5 h-1 overflow-hidden rounded-full bg-white/10" aria-hidden>
+                <motion.div
+                  className="h-full rounded-full bg-accent-cyan"
+                  style={{ width: `${Math.round(progress * 100)}%` }}
+                />
+              </div>
+            </div>
+          ) : null}
         </div>
 
-        {caption ? (
+        {/* Full caption only when not compact (enough vertical room) */}
+        {caption && !compact ? (
           <div
             className="border-t border-border-muted bg-surface-base/95 px-4 py-3"
             role="status"
             aria-live="polite"
           >
             <p className="text-[10px] font-semibold tracking-[0.16em] text-accent-cyan uppercase">
-              AI intro · {chapterLabel || "Speaking"}
+              {chapterLabel || "Speaking"}
             </p>
             <p className="mt-1.5 text-sm leading-relaxed text-text-secondary">
               {caption}
             </p>
           </div>
-        ) : !hasVideo && !compact ? (
-          <p className="border-t border-border-muted bg-surface-base/80 px-4 py-2.5 text-[11px] tracking-[0.08em] text-text-tertiary">
-            Tap avatar to play AI intro — frontend development & services
-          </p>
         ) : null}
       </div>
     </div>

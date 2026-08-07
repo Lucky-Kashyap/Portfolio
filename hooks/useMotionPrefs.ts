@@ -29,7 +29,7 @@ export function usePortfolioReady(reducedMotion: boolean) {
 
     const onReady = () => setReady(true);
     window.addEventListener("portfolio:ready", onReady);
-    const fallback = window.setTimeout(() => setReady(true), 4500);
+    const fallback = window.setTimeout(() => setReady(true), 7500);
 
     return () => {
       window.removeEventListener("portfolio:ready", onReady);

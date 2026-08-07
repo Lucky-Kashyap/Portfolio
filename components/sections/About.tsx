@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { Code2, Sparkles } from "lucide-react";
 import {
@@ -11,6 +10,7 @@ import {
   StackGroupCard,
 } from "@/components/cards/EducationCard";
 import {
+  AvatarVideoFrame,
   ChipGroup,
   Container,
   Eyebrow,
@@ -18,6 +18,7 @@ import {
   Quote,
   Text,
 } from "@/components/ui";
+import { AvatarSlot } from "@/components/avatar/AvatarScrollStage";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { TextGradientScroll } from "@/components/motion/TextGradientScroll";
 import { about, education, experience, site } from "@/lib/content";
@@ -62,22 +63,22 @@ function StatCounters() {
   return (
     <div
       ref={ref}
-      className="mt-10 grid gap-[1.25rem] sm:grid-cols-2 lg:grid-cols-4"
+      className="mt-6 grid gap-2 min-[400px]:gap-3 sm:grid-cols-2 lg:grid-cols-4"
       aria-label="Career highlights"
     >
       {about.stats.map((stat) => (
         <div
           key={stat.label}
-          className="rounded-sm border border-border-muted bg-surface-raised p-5 shadow-card"
+          className="rounded-sm border border-border-muted bg-surface-raised px-4 py-4 shadow-card"
         >
           <p
-            className="text-3xl font-semibold tracking-tight text-text-primary"
+            className="text-2xl font-semibold tracking-tight text-text-primary md:text-3xl"
             data-count={stat.value}
             data-suffix={stat.suffix}
           >
             {reduced ? `${stat.value}${stat.suffix}` : `0${stat.suffix}`}
           </p>
-          <p className="mt-2 text-xs tracking-[0.14em] text-text-tertiary uppercase">
+          <p className="mt-1.5 text-[11px] tracking-[0.14em] text-text-tertiary uppercase">
             {stat.label}
           </p>
         </div>
@@ -88,27 +89,29 @@ function StatCounters() {
 
 export function About() {
   const sectionRef = useRef<HTMLElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
+  const copyRef = useRef<HTMLDivElement>(null);
   const reduced = usePrefersReducedMotion();
 
   useGSAP(
     () => {
       registerGsap();
-      const img = imageRef.current;
-      if (!img || reduced) return;
+      const section = sectionRef.current;
+      const copy = copyRef.current;
+      if (!section || !copy || reduced) return;
 
       gsap.fromTo(
-        img,
-        { clipPath: "inset(12% 12% 12% 12% round 9999px)", scale: 1.08 },
+        copy,
+        { y: 36, opacity: 0.15, filter: "blur(4px)" },
         {
-          clipPath: "inset(0% 0% 0% 0% round 9999px)",
-          scale: 1,
-          duration: 1.15,
-          ease: "power3.out",
+          y: 0,
+          opacity: 1,
+          filter: "blur(0px)",
+          ease: "none",
           scrollTrigger: {
-            trigger: img,
-            start: "top 80%",
-            toggleActions: "play none none none",
+            trigger: section,
+            start: "top 85%",
+            end: "top 40%",
+            scrub: 0.55,
           },
         },
       );
@@ -120,143 +123,142 @@ export function About() {
     <section
       ref={sectionRef}
       id="about"
-      className="section-pad"
+      className="section-pad scroll-mt-28 overflow-x-clip md:scroll-mt-32"
       aria-labelledby="about-heading"
     >
       <Container>
-        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-12">
-          <div className="max-w-3xl">
-            <ScrollReveal y={36}>
-              <Eyebrow>About</Eyebrow>
-              <Heading id="about-heading" as={2} size="display-sm">
-                About me
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.2fr)] lg:items-end lg:gap-10 xl:gap-12">
+          <div className="order-1 w-full min-w-0">
+            <div className="relative mx-auto w-full max-w-[min(100%,340px)] sm:max-w-[380px] lg:mx-0 lg:max-w-none">
+              {reduced ? (
+                <AvatarVideoFrame
+                  variant="about"
+                  src={site.aboutAvatarVideo}
+                  poster={site.aboutAvatarPoster}
+                  lazy
+                  objectPosition="50% 12%"
+                  caption="Frontend Engineer"
+                />
+              ) : (
+                <AvatarSlot id="about" className="w-full">
+                  <div className="aspect-[3/4] w-full min-h-[280px]" />
+                </AvatarSlot>
+              )}
+            </div>
+          </div>
+
+          <div ref={copyRef} className="order-2 min-w-0 will-change-transform">
+            <ScrollReveal y={28}>
+              <p className="text-[11px] font-semibold tracking-[0.2em] text-text-tertiary uppercase">
+                Get to know me
+              </p>
+              <Eyebrow className="mt-3 mb-0">About</Eyebrow>
+              <Heading
+                id="about-heading"
+                as={2}
+                size="display-sm"
+                className="mt-3 max-w-xl text-[clamp(1.65rem,3.2vw,2.75rem)] leading-[1.12]"
+              >
+                {about.headline}
               </Heading>
             </ScrollReveal>
 
-            <TextGradientScroll
-              text={about.lead}
-              className="mt-8 text-xl leading-relaxed text-text-primary md:text-2xl md:leading-snug"
-              shadowOpacity={0.14}
-            />
-            <ScrollReveal delay={0.04} y={20}>
-              <p className="mt-8 max-w-2xl text-sm font-semibold tracking-[0.18em] text-accent-cyan uppercase md:text-base">
-                {about.headline}
-              </p>
+            <div className="mt-5 max-w-xl md:mt-6">
+              <TextGradientScroll
+                text={about.specialize}
+                className="text-[clamp(1.05rem,2.2vw,1.35rem)] font-medium leading-snug tracking-tight text-text-primary"
+                shadowOpacity={0.16}
+                offset={["start 0.95", "end 0.55"]}
+              />
+            </div>
+
+            <ScrollReveal delay={0.06} y={18}>
+              <Text tone="muted" className="mt-4 max-w-md text-sm leading-relaxed">
+                {about.lead}
+              </Text>
               <ChipGroup
                 items={[...about.highlightStack]}
-                className="mt-4 gap-2"
+                className="mt-5 gap-2"
               />
             </ScrollReveal>
-            <TextGradientScroll
-              text={about.specialize}
-              className="mt-8 text-lg leading-relaxed text-text-secondary"
-              shadowOpacity={0.18}
-              offset={["start 0.95", "start 0.4"]}
-            />
-            <TextGradientScroll
-              text={about.impact}
-              className="mt-6 text-lg leading-relaxed text-text-secondary"
-              shadowOpacity={0.18}
-              offset={["start 0.95", "start 0.4"]}
-            />
-            <TextGradientScroll
-              text={about.passion}
-              className="mt-6 text-lg leading-relaxed text-text-secondary"
-              shadowOpacity={0.18}
-              offset={["start 0.95", "start 0.4"]}
-            />
 
-            <ScrollReveal delay={0.05} y={24}>
+            <ScrollReveal delay={0.08} y={20}>
               <a
                 href={site.leetcode}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-6 inline-flex flex-wrap items-center gap-x-4 gap-y-2 rounded-sm border border-border-muted bg-surface-raised px-4 py-3 text-sm text-text-secondary shadow-card transition-[border-color,transform] duration-fast hover:-translate-y-0.5 hover:border-border-default hover:text-text-primary"
+                className="mt-6 inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-secondary transition-colors duration-fast hover:text-text-primary"
                 data-cursor="hover"
               >
-                <span className="font-medium tracking-[0.14em] text-accent-cyan uppercase">
+                <span className="font-semibold tracking-[0.14em] text-accent-cyan uppercase">
                   LeetCode
                 </span>
                 <span>@{site.leetcodeUser}</span>
-                <span>
-                  {site.leetcodeStats.solved} solved · Easy{" "}
-                  {site.leetcodeStats.easy} · Med {site.leetcodeStats.medium}
-                </span>
                 <span className="text-text-tertiary">
-                  {site.leetcodeStats.acceptance} acceptance
+                  {site.leetcodeStats.solved} solved
                 </span>
               </a>
             </ScrollReveal>
-
-            <StatCounters />
-          </div>
-
-          <div className="mx-auto flex w-full max-w-[220px] flex-col items-center lg:mx-0 lg:max-w-[240px]">
-            <div
-              ref={imageRef}
-              className="relative aspect-square w-40 overflow-hidden rounded-full border border-border-muted shadow-soft will-change-transform lg:w-44"
-            >
-              <Image
-                src="/svgs/brand-mark.webp"
-                alt="Divyanshu Kashyap anime coding brand mark — Frontend Engineer"
-                fill
-                className="object-cover"
-                sizes="176px"
-                unoptimized
-              />
-            </div>
           </div>
         </div>
 
-        <div className="mt-[clamp(2.75rem,5vw,4.5rem)] grid gap-6 md:grid-cols-2 md:gap-8 xl:grid-cols-3">
-          <ScrollReveal y={36}>
+        <StatCounters />
+
+        <div className="mt-10 grid items-start gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)] lg:gap-6">
+          <ScrollReveal y={32}>
             <InfoListCard
-              className="mt-0 h-full"
+              className="mt-0"
+              dense
               eyebrow="Key Areas of Expertise"
               title="What I deliver end to end"
-              icon={<Code2 size={20} aria-hidden />}
+              icon={<Code2 size={18} aria-hidden />}
               items={about.expertise}
             />
           </ScrollReveal>
 
-          <ScrollReveal delay={0.05} y={36}>
-            <InfoListCard
-              className="mt-0 h-full"
-              eyebrow="Currently Expanding"
-              title="Learning phase — not production claims"
-              icon={<Sparkles size={20} aria-hidden />}
-              items={about.learning}
-            />
-          </ScrollReveal>
-
-          <ScrollReveal delay={0.1} y={36} className="md:col-span-2 xl:col-span-1">
-            <div className="flex h-full flex-col gap-6 rounded-sm border border-border-muted bg-surface-raised p-6 shadow-card md:p-8">
-              <div>
-                <Eyebrow className="mb-0 tracking-[0.14em]">Top Skills</Eyebrow>
-                <ChipGroup items={[...about.topSkills]} className="mt-5 gap-3" />
+          <div className="flex flex-col gap-4">
+            <ScrollReveal delay={0.05} y={24}>
+              <div className="rounded-sm border border-border-muted bg-surface-raised p-5 shadow-card">
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary">
+                    <Sparkles size={18} aria-hidden />
+                  </span>
+                  <div className="min-w-0">
+                    <Eyebrow className="mb-0 tracking-[0.14em]">
+                      Currently Expanding
+                    </Eyebrow>
+                    <p className="mt-1.5 text-sm text-text-secondary">
+                      Learning phase — not production claims
+                    </p>
+                  </div>
+                </div>
+                <ChipGroup
+                  items={[...about.learning]}
+                  className="mt-4 gap-2"
+                />
               </div>
-              <Quote
-                cite={site.brand}
-                className="mt-auto border-l-2 border-action-primary pl-5"
-              >
-                {site.connect}
-              </Quote>
-            </div>
-          </ScrollReveal>
+            </ScrollReveal>
 
-          <ScrollReveal delay={0.08} className="md:col-span-2 xl:col-span-3" y={40}>
-            <div className="rounded-sm border border-border-muted bg-surface-raised p-6 shadow-card md:p-8">
+            <ScrollReveal delay={0.1} y={24}>
+              <div className="rounded-sm border border-border-muted bg-surface-raised p-5 shadow-card">
+                <Eyebrow className="mb-0 tracking-[0.14em]">Top Skills</Eyebrow>
+                <ChipGroup items={[...about.topSkills]} className="mt-3 gap-2" />
+                <Quote
+                  cite={site.brand}
+                  className="mt-4 border-l-2 border-action-primary pl-3 text-sm leading-snug"
+                >
+                  {site.connect}
+                </Quote>
+              </div>
+            </ScrollReveal>
+          </div>
+
+          <ScrollReveal delay={0.08} className="lg:col-span-2" y={36}>
+            <div className="rounded-sm border border-border-muted bg-surface-raised p-5 shadow-card md:p-6">
               <Eyebrow className="mb-0 tracking-[0.14em]">Technologies</Eyebrow>
-              <Text tone="muted" size="sm" className="mt-4 max-w-3xl leading-relaxed">
-                {about.technologies.join(" · ")}
-              </Text>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {Object.entries(about.stack).map(([group, items], index) => (
-                  <ScrollReveal
-                    key={group}
-                    delay={0.04 * index}
-                    y={24}
-                  >
+                  <ScrollReveal key={group} delay={0.03 * index} y={20}>
                     <StackGroupCard title={group} items={items} />
                   </ScrollReveal>
                 ))}

@@ -34,13 +34,38 @@ export const site = {
       { name: "Java", solved: 3 },
     ],
   },
+  /**
+   * Marketing AI avatar videos (muted autoplay + tap unmute).
+   * Drop MP4s in `public/media/` then run: `npm run media:posters`
+   */
+  heroAvatarVideo: "/media/hero-avatar.mp4",
+  /** Prefer photoreal poster for first paint */
+  heroAvatarPoster:
+    "/avatar/divyanshu-kashyap-3d-ai-avatar-frontend-engineer.webp",
+  aboutAvatarVideo: "/media/about-avatar.mp4",
+  aboutAvatarPoster:
+    "/avatar/divyanshu-kashyap-3d-ai-avatar-frontend-engineer.webp",
+  /** @deprecated aliases — prefer hero/about avatar media fields */
+  avatarPoster:
+    "/avatar/divyanshu-kashyap-3d-ai-avatar-frontend-engineer.webp",
+  avatarModel: "/models/avatar.glb",
+  avatarVoice: "",
   /** Photo avatar (about / meta) */
   avatar: "/profile/divyanshu-kashyap-frontend-developer-jaipur.webp",
-  /** Stylized 3D AI avatar (Pixar / corporate animation vibe) for hero */
-  aiAvatar: "/avatar/divyanshu-kashyap-3d-stylized-ai-avatar.webp",
-  /** Optional live GIF loop — prefer intro video when available */
+  /** Photorealistic AI avatar (meta / fallback stills) */
+  aiAvatar: "/avatar/divyanshu-kashyap-3d-ai-avatar-frontend-engineer.webp",
+  /**
+   * Stylized 3D AI portrait used by Three.js shader mesh
+   * (integrated hand wave — no separate hand object).
+   */
+  aiAvatar3d: "/avatar/divyanshu-kashyap-3d-stylized-ai-avatar.webp",
+  /** Live wave GIF drawn via canvas — fallback when 3D is off / reduced motion */
   aiAvatarGif: "/avatar/divyanshu-kashyap-realistic-ai-avatar-wave.gif",
-  aiAvatarGifEnabled: false,
+  aiAvatarGifEnabled: true,
+  /**
+   * Three.js R3F shader avatar (breathing + hand region displacement).
+   */
+  aiAvatar3dEnabled: true,
   /** Anime-style AI persona (asset kept; not shown in About) */
   animeAvatar: "/avatar/divyanshu-kashyap-anime-ai-avatar-frontend-engineer.webp",
   /**
@@ -56,35 +81,35 @@ export const site = {
    */
   avatarIntro:
     "Hey! I'm Divyanshu Kashyap, a Frontend Engineer based in Jaipur. I craft fast, accessible interfaces with React, Next.js, and TypeScript. I offer frontend development services — React and Next.js apps, UI architecture, API integration, motion design, Lighthouse performance, and SEO analytics. Explore my work, and let's build something extraordinary together.",
-  /** Timed AI narration chapters — spoken on avatar play */
+  /** Timed AI narration chapters — spoken on avatar unmute (Hindi) */
   avatarIntroChapters: [
     {
       id: "hello",
-      label: "Intro",
-      text: "Hey! I'm Divyanshu Kashyap — a Frontend Engineer from Jaipur. Welcome to my portfolio.",
+      label: "परिचय",
+      text: "नमस्ते! मैं दिव्यांशु कश्यप हूँ — जयपुर से एक फ्रंटएंड इंजीनियर। मेरे पोर्टफोलियो में आपका स्वागत है।",
     },
     {
       id: "frontend",
-      label: "Frontend",
-      text: "I specialize in Frontend Development — building scalable, responsive web apps with React.js, Next.js, TypeScript, and modern UI systems that feel fast and look polished.",
+      label: "फ्रंटएंड",
+      text: "मैं फ्रंटएंड डेवलपमेंट में माहिर हूँ — React.js, Next.js और TypeScript से तेज़, सुंदर और स्केलेबल वेब ऐप्स बनाता हूँ।",
     },
     {
       id: "services",
-      label: "Services",
-      text: "As a Frontend Developer, I offer services including React and Next.js development, UI architecture, REST API integration, motion and interaction design with GSAP and Framer Motion, Lighthouse performance optimization, and SEO with Analytics and Search Console.",
+      label: "सेवाएँ",
+      text: "मैं React और Next.js डेवलपमेंट, UI आर्किटेक्चर, API इंटीग्रेशन, GSAP और Framer Motion से मोशन डिज़ाइन, परफॉर्मेंस ऑप्टिमाइज़ेशन और SEO जैसी सेवाएँ देता हूँ।",
     },
     {
       id: "close",
-      label: "Connect",
-      text: "Whether you need a product UI, landing experience, or performance upgrade — I can help. Explore my projects below, and let's build something extraordinary together.",
+      label: "जुड़ें",
+      text: "अगर आपको प्रोडक्ट UI, लैंडिंग पेज या परफॉर्मेंस अपग्रेड चाहिए — मैं मदद कर सकता हूँ। नीचे प्रोजेक्ट्स देखें, और मिलकर कुछ शानदार बनाते हैं।",
     },
   ] as const,
   heroHeadline: "FRONTEND ENGINEER",
   heroRoles: [
     "FRONTEND ENGINEER",
+    "AI UI BUILDER",
     "REACT DEVELOPER",
     "NEXT.JS BUILDER",
-    "UI ARCHITECT",
   ] as const,
   summary:
     "I build intelligent digital experiences combining high-performance code with striking visual design — React, Next.js, TypeScript, and motion.",
@@ -104,14 +129,24 @@ export const navItems = [
 ] as const;
 
 export const about = {
-  lead: "Frontend Engineer with 2.5+ years of experience building scalable, responsive, and high-performance web applications using React.js, Next.js, Angular, TypeScript, and modern frontend technologies.",
+  /** Short About blurb — keep the section scannable */
+  lead: "Frontend Engineer with 2.5+ years shipping React, Next.js, and TypeScript products.",
   headline: "AI-POWERED WEB & INTERACTIVE FRONTEND EXPERIENCES",
+  /** One-liner under the headline */
   specialize:
-    "I specialize in transforming complex business requirements into intuitive, user-friendly digital experiences. My expertise includes developing reusable component architectures, integrating APIs, optimizing application performance, implementing accessibility standards, and delivering responsive interfaces across devices and browsers.",
+    "Clean interfaces, reusable systems, API-ready UI, and motion that feels intentional.",
+  /**
+   * Longer narrative — reused in Manifesto / Services (not stacked in About).
+   */
+  narrative:
+    "I specialize in transforming complex business requirements into intuitive digital experiences. From reusable UI architecture to API integration, performance, accessibility, and motion — I ship interfaces that feel fast and look intentional.",
   impact:
-    "Over the years, I have contributed to enterprise platforms, AI-powered applications, media management systems, event management solutions, and customer-facing web products. I enjoy solving real-world problems through clean code, modern architecture, and user-centric design principles.",
+    "Enterprise platforms, AI-assisted apps, media tools, and customer-facing products — clarity, speed, and maintainable architecture.",
   passion:
-    "Based in Jaipur, I build highly interactive SPA architectures and polished UI with React, Next.js, and TypeScript. I am actively learning backend technologies and full-stack fundamentals — and I am available for remote frontend opportunities worldwide.",
+    "Based in Jaipur and open to remote frontend roles worldwide — deepening full-stack fundamentals while shipping polished React and Next.js experiences.",
+  /** @deprecated alias — prefer `narrative` */
+  shortBio:
+    "I specialize in transforming complex business requirements into intuitive digital experiences. From reusable UI architecture to API integration, performance, accessibility, and motion — I ship interfaces that feel fast and look intentional.",
   expertise: [
     "React.js & Next.js Development",
     "Angular Development",
@@ -124,13 +159,24 @@ export const about = {
     "UI Architecture & Component Design",
     "SEO tooling, Analytics & link audits",
   ],
-  topSkills: ["React bits", "GSAP ScrollTrigger", "Web Accessibility"],
+  topSkills: [
+    "React.js",
+    "Next.js",
+    "TypeScript",
+    "GSAP ScrollTrigger",
+    "React Query",
+    "Redux Toolkit",
+    "Tailwind CSS",
+    "Web Accessibility",
+    "Framer Motion",
+    "Performance",
+  ],
   learning: [
-    "Backend fundamentals (learning)",
-    "Node.js & APIs (learning)",
-    "Databases (learning)",
-    "Cloud services (learning)",
-    "AI-powered frontend experiences",
+    "Backend fundamentals",
+    "Node.js & APIs",
+    "Databases",
+    "Cloud services",
+    "AI-powered frontend",
   ],
   technologies: [
     "React.js",
@@ -281,34 +327,46 @@ export const certifications: Certification[] = [
 
 export const services = [
   {
+    id: "react-next",
     title: "React & Next.js Development",
     description:
-      "Scalable React and Next.js applications with TypeScript, reusable components, and clean architecture.",
+      "Scalable apps with TypeScript, reusable components, and clean architecture.",
+    outcome: "Ship-ready product UI",
   },
   {
+    id: "ui-architecture",
     title: "UI Architecture",
     description:
-      "Component systems and scalable UI patterns that stay consistent, accessible, and easy to extend.",
+      "Component systems that stay consistent, accessible, and easy to extend.",
+    outcome: "Design-system friendly",
   },
   {
+    id: "api",
     title: "API Integration",
     description:
-      "REST API integration with robust state management using Redux Toolkit and React Query.",
+      "REST wiring with Redux Toolkit and React Query for resilient client state.",
+    outcome: "Reliable data flows",
   },
   {
+    id: "performance",
     title: "Performance & Lighthouse",
     description:
-      "Lighthouse-driven speed work — Core Web Vitals, lean bundles, and stronger production scores.",
+      "Core Web Vitals, lean bundles, and stronger production scores.",
+    outcome: "Faster experiences",
   },
   {
+    id: "motion",
     title: "Motion & Interaction",
     description:
-      "UI motion with GSAP, ScrollTrigger, Locomotive Scroll, and Shery.js.",
+      "GSAP, ScrollTrigger, Locomotive Scroll, and Shery.js — motion with purpose.",
+    outcome: "Memorable interfaces",
   },
   {
+    id: "seo",
     title: "SEO & Analytics",
     description:
-      "Search Console, Analytics, Screaming Frog, and broken-link checks — including WordPress sites.",
+      "Search Console, Analytics, Screaming Frog, and link health — including WordPress.",
+    outcome: "Discoverable & healthy",
   },
 ] as const;
 

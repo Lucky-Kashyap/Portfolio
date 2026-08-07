@@ -1,4 +1,4 @@
-import { site } from "@/lib/content";
+import { about, site } from "@/lib/content";
 
 /** Update when production domain is final */
 export const siteUrl =
@@ -36,8 +36,7 @@ export const faqs = [
   {
     id: "specialize",
     question: "What kind of frontend work do you specialize in?",
-    answer:
-      "I specialize in scalable React.js and Next.js applications with TypeScript — reusable UI architecture, REST API integration, performance optimization, accessibility, and responsive interfaces across devices and browsers.",
+    answer: `${about.specialize} ${about.narrative}`,
   },
   {
     id: "stack",
@@ -54,8 +53,7 @@ export const faqs = [
   {
     id: "opportunities",
     question: "Are you open to new opportunities or collaborations?",
-    answer:
-      "Yes. I am open to connecting with developers, recruiters, and technology leaders interested in web engineering, product development, and AI-powered frontend experiences.",
+    answer: about.passion,
   },
   {
     id: "contact",
