@@ -7,7 +7,20 @@ import type { Config } from "tailwindcss";
  */
 export const tokens = {
   fontFamily: {
-    sans: ["var(--font-inter)", "Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+    sans: [
+      "var(--font-dm-sans)",
+      "DM Sans",
+      "ui-sans-serif",
+      "system-ui",
+      "sans-serif",
+    ],
+    display: [
+      "var(--font-syne)",
+      "Syne",
+      "ui-sans-serif",
+      "system-ui",
+      "sans-serif",
+    ],
   },
   fontSize: {
     xs: ["11px", { lineHeight: "1.4" }],
@@ -37,39 +50,41 @@ export const tokens = {
   },
   colors: {
     text: {
-      primary: "oklch(0.92 0.004 286.32)",
-      secondary: "oklch(0.705 0.015 286.067)",
-      tertiary: "oklch(0.552 0.016 285.938)",
-      inverse: "oklch(0.14 0.005 286)",
-      muted: "oklch(0.552 0.016 285.938)",
+      primary: "oklch(0.97 0.006 230)",
+      secondary: "oklch(0.82 0.02 230)",
+      tertiary: "oklch(0.68 0.02 230)",
+      inverse: "oklch(0.14 0.02 250)",
+      muted: "oklch(0.68 0.02 230)",
     },
     surface: {
-      base: "#000000",
-      muted: "oklab(0.21 0.00164225 -0.00577088 / 0.96)",
-      raised: "oklch(0.141 0.005 285.823)",
-      strong: "#ffffff",
-      overlay: "color-mix(in srgb, #000000 88%, transparent)",
+      base: "#03060b",
+      muted: "#070b12",
+      raised: "#0e1520",
+      strong: "#f8fafc",
+      overlay: "color-mix(in srgb, #03060b 88%, transparent)",
     },
     border: {
-      default: "color-mix(in srgb, #ffffff 55%, transparent)",
-      muted: "color-mix(in srgb, #ffffff 14%, transparent)",
+      default: "color-mix(in srgb, #e2e8f0 42%, transparent)",
+      muted: "color-mix(in srgb, #94a3b8 18%, transparent)",
     },
     action: {
-      primary: "#ffffff",
-      "primary-hover": "#e8e8ec",
-      "primary-deep": "oklch(0.705 0.015 286.067)",
+      primary: "#f8fafc",
+      "primary-hover": "#e2e8f0",
+      "primary-deep": "oklch(0.72 0.03 230)",
     },
     focus: {
-      ring: "#ffffff",
-      glow: "color-mix(in srgb, #ffffff 22%, transparent)",
+      ring: "#7dd3fc",
+      glow: "color-mix(in srgb, #7dd3fc 28%, transparent)",
     },
     accent: {
       cyan: "#7dd3fc",
+      amber: "#e8c47c",
+      mist: "#94a3b8",
     },
     state: {
-      disabled: "color-mix(in srgb, #ffffff 35%, transparent)",
-      error: "#f87171",
-      loading: "oklch(0.705 0.015 286.067)",
+      disabled: "color-mix(in srgb, #e2e8f0 35%, transparent)",
+      error: "#fb7185",
+      loading: "oklch(0.72 0.03 230)",
     },
   },
   spacing: {
@@ -96,10 +111,10 @@ export const tokens = {
     xl: "9999px",
   },
   boxShadow: {
-    soft: "0 10px 30px rgba(0, 0, 0, 0.5)",
-    card: "0 1px 0 color-mix(in srgb, #ffffff 8%, transparent)",
-    accent: "0 10px 30px rgba(0, 0, 0, 0.45)",
-    "accent-lg": "0 16px 40px rgba(0, 0, 0, 0.55)",
+    soft: "0 18px 50px rgba(3, 6, 11, 0.55)",
+    card: "0 1px 0 color-mix(in srgb, #7dd3fc 10%, transparent), 0 20px 50px rgba(3, 6, 11, 0.45)",
+    accent: "0 12px 40px rgba(14, 165, 233, 0.18)",
+    "accent-lg": "0 22px 60px rgba(14, 165, 233, 0.22)",
   },
   transitionDuration: {
     instant: "150ms",

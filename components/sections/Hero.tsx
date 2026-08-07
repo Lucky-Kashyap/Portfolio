@@ -6,6 +6,7 @@ import { useGSAP } from "@gsap/react";
 import { Button, Container, AvatarVideoFrame } from "@/components/ui";
 import { AvatarSlot } from "@/components/avatar/AvatarScrollStage";
 import { SocialMagneticIcons } from "@/components/motion/SocialMagneticIcons";
+import { HeroScene } from "@/components/three/HeroScene";
 import { site } from "@/lib/content";
 import { scrollToId } from "@/lib/scroll";
 import { gsap, registerGsap } from "@/lib/gsap";
@@ -212,15 +213,15 @@ export function Hero() {
       });
 
       scrub
-        .to(bgRef.current, { y: 110, ease: "none" }, 0)
+        .to(bgRef.current, { y: 48, ease: "none" }, 0)
         .to(
           q("[data-hero-copy]"),
-          { y: 56, opacity: 0.12, filter: "blur(4px)", ease: "none" },
+          { y: 24, opacity: 0.55, ease: "none" },
           0,
         )
         .to(
           creativeRef.current,
-          { opacity: 0, scale: 1.18, y: 40, ease: "none" },
+          { opacity: 0, scale: 1.08, y: 24, ease: "none" },
           0,
         );
 
@@ -245,11 +246,12 @@ export function Hero() {
         className="pointer-events-none absolute inset-0 will-change-transform"
         aria-hidden
       >
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_70%_20%,color-mix(in_srgb,#7dd3fc_14%,transparent),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_15%_80%,color-mix(in_srgb,#ffffff_6%,transparent),transparent_55%)]" />
+        <HeroScene />
+        <div className="absolute inset-0 z-[2] bg-[radial-gradient(ellipse_60%_50%_at_75%_25%,color-mix(in_srgb,#7dd3fc_12%,transparent),transparent_58%)]" />
+        <div className="absolute inset-0 z-[2] bg-[radial-gradient(ellipse_45%_40%_at_10%_85%,color-mix(in_srgb,#e8c47c_6%,transparent),transparent_55%)]" />
         <p
           ref={creativeRef}
-          className="absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2 select-none text-center text-[clamp(3.25rem,15vw,11rem)] font-bold tracking-tighter text-accent-cyan/[0.07] uppercase"
+          className="absolute left-1/2 top-[42%] z-[2] -translate-x-1/2 -translate-y-1/2 select-none text-center font-display text-[clamp(3.25rem,15vw,11rem)] font-bold tracking-tighter text-accent-cyan/[0.08] uppercase"
         >
           Creative
         </p>
@@ -278,7 +280,7 @@ export function Hero() {
               <h1
                 id="hero-heading"
                 className={cn(
-                  "font-bold tracking-[-0.03em] text-text-primary uppercase",
+                  "font-display font-bold tracking-[-0.03em] text-text-primary uppercase",
                   "text-[clamp(1.85rem,4.6vw,3.35rem)] leading-[1.02]",
                 )}
               >
@@ -333,21 +335,21 @@ export function Hero() {
             data-hero-avatar
             className="order-1 mx-auto flex w-full max-w-[min(100%,240px)] items-center justify-center min-[350px]:max-w-[280px] sm:max-w-[320px] lg:order-2 lg:mx-0 lg:max-w-none lg:justify-end"
           >
-            <div className="w-full max-h-[min(56svh,460px)] lg:max-h-[min(72svh,560px)]">
+            <div className="w-full max-w-[280px] sm:max-w-[300px] lg:max-w-[320px]">
               {reduced ? (
                 <AvatarVideoFrame
                   variant="hero"
                   src={site.heroAvatarVideo}
                   poster={site.heroAvatarPoster}
                   lazy={false}
-                  objectPosition="50% 14%"
+                  objectPosition={site.heroAvatarObjectPosition}
                 />
               ) : (
                 <AvatarSlot
                   id="hero"
-                  className="mx-auto max-h-[min(56svh,460px)] lg:max-h-[min(72svh,560px)]"
+                  className="mx-auto w-full max-h-[min(48svh,400px)] lg:max-h-[min(56svh,440px)]"
                 >
-                  <div className="aspect-[4/5] max-h-[min(56svh,460px)] w-full lg:max-h-[min(72svh,560px)]" />
+                  <div className="aspect-[3/4] w-full" />
                 </AvatarSlot>
               )}
             </div>

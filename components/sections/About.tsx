@@ -89,65 +89,37 @@ function StatCounters() {
 
 export function About() {
   const sectionRef = useRef<HTMLElement>(null);
-  const copyRef = useRef<HTMLDivElement>(null);
   const reduced = usePrefersReducedMotion();
-
-  useGSAP(
-    () => {
-      registerGsap();
-      const section = sectionRef.current;
-      const copy = copyRef.current;
-      if (!section || !copy || reduced) return;
-
-      gsap.fromTo(
-        copy,
-        { y: 36, opacity: 0.15, filter: "blur(4px)" },
-        {
-          y: 0,
-          opacity: 1,
-          filter: "blur(0px)",
-          ease: "none",
-          scrollTrigger: {
-            trigger: section,
-            start: "top 85%",
-            end: "top 40%",
-            scrub: 0.55,
-          },
-        },
-      );
-    },
-    { dependencies: [reduced], scope: sectionRef },
-  );
 
   return (
     <section
       ref={sectionRef}
       id="about"
-      className="section-pad scroll-mt-28 overflow-x-clip md:scroll-mt-32"
+      className="section-pad scroll-mt-28 overflow-x-clip pt-[clamp(2.5rem,5vw,3.5rem)] md:scroll-mt-32"
       aria-labelledby="about-heading"
     >
       <Container>
-        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.2fr)] lg:items-end lg:gap-10 xl:gap-12">
+        <div className="grid items-center gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.25fr)] lg:gap-10 xl:gap-12">
           <div className="order-1 w-full min-w-0">
-            <div className="relative mx-auto w-full max-w-[min(100%,340px)] sm:max-w-[380px] lg:mx-0 lg:max-w-none">
+            <div className="relative mx-auto w-full max-w-[240px] sm:max-w-[280px] lg:mx-0 lg:max-w-[320px]">
               {reduced ? (
                 <AvatarVideoFrame
                   variant="about"
                   src={site.aboutAvatarVideo}
                   poster={site.aboutAvatarPoster}
                   lazy
-                  objectPosition="50% 12%"
+                  objectPosition={site.heroAvatarObjectPosition}
                   caption="Frontend Engineer"
                 />
               ) : (
-                <AvatarSlot id="about" className="w-full">
-                  <div className="aspect-[3/4] w-full min-h-[280px]" />
+                <AvatarSlot id="about" className="w-full max-h-[min(48svh,400px)]">
+                  <div className="aspect-[3/4] w-full" />
                 </AvatarSlot>
               )}
             </div>
           </div>
 
-          <div ref={copyRef} className="order-2 min-w-0 will-change-transform">
+          <div className="order-2 min-w-0">
             <ScrollReveal y={28}>
               <p className="text-[11px] font-semibold tracking-[0.2em] text-text-tertiary uppercase">
                 Get to know me
@@ -204,8 +176,8 @@ export function About() {
 
         <StatCounters />
 
-        <div className="mt-10 grid items-start gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)] lg:gap-6">
-          <ScrollReveal y={32}>
+        <div className="mt-8 grid items-start gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)] lg:gap-5">
+          <ScrollReveal y={28}>
             <InfoListCard
               className="mt-0"
               dense
@@ -217,7 +189,7 @@ export function About() {
           </ScrollReveal>
 
           <div className="flex flex-col gap-4">
-            <ScrollReveal delay={0.05} y={24}>
+            <ScrollReveal delay={0.05} y={20}>
               <div className="rounded-sm border border-border-muted bg-surface-raised p-5 shadow-card">
                 <div className="flex items-center gap-3">
                   <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-xs bg-surface-muted text-text-primary">
@@ -239,7 +211,7 @@ export function About() {
               </div>
             </ScrollReveal>
 
-            <ScrollReveal delay={0.1} y={24}>
+            <ScrollReveal delay={0.1} y={20}>
               <div className="rounded-sm border border-border-muted bg-surface-raised p-5 shadow-card">
                 <Eyebrow className="mb-0 tracking-[0.14em]">Top Skills</Eyebrow>
                 <ChipGroup items={[...about.topSkills]} className="mt-3 gap-2" />
@@ -253,14 +225,12 @@ export function About() {
             </ScrollReveal>
           </div>
 
-          <ScrollReveal delay={0.08} className="lg:col-span-2" y={36}>
+          <ScrollReveal delay={0.08} className="lg:col-span-2" y={28}>
             <div className="rounded-sm border border-border-muted bg-surface-raised p-5 shadow-card md:p-6">
               <Eyebrow className="mb-0 tracking-[0.14em]">Technologies</Eyebrow>
-              <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {Object.entries(about.stack).map(([group, items], index) => (
-                  <ScrollReveal key={group} delay={0.03 * index} y={20}>
-                    <StackGroupCard title={group} items={items} />
-                  </ScrollReveal>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {Object.entries(about.stack).map(([group, items]) => (
+                  <StackGroupCard key={group} title={group} items={items} />
                 ))}
               </div>
             </div>
@@ -299,23 +269,42 @@ export function Experience() {
       );
 
       const cards = root.querySelectorAll("[data-timeline-card]");
+      const cleanups: Array<() => void> = [];
+
       cards.forEach((card) => {
-        gsap.fromTo(
-          card,
-          { opacity: 0, x: -28 },
-          {
-            opacity: 1,
-            x: 0,
-            duration: 0.75,
-            ease: "power3.out",
-            scrollTrigger: {
-              trigger: card,
-              start: "top 85%",
-              toggleActions: "play none none none",
-            },
-          },
-        );
+        const el = card as HTMLElement;
+        let played = false;
+        let raf = 0;
+        el.style.opacity = "0.2";
+        el.style.transform = "translate3d(-20px,0,0)";
+
+        const play = () => {
+          if (played) return;
+          played = true;
+          cancelAnimationFrame(raf);
+          el.style.transition =
+            "opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)";
+          el.style.opacity = "1";
+          el.style.transform = "translate3d(0,0,0)";
+        };
+
+        const loop = () => {
+          if (played) return;
+          const rect = el.getBoundingClientRect();
+          const vh = window.innerHeight || 1;
+          if (rect.top < vh * 0.9) {
+            play();
+            return;
+          }
+          raf = requestAnimationFrame(loop);
+        };
+        raf = requestAnimationFrame(loop);
+        cleanups.push(() => cancelAnimationFrame(raf));
       });
+
+      return () => {
+        cleanups.forEach((fn) => fn());
+      };
     },
     { dependencies: [reduced], scope: rootRef },
   );

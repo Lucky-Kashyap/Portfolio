@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useId, useRef, useState, type ReactNode } from "react";
+import { FormEvent, useId, useState, type ReactNode } from "react";
 import Image from "next/image";
 import {
   AlertCircle,
@@ -11,7 +11,6 @@ import {
   MapPin,
   Phone,
 } from "lucide-react";
-import { useGSAP } from "@gsap/react";
 import {
   Button,
   Container,
@@ -26,7 +25,6 @@ import { ScrollWords } from "@/components/motion/ScrollHeading";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { site } from "@/lib/content";
 import { cn } from "@/lib/utils";
-import { gsap, registerGsap } from "@/lib/gsap";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
 
 type Status = "idle" | "loading" | "success" | "error";
@@ -92,7 +90,6 @@ function ContactChannel({
 
 export function Contact() {
   const formId = useId();
-  const formRef = useRef<HTMLFormElement>(null);
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState("");
   const [invalid, setInvalid] = useState({
@@ -101,33 +98,6 @@ export function Contact() {
     message: false,
   });
   const reduced = usePrefersReducedMotion();
-
-  useGSAP(
-    () => {
-      registerGsap();
-      const form = formRef.current;
-      if (!form || reduced) return;
-
-      const fields = form.querySelectorAll("[data-contact-field]");
-      gsap.fromTo(
-        fields,
-        { opacity: 0, y: 14 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.45,
-          stagger: 0.06,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: form,
-            start: "top 85%",
-            toggleActions: "play none none none",
-          },
-        },
-      );
-    },
-    { dependencies: [reduced] },
-  );
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -289,14 +259,13 @@ export function Contact() {
               </div>
 
               <form
-                ref={formRef}
                 onSubmit={onSubmit}
                 noValidate
                 aria-describedby={error ? `${formId}-error` : undefined}
                 className="flex flex-1 flex-col gap-4"
               >
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <div data-contact-field>
+                  <div>
                     <Field id={`${formId}-name`} label="Name">
                       <Input
                         id={`${formId}-name`}
@@ -312,7 +281,7 @@ export function Contact() {
                       />
                     </Field>
                   </div>
-                  <div data-contact-field>
+                  <div>
                     <Field id={`${formId}-email`} label="Email">
                       <Input
                         id={`${formId}-email`}
@@ -330,7 +299,7 @@ export function Contact() {
                   </div>
                 </div>
 
-                <div data-contact-field className="flex min-h-0 flex-1 flex-col">
+                <div className="flex min-h-0 flex-1 flex-col">
                   <Field
                     id={`${formId}-message`}
                     label="Message"
@@ -375,7 +344,7 @@ export function Contact() {
                     </p>
                   ) : null}
 
-                  <div data-contact-field>
+                  <div>
                     <Button
                       type="submit"
                       className="w-full min-h-11"

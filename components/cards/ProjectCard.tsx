@@ -17,8 +17,7 @@ type ProjectCardProps = {
 };
 
 /**
- * Editorial project panel — image plane + overlay type.
- * Used in snap rails (mobile) and mosaic (desktop).
+ * Editorial project panel — image plane + readable overlay.
  */
 export function ProjectCard({
   project,
@@ -46,7 +45,7 @@ export function ProjectCard({
     const rect = mediaRef.current.getBoundingClientRect();
     const x = (event.clientX - rect.left) / rect.width - 0.5;
     const y = (event.clientY - rect.top) / rect.height - 0.5;
-    mediaRef.current.style.transform = `scale(1.08) translate(${x * 12}px, ${y * 12}px)`;
+    mediaRef.current.style.transform = `scale(1.06) translate(${x * 10}px, ${y * 10}px)`;
   };
 
   const onLeave = () => {
@@ -59,10 +58,12 @@ export function ProjectCard({
     <article
       className={cn(
         "group relative flex h-full min-h-0 w-full flex-col overflow-hidden",
-        "bg-[#0a0e14] outline-none",
-        "transition-[transform,box-shadow] duration-normal will-change-transform",
-        !rail && "hover:shadow-[0_0_0_1px_rgba(125,211,252,0.28)]",
+        "rounded-md border border-border-muted bg-surface-raised shadow-card",
+        "outline-none transition-[transform,box-shadow,border-color] duration-normal",
+        !rail &&
+          "hover:-translate-y-0.5 hover:border-accent-cyan/35 hover:shadow-accent",
         rail && "min-h-[22rem] sm:min-h-[24rem]",
+        featured && "border-accent-cyan/25 shadow-accent",
       )}
       aria-label={`${project.title} project`}
       data-cursor="hover"
@@ -75,7 +76,7 @@ export function ProjectCard({
           rail
             ? "aspect-[4/5] min-h-[18rem]"
             : featured
-              ? "aspect-[16/11] md:aspect-[16/9]"
+              ? "aspect-[16/10] md:aspect-[16/8.5]"
               : "aspect-[16/11]",
         )}
         onMouseMove={onMove}
@@ -93,7 +94,7 @@ export function ProjectCard({
               rail
                 ? "(max-width: 640px) 86vw, 420px"
                 : featured
-                  ? "(max-width: 768px) 100vw, 66vw"
+                  ? "(max-width: 768px) 100vw, 80vw"
                   : "(max-width: 768px) 100vw, 50vw"
             }
             quality={rail ? 75 : 88}
@@ -104,23 +105,23 @@ export function ProjectCard({
 
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black via-black/55 to-transparent"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#03060b] via-[#03060b]/70 to-[#03060b]/10"
         />
         <div
           aria-hidden
           className={cn(
-            "pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,rgba(125,211,252,0.16),transparent_55%)] transition-opacity duration-normal",
-            hovered || rail ? "opacity-100" : "opacity-40",
+            "pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_25%_15%,rgba(125,211,252,0.22),transparent_55%)] transition-opacity duration-normal",
+            hovered || rail || featured ? "opacity-100" : "opacity-50",
           )}
         />
 
         <div className="absolute top-3 left-3 z-10 flex items-center gap-2 sm:top-4 sm:left-4">
-          <span className="font-mono text-[10px] tracking-[0.2em] text-accent-cyan sm:text-xs">
+          <span className="rounded-xs bg-surface-base/70 px-2 py-1 font-mono text-[10px] tracking-[0.2em] text-accent-cyan backdrop-blur-sm sm:text-xs">
             {indexLabel}
           </span>
           {typeof project.stars === "number" ? (
-            <span className="inline-flex items-center gap-1 text-[10px] text-text-secondary sm:text-[11px]">
-              <Star size={10} className="text-accent-cyan" aria-hidden />
+            <span className="inline-flex items-center gap-1 rounded-xs bg-surface-base/60 px-2 py-1 text-[10px] text-text-secondary backdrop-blur-sm sm:text-[11px]">
+              <Star size={10} className="text-accent-amber" aria-hidden />
               {project.stars}
               {typeof project.forks === "number" ? (
                 <>
@@ -132,12 +133,12 @@ export function ProjectCard({
           ) : null}
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 z-10 p-3 sm:p-4 md:p-5">
-          <ul className="mb-2 flex flex-wrap gap-x-2 gap-y-1 sm:mb-3 sm:gap-x-3">
-            {project.tags.slice(0, rail ? 3 : 4).map((tag) => (
+        <div className="absolute inset-x-0 bottom-0 z-10 p-3.5 sm:p-5 md:p-6">
+          <ul className="mb-2.5 flex flex-wrap gap-x-2.5 gap-y-1 sm:mb-3">
+            {project.tags.slice(0, rail ? 3 : 5).map((tag) => (
               <li
                 key={tag}
-                className="text-[9px] font-medium tracking-[0.14em] text-text-tertiary uppercase sm:text-[10px]"
+                className="text-[10px] font-semibold tracking-[0.16em] text-accent-mist uppercase sm:text-[11px]"
               >
                 {tag}
               </li>
@@ -146,19 +147,19 @@ export function ProjectCard({
 
           <h3
             className={cn(
-              "font-bold tracking-tight text-text-primary",
+              "font-display font-bold tracking-tight text-text-primary",
               rail
-                ? "text-base leading-snug sm:text-lg"
+                ? "text-lg leading-snug sm:text-xl"
                 : featured
-                  ? "text-xl md:text-2xl lg:text-3xl"
-                  : "text-lg md:text-xl",
+                  ? "text-2xl md:text-3xl lg:text-[2.15rem]"
+                  : "text-xl md:text-2xl",
             )}
           >
             {hasLink ? (
               <TextLink
                 href={project.href}
                 external
-                className="text-inherit no-underline hover:text-accent-cyan"
+                className="text-inherit no-underline transition-colors hover:text-accent-cyan"
               >
                 {project.title}
               </TextLink>
@@ -169,29 +170,33 @@ export function ProjectCard({
 
           <p
             className={cn(
-              "mt-1.5 text-xs leading-relaxed text-text-secondary sm:mt-2 sm:text-sm",
-              rail ? "line-clamp-2" : hovered ? "line-clamp-4" : "line-clamp-2",
+              "mt-2 text-sm leading-relaxed text-text-secondary",
+              rail
+                ? "line-clamp-2 text-xs sm:text-sm"
+                : hovered || featured
+                  ? "line-clamp-3 md:line-clamp-4"
+                  : "line-clamp-2",
             )}
           >
             {project.description}
           </p>
 
           {hasLink ? (
-            <div className="mt-2.5 flex flex-wrap items-center gap-3 sm:mt-3 sm:gap-4">
+            <div className="mt-3.5 flex flex-wrap items-center gap-3 sm:mt-4 sm:gap-4">
               <TextLink
                 href={project.href}
                 external
-                className="inline-flex items-center gap-1 text-[10px] font-semibold tracking-[0.14em] text-accent-cyan uppercase no-underline sm:text-xs"
+                className="inline-flex items-center gap-1.5 rounded-xs border border-accent-cyan/35 bg-accent-cyan/10 px-3 py-1.5 text-[11px] font-semibold tracking-[0.14em] text-accent-cyan uppercase no-underline transition-colors hover:bg-accent-cyan/20 sm:text-xs"
                 aria-label={`${project.title} — ${cta}`}
               >
                 {cta}
-                <ArrowUpRight size={12} aria-hidden />
+                <ArrowUpRight size={13} aria-hidden />
               </TextLink>
               {project.githubHref && !rail ? (
                 <TextLink
                   href={project.githubHref}
                   external
-                  className="text-[10px] font-semibold tracking-[0.14em] text-text-tertiary uppercase no-underline hover:text-text-primary sm:text-xs"
+                  className="text-[11px] font-semibold tracking-[0.14em] text-text-tertiary uppercase no-underline hover:text-text-primary sm:text-xs"
                 >
                   GitHub
                 </TextLink>

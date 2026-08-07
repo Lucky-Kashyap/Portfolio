@@ -68,7 +68,7 @@ export function Services() {
     <section
       id="services"
       aria-labelledby="services-heading"
-      className="cv-auto section-pad scroll-mt-28 overflow-x-clip border-y border-border-muted bg-surface-raised/40 md:scroll-mt-32"
+      className="section-pad scroll-mt-28 overflow-x-clip border-y border-border-muted bg-surface-raised/40 md:scroll-mt-32"
     >
       <Container>
         <div className="grid items-end gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-8">

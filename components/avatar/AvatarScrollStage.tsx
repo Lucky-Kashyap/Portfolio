@@ -1,20 +1,13 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { Volume2, VolumeX } from "lucide-react";
 import { useGSAP } from "@gsap/react";
+import { AutoplayVideo } from "@/components/ui/AutoplayVideo";
 import { gsap, registerGsap, ScrollTrigger } from "@/lib/gsap";
 import { site } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
-import { playAvatarSpeech, stopAvatarSpeech } from "@/lib/avatar-speech";
-
-const Avatar3D = dynamic(
-  () => import("@/components/motion/Avatar3D").then((m) => m.Avatar3D),
-  { ssr: false },
-);
 
 function easeInOutCubic(t: number) {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
@@ -24,41 +17,25 @@ function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
 }
 
+function roundPx(n: number) {
+  return Math.round(n * 2) / 2;
+}
+
 /**
- * Shared Three.js AI avatar portaled to `document.body` (Lenis-safe).
- * Morphs Hero → About; tap unmute plays Hindi intro.
+ * One shared AutoplayVideo (never unmounted during morph).
+ * Portaled to body for Lenis; Hero → About with identical aspect slots.
+ * Slot posters stay invisible during morph so the avatar never doubles.
  */
 export function AvatarScrollStage() {
   const reduced = usePrefersReducedMotion();
   const frameRef = useRef<HTMLDivElement>(null);
+  const captionRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef(0);
-  const hiddenRef = useRef(false);
   const [mounted, setMounted] = useState(false);
-  const [captionVisible, setCaptionVisible] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const [speaking, setSpeaking] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    hiddenRef.current = hidden;
-  }, [hidden]);
-
-  useEffect(() => {
-    return () => stopAvatarSpeech();
-  }, []);
-
-  const toggleSpeech = () => {
-    if (speaking) {
-      stopAvatarSpeech();
-      setSpeaking(false);
-      return;
-    }
-    setSpeaking(true);
-    void playAvatarSpeech().then(() => setSpeaking(false));
-  };
 
   useGSAP(
     () => {
@@ -69,7 +46,30 @@ export function AvatarScrollStage() {
       const about = document.querySelector('[data-avatar-slot="about"]');
       const range = document.querySelector("[data-avatar-scroll-range]");
       const frame = frameRef.current;
+      const caption = captionRef.current;
+      const aboutPoster = document.querySelector(
+        '[data-avatar-slot-poster="about"]',
+      ) as HTMLElement | null;
+      const heroPoster = document.querySelector(
+        '[data-avatar-slot-poster="hero"]',
+      ) as HTMLElement | null;
+
       if (!hero || !about || !range || !frame) return;
+
+      // Layout-only targets — never show a second face under the floating video
+      if (heroPoster) gsap.set(heroPoster, { opacity: 0 });
+      if (aboutPoster) gsap.set(aboutPoster, { opacity: 0 });
+
+      let lastP = -1;
+
+      const setAboutPoster = (visible: boolean) => {
+        if (!aboutPoster) return;
+        gsap.to(aboutPoster, {
+          opacity: visible ? 1 : 0,
+          duration: 0.2,
+          overwrite: "auto",
+        });
+      };
 
       const apply = (raw?: number) => {
         const p = easeInOutCubic(
@@ -81,30 +81,39 @@ export function AvatarScrollStage() {
         const to = about.getBoundingClientRect();
         if (from.width < 4 || to.width < 4) return;
 
+        if (Math.abs(p - lastP) < 0.001 && raw === undefined && p < 0.995) {
+          return;
+        }
+        lastP = p;
+
+        // Keep slot posters hidden while floating video is the source of truth
+        if (p < 0.98) setAboutPoster(false);
+
         gsap.set(frame, {
-          top: lerp(from.top, to.top, p),
-          left: lerp(from.left, to.left, p),
-          width: lerp(from.width, to.width, p),
-          height: lerp(from.height, to.height, p),
+          top: roundPx(lerp(from.top, to.top, p)),
+          left: roundPx(lerp(from.left, to.left, p)),
+          width: roundPx(lerp(from.width, to.width, p)),
+          height: roundPx(lerp(from.height, to.height, p)),
           borderRadius: 16,
-          opacity: hiddenRef.current ? 0 : 1,
+          opacity: 1,
           visibility: "visible",
+          force3D: true,
         });
 
-        setCaptionVisible((prev) => {
-          const next = p > 0.75;
-          return prev === next ? prev : next;
-        });
+        if (caption) {
+          caption.style.opacity = p > 0.88 ? "1" : "0";
+        }
       };
 
       requestAnimationFrame(() => apply(0));
 
+      // Morph finishes later — avatar parks in About when the section is in view
       const st = ScrollTrigger.create({
         trigger: range,
         start: "top top",
         endTrigger: about,
-        end: "top 30%",
-        scrub: 0.55,
+        end: "center center",
+        scrub: 0.85,
         invalidateOnRefresh: true,
         onUpdate: (self) => apply(self.progress),
         onLeave: () => apply(1),
@@ -114,34 +123,26 @@ export function AvatarScrollStage() {
 
       const stick = ScrollTrigger.create({
         trigger: about,
-        start: "top 80%",
-        end: "bottom top",
+        start: "center center",
+        end: "bottom+=60 top",
         onUpdate: () => {
-          if (progressRef.current >= 0.98) apply(1);
+          if (progressRef.current >= 0.995) apply(1);
         },
-        onEnter: () => apply(Math.max(progressRef.current, 0.85)),
       });
 
       const hideSt = ScrollTrigger.create({
         trigger: about,
-        start: "bottom top",
+        start: "bottom+=10 top",
         onEnter: () => {
-          setHidden(true);
           gsap.to(frame, { opacity: 0, duration: 0.2, overwrite: "auto" });
+          setAboutPoster(true);
         },
         onLeaveBack: () => {
-          setHidden(false);
+          setAboutPoster(false);
           apply(1);
           gsap.to(frame, { opacity: 1, duration: 0.15, overwrite: "auto" });
         },
       });
-
-      const ticker = () => {
-        if (progressRef.current > 0.02 || progressRef.current >= 0.98) {
-          apply();
-        }
-      };
-      gsap.ticker.add(ticker);
 
       const refresh = () => {
         ScrollTrigger.refresh();
@@ -149,11 +150,12 @@ export function AvatarScrollStage() {
       };
       window.addEventListener("portfolio:ready", refresh);
       window.addEventListener("resize", refresh);
-      window.setTimeout(refresh, 200);
-      window.setTimeout(refresh, 800);
+      const t1 = window.setTimeout(refresh, 150);
+      const t2 = window.setTimeout(refresh, 700);
 
       return () => {
-        gsap.ticker.remove(ticker);
+        window.clearTimeout(t1);
+        window.clearTimeout(t2);
         st.kill();
         stick.kill();
         hideSt.kill();
@@ -166,8 +168,6 @@ export function AvatarScrollStage() {
 
   if (reduced || !mounted) return null;
 
-  const faceUrl = site.aiAvatar3d ?? site.aiAvatar ?? site.heroAvatarPoster;
-
   return createPortal(
     <div
       ref={frameRef}
@@ -175,67 +175,42 @@ export function AvatarScrollStage() {
         "pointer-events-auto fixed z-[45] overflow-hidden",
         "border border-white/14 bg-[#070b12]",
         "shadow-[0_28px_70px_rgba(0,0,0,0.55),0_0_0_1px_rgba(125,211,252,0.12)]",
-        "will-change-[top,left,width,height]",
+        "will-change-[top,left,width,height,opacity]",
+        "backface-hidden transform-gpu",
       )}
       style={{ top: 0, left: -9999, width: 1, height: 1, opacity: 0 }}
       data-avatar-floating
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={faceUrl}
-        alt=""
-        className="absolute inset-0 size-full object-cover opacity-80"
-        style={{ objectPosition: "50% 12%" }}
-        draggable={false}
+      <AutoplayVideo
+        src={site.heroAvatarVideo}
+        poster={site.heroAvatarPoster}
+        lazy={false}
+        speechOnUnmute={false}
+        tapSurfaceUnmute
+        objectPosition={site.heroAvatarObjectPosition}
+        muteControlSide="left"
+        className="absolute inset-0 z-[2]"
       />
-
-      {!hidden ? (
-        <Avatar3D
-          faceUrl={faceUrl}
-          speaking={speaking}
-          onActivate={toggleSpeech}
-          className="z-[2]"
-        />
-      ) : null}
 
       <div
-        className="pointer-events-none absolute inset-0 z-[3] bg-[radial-gradient(ellipse_at_50%_30%,transparent_35%,rgba(0,0,0,0.45)_100%)]"
+        ref={captionRef}
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] bg-[linear-gradient(180deg,transparent,rgba(8,12,20,0.95))] px-4 pb-3.5 pt-14 opacity-0 transition-opacity duration-300"
         aria-hidden
-      />
-
-      <button
-        type="button"
-        onClick={toggleSpeech}
-        data-cursor="hover"
-        className={cn(
-          "absolute bottom-3 z-20 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/55 px-3 py-1.5 text-[10px] font-semibold tracking-[0.12em] text-white uppercase backdrop-blur-md transition-colors duration-fast",
-          captionVisible ? "right-3" : "left-3",
-          speaking
-            ? "border-accent-cyan/45 text-accent-cyan"
-            : "hover:border-accent-cyan/40",
-        )}
-        aria-pressed={speaking}
-        aria-label={speaking ? "Mute avatar" : "Unmute avatar intro"}
       >
-        {speaking ? <Volume2 size={12} /> : <VolumeX size={12} />}
-        <span>{speaking ? "Sound on" : "Tap to unmute"}</span>
-      </button>
-
-      {captionVisible ? (
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] bg-[linear-gradient(180deg,transparent,rgba(8,12,20,0.95))] px-4 pb-3.5 pt-14"
-          aria-hidden
-        >
-          <p className="text-sm font-bold tracking-tight text-white uppercase md:text-base">
-            Frontend Engineer
-          </p>
-        </div>
-      ) : null}
+        <p className="text-sm font-bold tracking-tight text-white uppercase md:text-base">
+          Frontend Engineer
+        </p>
+      </div>
     </div>,
     document.body,
   );
 }
 
+/**
+ * Layout target for the floating avatar.
+ * Poster is hidden during morph (no double face); About poster fades in only
+ * after the floating video leaves the section.
+ */
 export function AvatarSlot({
   id,
   className,
@@ -248,16 +223,23 @@ export function AvatarSlot({
   return (
     <div
       data-avatar-slot={id}
-      className={cn("relative w-full", className)}
+      className={cn(
+        "relative w-full overflow-hidden rounded-2xl border border-white/10 bg-[#070b12]",
+        className,
+      )}
       aria-hidden
     >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        data-avatar-slot-poster={id}
+        src={site.heroAvatarPoster}
+        alt=""
+        className="absolute inset-0 size-full object-cover opacity-0"
+        style={{ objectPosition: site.heroAvatarObjectPosition }}
+        draggable={false}
+      />
       {children ?? (
-        <div
-          className={cn(
-            "w-full rounded-2xl",
-            id === "hero" ? "aspect-[4/5]" : "aspect-[3/4]",
-          )}
-        />
+        <div className="relative aspect-[3/4] w-full max-h-[min(48svh,400px)]" />
       )}
     </div>
   );

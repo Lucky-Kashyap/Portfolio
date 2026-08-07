@@ -10,10 +10,12 @@ type HeadingProps = HTMLAttributes<HTMLHeadingElement> & {
 };
 
 const sizeClass = {
-  "display-lg": "text-display-lg font-semibold leading-tight tracking-tight",
-  "display-md": "text-display-md font-semibold leading-tight tracking-tight",
-  "display-sm": "text-display-sm font-semibold leading-tight",
-  xl: "text-xl font-medium leading-snug",
+  "display-lg":
+    "font-display text-display-lg font-semibold leading-tight tracking-tight",
+  "display-md":
+    "font-display text-display-md font-semibold leading-tight tracking-tight",
+  "display-sm": "font-display text-display-sm font-semibold leading-tight",
+  xl: "font-display text-xl font-medium leading-snug",
   lg: "text-lg font-medium leading-snug",
 } as const;
 

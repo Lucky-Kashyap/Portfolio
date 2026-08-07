@@ -1,14 +1,20 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { DM_Sans, Syne } from "next/font/google";
 import { AppShell } from "@/components/layout/AppShell";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { site } from "@/lib/content";
 import { seo, siteUrl } from "@/lib/seo";
 import "./globals.css";
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-dm-sans",
+  display: "swap",
+});
+
+const syne = Syne({
+  subsets: ["latin"],
+  variable: "--font-syne",
   display: "swap",
 });
 
@@ -91,7 +97,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${dmSans.variable} ${syne.variable} h-full antialiased`}
+    >
       <body className="flex min-h-full flex-col overflow-x-hidden bg-surface-base font-sans text-text-primary">
         <a href="#main-content" className="skip-link">
           Skip to main content

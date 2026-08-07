@@ -35,46 +35,17 @@ export const site = {
     ],
   },
   /**
-   * Marketing AI avatar videos (muted autoplay + tap unmute).
-   * Drop MP4s in `public/media/` then run: `npm run media:posters`
+   * Marketing AI avatar video (muted autoplay + tap unmute).
+   * Hero + About share the same encoded clip in public/media.
    */
   heroAvatarVideo: "/media/hero-avatar.mp4",
-  /** Prefer photoreal poster for first paint */
-  heroAvatarPoster:
-    "/avatar/divyanshu-kashyap-3d-ai-avatar-frontend-engineer.webp",
-  aboutAvatarVideo: "/media/about-avatar.mp4",
-  aboutAvatarPoster:
-    "/avatar/divyanshu-kashyap-3d-ai-avatar-frontend-engineer.webp",
-  /** @deprecated aliases — prefer hero/about avatar media fields */
-  avatarPoster:
-    "/avatar/divyanshu-kashyap-3d-ai-avatar-frontend-engineer.webp",
-  avatarModel: "/models/avatar.glb",
-  avatarVoice: "",
+  heroAvatarPoster: "/media/hero-avatar-poster.jpg",
+  /** Face crop for landscape talking-head in portrait frame */
+  heroAvatarObjectPosition: "50% 22%",
+  aboutAvatarVideo: "/media/hero-avatar.mp4",
+  aboutAvatarPoster: "/media/hero-avatar-poster.jpg",
   /** Photo avatar (about / meta) */
   avatar: "/profile/divyanshu-kashyap-frontend-developer-jaipur.webp",
-  /** Photorealistic AI avatar (meta / fallback stills) */
-  aiAvatar: "/avatar/divyanshu-kashyap-3d-ai-avatar-frontend-engineer.webp",
-  /**
-   * Stylized 3D AI portrait used by Three.js shader mesh
-   * (integrated hand wave — no separate hand object).
-   */
-  aiAvatar3d: "/avatar/divyanshu-kashyap-3d-stylized-ai-avatar.webp",
-  /** Live wave GIF drawn via canvas — fallback when 3D is off / reduced motion */
-  aiAvatarGif: "/avatar/divyanshu-kashyap-realistic-ai-avatar-wave.gif",
-  aiAvatarGifEnabled: true,
-  /**
-   * Three.js R3F shader avatar (breathing + hand region displacement).
-   */
-  aiAvatar3dEnabled: true,
-  /** Anime-style AI persona (asset kept; not shown in About) */
-  animeAvatar: "/avatar/divyanshu-kashyap-anime-ai-avatar-frontend-engineer.webp",
-  /**
-   * Talking / waving intro video (HeyGen / D-ID / Synthesia / Runway export).
-   * Drop `public/avatar/intro.mp4` and set `avatarVideoEnabled: true`.
-   * Uses AutoplayVideo + shared tap-to-unmute audio lock.
-   */
-  avatarVideo: "/avatar/intro.mp4",
-  avatarVideoEnabled: false,
   /**
    * Full spoken intro (also used as fallback caption).
    * Prefer `avatarIntroChapters` for timed AI-style narration.

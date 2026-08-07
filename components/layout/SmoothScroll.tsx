@@ -23,6 +23,25 @@ function LenisGsapBridge() {
 
     window.__lenis = lenis;
 
+    // Keep ScrollTrigger in sync with Lenis (virtual scroll)
+    ScrollTrigger.scrollerProxy(document.documentElement, {
+      scrollTop(value) {
+        if (arguments.length && typeof value === "number") {
+          lenis.scrollTo(value, { immediate: true });
+        }
+        return lenis.scroll;
+      },
+      getBoundingClientRect() {
+        return {
+          top: 0,
+          left: 0,
+          width: window.innerWidth,
+          height: window.innerHeight,
+        };
+      },
+    });
+    ScrollTrigger.defaults({ scroller: document.documentElement });
+
     const onScroll = () => ScrollTrigger.update();
     lenis.on("scroll", onScroll);
 
@@ -74,11 +93,11 @@ export function SmoothScroll({ children }: SmoothScrollProps) {
     <ReactLenis
       root
       options={{
-        lerp: 0.075,
-        duration: 1.15,
+        lerp: 0.065,
+        duration: 1.25,
         smoothWheel: true,
-        wheelMultiplier: 0.85,
-        touchMultiplier: 1.35,
+        wheelMultiplier: 0.8,
+        touchMultiplier: 1.25,
         anchors: false,
         autoRaf: false,
       }}

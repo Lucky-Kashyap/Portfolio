@@ -29,7 +29,7 @@ export const seo = {
   ogImage: "/divyanshu-kashyap-frontend-engineer-portfolio-og.webp",
   profileImage: "/profile/divyanshu-kashyap-frontend-developer-jaipur.webp",
   locale: "en_IN",
-  themeColor: "#09090b",
+  themeColor: "#03060b",
 } as const;
 
 export const faqs = [

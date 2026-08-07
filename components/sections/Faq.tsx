@@ -116,7 +116,7 @@ export function Faq() {
     <section
       id="faq"
       aria-labelledby="faq-heading"
-      className="relative section-pad scroll-mt-28 overflow-hidden border-y border-border-muted bg-surface-base cv-auto md:scroll-mt-32"
+      className="relative section-pad scroll-mt-28 overflow-hidden border-y border-border-muted bg-surface-base md:scroll-mt-32"
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.35]"

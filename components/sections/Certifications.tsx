@@ -90,7 +90,7 @@ export function Certifications() {
     <section
       id="certifications"
       aria-labelledby="certifications-heading"
-      className="cv-auto section-pad scroll-mt-28 overflow-x-clip border-y border-border-muted bg-surface-raised/30 md:scroll-mt-32"
+      className="section-pad scroll-mt-28 overflow-x-clip border-y border-border-muted bg-surface-raised/30 md:scroll-mt-32"
     >
       <Container>
         <ScrollReveal>

@@ -37,7 +37,8 @@ export function AvatarVideoFrame({
         "shadow-[0_28px_70px_rgba(0,0,0,0.55),0_0_0_1px_rgba(125,211,252,0.08)]",
         "transition-[box-shadow,transform] duration-500 ease-out",
         "hover:shadow-[0_32px_80px_rgba(0,0,0,0.6),0_0_0_1px_rgba(125,211,252,0.22)]",
-        isHero ? "aspect-[4/5]" : "aspect-[3/4]",
+        // Match scroll-morph slots (same aspect = no reshape flicker)
+        "aspect-[3/4]",
         className,
       )}
     >
