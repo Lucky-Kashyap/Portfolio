@@ -63,6 +63,7 @@ function easeOutQuart(t: number) {
 
 /**
  * Govind-style rolling digit column — strip of 0–9 slides to the active digit.
+ * Tween (not spring) so digits never overshoot past the target (e.g. 100 → 155).
  */
 function RollingDigit({
   value,
@@ -71,30 +72,25 @@ function RollingDigit({
   value: number;
   className?: string;
 }) {
-  const digit = ((value % 10) + 10) % 10;
+  const digit = ((Math.trunc(value) % 10) + 10) % 10;
 
   return (
     <span
       className={cn(
-        "relative inline-block h-[0.95em] w-[0.62em] overflow-hidden",
+        "relative inline-block h-[1em] w-[0.62em] overflow-hidden",
         className,
       )}
       aria-hidden
     >
       <motion.span
-        className="absolute inset-x-0 top-0 flex flex-col items-center"
-        animate={{ y: `${-digit * 0.95}em` }}
-        transition={{
-          type: "spring",
-          stiffness: 120,
-          damping: 22,
-          mass: 0.85,
-        }}
+        className="absolute inset-x-0 top-0 flex flex-col items-center will-change-transform"
+        animate={{ y: `${-digit}em` }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
       >
         {DIGITS.map((d) => (
           <span
             key={d}
-            className="flex h-[0.95em] items-center justify-center leading-none"
+            className="flex h-[1em] w-full items-center justify-center leading-none"
           >
             {d}
           </span>
@@ -104,8 +100,13 @@ function RollingDigit({
   );
 }
 
+function clampPercent(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(100, Math.max(0, value));
+}
+
 function RollingPercent({ value }: { value: number }) {
-  const clamped = Math.min(100, Math.max(0, Math.round(value)));
+  const clamped = Math.round(clampPercent(value));
   const hundreds = Math.floor(clamped / 100);
   const tens = Math.floor((clamped % 100) / 10);
   const ones = clamped % 10;
@@ -165,7 +166,8 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
     const tick = (now: number) => {
       const t = Math.min(1, (now - started) / LOAD_MS);
       const eased = easeOutQuart(t);
-      setProgress(eased * 100);
+      const next = clampPercent(eased * 100);
+      setProgress(next);
       setPhaseLabel(phaseLabelFor(t));
 
       setStatusIndex(
@@ -215,8 +217,9 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
 
   if (phase === "done") return null;
 
-  const pctLabel = String(Math.min(100, Math.round(progress))).padStart(3, "0");
-  const barWidth = `${Math.min(100, progress)}%`;
+  const displayProgress = clampPercent(progress);
+  const pctLabel = String(Math.round(displayProgress)).padStart(3, "0");
+  const barWidth = `${displayProgress}%`;
 
   return (
     <motion.div
@@ -286,7 +289,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
         >
-          <RollingPercent value={progress} />
+          <RollingPercent value={displayProgress} />
         </motion.div>
 
         <div className="mt-8 flex min-h-[2rem] max-w-2xl flex-col items-center justify-center gap-3 sm:mt-10">

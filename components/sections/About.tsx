@@ -49,14 +49,14 @@ function AboutHelpTicker({ reduced }: { reduced: boolean }) {
   const line = ABOUT_HELP_LINES[index % ABOUT_HELP_LINES.length];
 
   return (
-    <div className="pointer-events-none absolute right-3 bottom-4 z-[3] max-w-[52%] text-right sm:right-4 sm:bottom-5">
+    <div className="pointer-events-none absolute right-3 bottom-3 z-[3] max-w-[55%] text-right sm:right-4 sm:bottom-4">
       <p
         className="text-[9px] font-semibold tracking-[0.16em] text-accent-cyan uppercase"
         style={{ textShadow: "0 1px 10px rgba(0,0,0,0.75)" }}
       >
         About
       </p>
-      <div className="relative mt-1 min-h-[2.85em] overflow-hidden">
+      <div className="relative mt-1 min-h-[2.75em] overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.p
             key={line}
@@ -79,20 +79,41 @@ function AboutAvatarVisual({ className }: { className?: string }) {
   const reduced = usePrefersReducedMotion();
 
   return (
-    <div className={cn("relative mx-auto w-full max-w-[22rem] lg:mx-0 lg:max-w-none", className)}>
+    <div className={cn("relative h-full w-full min-h-[22rem]", className)}>
       <div
-        className="pointer-events-none absolute -inset-3 z-0 sm:-inset-4"
+        className="pointer-events-none absolute -inset-4 z-0"
         aria-hidden
       >
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_55%_40%,rgba(232,196,124,0.14),transparent_68%)] blur-xl" />
-        <div className="absolute inset-0 animate-avatar-glow-pulse motion-reduce:animate-none bg-[radial-gradient(ellipse_45%_50%_at_70%_28%,rgba(125,211,252,0.12),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_65%_at_50%_40%,rgba(232,196,124,0.16),transparent_70%)] blur-2xl" />
+        <div className="absolute inset-0 animate-avatar-glow-pulse motion-reduce:animate-none bg-[radial-gradient(ellipse_40%_50%_at_70%_30%,rgba(125,211,252,0.14),transparent_70%)]" />
       </div>
 
-      {/* Compact frame — full regenerated image (CREATIVE + face + hand) */}
-      <figure className="relative z-[1] aspect-[3/4] w-full max-h-[24rem] overflow-hidden rounded-[1.25rem] border border-border-muted bg-[#05070c] sm:max-h-[26rem] sm:rounded-[1.4rem] lg:ml-auto lg:h-[26rem] lg:max-h-[26rem] lg:w-full lg:max-w-[22rem] lg:aspect-auto">
+      <figure className="@container relative z-[1] h-full min-h-[22rem] w-full overflow-hidden rounded-[1.4rem] border border-border-muted bg-[#05070c] shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
+        {/*
+          CREATIVE was clipping because fontSize used 22cqw — on a wide card
+          that made glyphs taller than the frame, then overflow-hidden cut the tops.
+        */}
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 z-0 flex justify-center px-3 pt-5"
+          aria-hidden
+        >
+          <span
+            className="w-full select-none text-center font-semibold tracking-[-0.05em] text-transparent uppercase"
+            style={{
+              fontSize: "clamp(1.7rem, 10.5cqw, 3.4rem)",
+              WebkitTextStroke: "1.5px rgba(125, 211, 252, 0.92)",
+              textShadow:
+                "0 0 22px rgba(125, 211, 252, 0.38), 0 0 44px rgba(125, 211, 252, 0.18)",
+              lineHeight: 1,
+            }}
+          >
+            CREATIVE
+          </span>
+        </div>
+
         <motion.div
-          className="absolute inset-0"
-          animate={reduced ? undefined : { y: [0, -6, 0] }}
+          className="absolute inset-0 z-[1]"
+          animate={reduced ? undefined : { y: [0, -3, 0] }}
           transition={
             reduced
               ? undefined
@@ -100,16 +121,15 @@ function AboutAvatarVisual({ className }: { className?: string }) {
           }
         >
           <Image
-            src={`${site.aboutVisual}?v=final`}
-            alt={`${site.brand} — stylized AI avatar`}
+            src={`${site.aboutVisual}?v=face`}
+            alt={`${site.brand} — stylized AI avatar with CREATIVE backdrop`}
             fill
-            className="object-contain object-center"
-            sizes="(max-width: 1024px) 22rem, 22rem"
+            className="object-cover object-[50%_55%] mix-blend-lighten"
+            sizes="(min-width: 1024px) 36vw, 90vw"
             quality={92}
             priority
           />
         </motion.div>
-
         <AboutHelpTicker reduced={reduced} />
       </figure>
     </div>
@@ -191,52 +211,54 @@ export function About() {
       aria-labelledby="about-heading"
     >
       <Container>
-        <div className="mt-6 grid items-center gap-6 lg:mt-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-8 xl:gap-10">
-          <div className="order-2 min-w-0 lg:order-1">
-            <ScrollReveal y={28}>
-              <p className="text-[11px] font-semibold tracking-[0.2em] text-text-tertiary uppercase">
-                Get to know me
-              </p>
-              <Eyebrow className="mt-3 mb-0">About</Eyebrow>
-              <Heading
-                id="about-heading"
-                as={2}
-                size="display-sm"
-                className="mt-3 max-w-xl text-[clamp(1.65rem,3.2vw,2.75rem)] leading-[1.12]"
-              >
-                {about.headline}
-              </Heading>
-            </ScrollReveal>
+        <div className="mt-6 grid items-stretch gap-6 lg:mt-8 lg:grid-cols-2 lg:gap-8 xl:gap-10">
+          <div className="order-2 flex h-full min-h-0 min-w-0 flex-col justify-between lg:order-1">
+            <div>
+              <ScrollReveal y={28}>
+                <p className="text-[11px] font-semibold tracking-[0.2em] text-text-tertiary uppercase">
+                  Get to know me
+                </p>
+                <Eyebrow className="mt-3 mb-0">About</Eyebrow>
+                <Heading
+                  id="about-heading"
+                  as={2}
+                  size="display-sm"
+                  className="mt-3 max-w-xl text-[clamp(1.65rem,3.2vw,2.75rem)] leading-[1.12]"
+                >
+                  {about.headline}
+                </Heading>
+              </ScrollReveal>
 
-            <div className="mt-5 max-w-xl md:mt-6">
-              <TextGradientScroll
-                text={about.specialize}
-                className="text-[clamp(1.05rem,2.2vw,1.35rem)] font-medium leading-snug tracking-tight text-text-primary"
-                shadowOpacity={0.16}
-              />
+              <div className="mt-5 max-w-xl md:mt-6">
+                <TextGradientScroll
+                  text={about.specialize}
+                  className="text-[clamp(1.05rem,2.2vw,1.35rem)] font-medium leading-snug tracking-tight text-text-primary"
+                  shadowOpacity={0.16}
+                />
+              </div>
+
+              <div className="mt-4 max-w-md">
+                <TextGradientScroll
+                  text={about.lead}
+                  className="text-sm leading-relaxed text-text-secondary"
+                  shadowOpacity={0.2}
+                />
+              </div>
+
+              <ScrollReveal delay={0.06} y={18}>
+                <ChipGroup
+                  items={[...about.highlightStack]}
+                  className="mt-5 gap-2"
+                />
+              </ScrollReveal>
             </div>
-
-            <div className="mt-4 max-w-md">
-              <TextGradientScroll
-                text={about.lead}
-                className="text-sm leading-relaxed text-text-secondary"
-                shadowOpacity={0.2}
-              />
-            </div>
-
-            <ScrollReveal delay={0.06} y={18}>
-              <ChipGroup
-                items={[...about.highlightStack]}
-                className="mt-5 gap-2"
-              />
-            </ScrollReveal>
 
             <ScrollReveal delay={0.08} y={20}>
               <a
                 href={site.leetcode}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-6 inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-secondary transition-colors duration-fast hover:text-text-primary"
+                className="mt-6 inline-flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-text-secondary transition-colors duration-fast hover:text-text-primary lg:mt-8"
                 data-cursor="hover"
               >
                 <span className="font-semibold tracking-[0.14em] text-accent-cyan uppercase">
@@ -250,7 +272,7 @@ export function About() {
             </ScrollReveal>
           </div>
 
-          <div className="order-1 w-full lg:order-2 lg:flex lg:justify-end">
+          <div className="order-1 h-full min-h-[22rem] w-full lg:order-2 lg:min-h-0">
             <AboutAvatarVisual />
           </div>
         </div>
