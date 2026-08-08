@@ -33,7 +33,7 @@ function updateScrollMetrics(
 
 /** Shared glass FAB surface — translucent circles */
 const fabGlass =
-  "border border-white/12 bg-black/45 text-white shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md";
+  "border border-[color:var(--glass-border)] bg-[color:var(--glass-bg)] text-[color:var(--glass-fg)] shadow-soft backdrop-blur-md";
 
 function FabLabel({
   children,
@@ -47,8 +47,8 @@ function FabLabel({
       aria-hidden
       className={cn(
         "pointer-events-none absolute right-[calc(100%+10px)] top-1/2 z-20 -translate-y-1/2",
-        "whitespace-nowrap rounded-md border border-white/12 bg-black/80 px-2.5 py-1",
-        "text-[11px] font-medium tracking-[0.14em] text-white uppercase backdrop-blur-md",
+        "whitespace-nowrap rounded-md border border-[color:var(--glass-border)] bg-[color:var(--glass-bg-strong)] px-2.5 py-1",
+        "text-[11px] font-medium tracking-[0.14em] text-[color:var(--glass-fg)] uppercase backdrop-blur-md",
         "opacity-0 translate-x-2 scale-95",
         "transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]",
         "group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100",
@@ -154,9 +154,8 @@ export function FloatingActions() {
                   className={cn(
                     "relative z-10 inline-flex size-[44px] items-center justify-center rounded-full",
                     fabGlass,
-                    "border-white/18",
                     "transition-[border-color,background-color] duration-fast",
-                    "group-hover:border-accent-cyan/45 group-hover:bg-black/60",
+                    "group-hover:border-accent-cyan/45 group-hover:bg-[color:var(--glass-bg-strong)]",
                   )}
                 >
                   <ArrowUp size={18} strokeWidth={2.25} aria-hidden />
@@ -179,7 +178,7 @@ export function FloatingActions() {
               "group relative inline-flex size-[44px] items-center justify-center rounded-full no-underline",
               fabGlass,
               "text-[#25D366] transition-[border-color,background-color,box-shadow] duration-fast",
-              "hover:border-[#25D366]/45 hover:bg-black/60 hover:text-[#4ade80]",
+              "hover:border-[#25D366]/45 hover:bg-[color:var(--glass-bg-strong)] hover:text-[#4ade80]",
               "hover:shadow-[0_0_0_3px_rgba(37,211,102,0.12)]",
             )}
           >
@@ -212,9 +211,9 @@ export function FloatingActions() {
             className={cn(
               "group relative inline-flex size-[44px] items-center justify-center rounded-full no-underline",
               fabGlass,
-              "text-white/90 transition-[border-color,background-color,box-shadow] duration-fast",
-              "hover:border-white/28 hover:bg-black/60",
-              "hover:shadow-[0_0_0_3px_rgba(255,255,255,0.08)]",
+              "transition-[border-color,background-color,box-shadow] duration-fast",
+              "hover:border-accent-cyan/35 hover:bg-[color:var(--glass-bg-strong)]",
+              "hover:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-accent-cyan)_12%,transparent)]",
             )}
           >
             <FabLabel reduced={reduced}>Download resume</FabLabel>

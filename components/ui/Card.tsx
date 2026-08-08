@@ -6,15 +6,15 @@ type CardPadding = "none" | "sm" | "md" | "lg";
 
 /** Shared raised-surface chrome — use on raw card shells outside `<Card>`. */
 export const cardSurfaceClass =
-  "border border-border-muted bg-surface-raised shadow-card transition-[border-color,box-shadow,transform] duration-normal ease-standard hover:border-accent-cyan/70 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.28),0_18px_50px_rgba(3,6,11,0.55)]";
+  "border border-border-muted bg-surface-raised shadow-card transition-[border-color,box-shadow,transform] duration-normal ease-standard hover:border-accent-cyan/70 hover:shadow-accent";
 
 const variantClass: Record<CardVariant, string> = {
   raised: cardSurfaceClass,
-  base: "border border-border-muted bg-surface-muted transition-[border-color,box-shadow,transform] duration-normal ease-standard hover:border-accent-cyan/65 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.22),0_12px_36px_rgba(3,6,11,0.4)]",
+  base: "border border-border-muted bg-surface-muted transition-[border-color,box-shadow,transform] duration-normal ease-standard hover:border-accent-cyan/65 hover:shadow-soft",
   interactive:
     "group/card border border-border-muted bg-surface-raised shadow-card transition-[border-color,transform,box-shadow] duration-normal ease-standard hover:-translate-y-1 hover:border-accent-cyan/70 hover:shadow-accent",
   accent:
-    "border border-border-muted bg-surface-raised shadow-card transition-[border-color,box-shadow,transform] duration-normal ease-standard hover:-translate-y-0.5 hover:border-accent-cyan/70 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.28),0_18px_50px_rgba(3,6,11,0.55)]",
+    "border border-border-muted bg-surface-raised shadow-card transition-[border-color,box-shadow,transform] duration-normal ease-standard hover:-translate-y-0.5 hover:border-accent-cyan/70 hover:shadow-accent",
 };
 
 const paddingClass: Record<CardPadding, string> = {

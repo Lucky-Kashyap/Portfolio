@@ -339,7 +339,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
           {initials}
         </motion.p>
         <motion.p
-          className="text-xs font-medium tracking-[0.18em] text-white/70 uppercase md:text-sm"
+          className="text-xs font-medium tracking-[0.18em] text-text-secondary uppercase md:text-sm"
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.05 }}
@@ -376,7 +376,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                className="text-center text-sm font-semibold tracking-[0.18em] text-white uppercase sm:text-base md:text-lg md:tracking-[0.2em]"
+                className="text-center text-sm font-semibold tracking-[0.18em] text-text-primary uppercase sm:text-base md:text-lg md:tracking-[0.2em]"
               >
                 {STATUS_LINES[statusIndex]}
               </motion.p>
@@ -392,7 +392,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
               }}
             />
           </div>
-          <p className="max-w-md text-center text-xs leading-relaxed text-white/65 sm:text-sm">
+          <p className="max-w-md text-center text-xs leading-relaxed text-text-secondary sm:text-sm">
             Building scalable, responsive experiences with React, Next.js, and
             TypeScript — based in Jaipur.
           </p>
@@ -400,7 +400,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
       </div>
 
       <div className="absolute inset-x-0 bottom-0 z-20 px-5 pb-9 md:px-10 md:pb-11">
-        <div className="relative h-[2px] w-full overflow-hidden rounded-full bg-white/15">
+        <div className="relative h-[2px] w-full overflow-hidden rounded-full bg-border-muted">
           <motion.div
             className="absolute inset-y-0 left-0 rounded-full bg-accent-cyan"
             animate={{ width: barWidth }}
@@ -409,7 +409,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
           />
           {/* Progress shimmer */}
           <motion.div
-            className="pointer-events-none absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/50 to-transparent"
+            className="pointer-events-none absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-action-primary/40 to-transparent"
             aria-hidden
             animate={{ left: ["-35%", "110%"] }}
             transition={{
@@ -419,7 +419,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
             }}
           />
           <motion.div
-            className="absolute top-1/2 size-2.5 -translate-y-1/2 rounded-full bg-white shadow-[0_0_18px_5px_rgba(125,211,252,0.9)]"
+            className="absolute top-1/2 size-2.5 -translate-y-1/2 rounded-full bg-action-primary shadow-[0_0_18px_5px_color-mix(in_srgb,var(--color-accent-cyan)_70%,transparent)]"
             animate={{ left: barWidth }}
             transition={{ duration: 0.18, ease: "linear" }}
             style={{ marginLeft: "-5px" }}
@@ -434,7 +434,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.32 }}
-              className="text-xs font-semibold tracking-[0.16em] text-white uppercase sm:text-sm md:tracking-[0.2em]"
+              className="text-xs font-semibold tracking-[0.16em] text-text-primary uppercase sm:text-sm md:tracking-[0.2em]"
             >
               {phaseLabel}
             </motion.span>

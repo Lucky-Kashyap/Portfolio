@@ -67,7 +67,7 @@ export function IconNavLinks({
               "group relative inline-flex size-8 items-center justify-center rounded-full transition-[background,color,transform] duration-fast",
               active
                 ? "bg-accent-cyan/15 text-accent-cyan"
-                : "text-text-tertiary hover:bg-white/5 hover:text-text-primary",
+                : "text-text-tertiary hover:bg-surface-raised/80 hover:text-text-primary",
             )}
             onClick={(event) => {
               event.preventDefault();

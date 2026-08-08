@@ -28,14 +28,14 @@ export function ScrollWords({
     if (!el || reduced) return;
 
     const spans = el.querySelectorAll("[data-word]");
-    gsap.set(spans, { yPercent: 110, opacity: 0 });
-
-    const tween = gsap.to(spans, {
-      yPercent: 0,
-      opacity: 1,
+    const tween = gsap.from(spans, {
+      yPercent: 110,
+      opacity: 0,
       duration: 0.7,
       stagger: 0.06,
       ease: "power3.out",
+      immediateRender: false,
+      clearProps: "opacity,transform",
       scrollTrigger: {
         trigger: el,
         start: "top 85%",

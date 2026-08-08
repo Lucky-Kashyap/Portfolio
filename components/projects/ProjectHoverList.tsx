@@ -293,7 +293,7 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
       ? createPortal(
           <motion.div
             aria-hidden
-            className="pointer-events-none fixed z-[80] overflow-hidden rounded-[4px] border border-border-muted bg-[#070b12] shadow-accent"
+            className="pointer-events-none fixed z-[80] overflow-hidden rounded-[4px] border border-border-muted bg-surface-muted shadow-accent"
             style={{
               left: x,
               top: y,
@@ -342,7 +342,7 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
               ) : null}
 
               <div
-                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#03060b]/85 via-transparent to-transparent"
+                className="pointer-events-none absolute inset-0 bg-gradient-to-t from-surface-base/85 via-transparent to-transparent"
                 aria-hidden
               />
               {active ? (
@@ -473,7 +473,7 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
                           }
                           animate={{ y: 0, opacity: 1, scale: 1 }}
                           transition={{ duration: 0.45, ease: EASE_OUT }}
-                          className="relative aspect-[16/10] overflow-hidden border border-border-muted bg-[#070b12] surface-hover transition-[border-color,box-shadow,transform] duration-normal ease-standard hover:border-accent-cyan/70 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.28),0_18px_50px_rgba(3,6,11,0.55)]"
+                          className="relative aspect-[16/10] overflow-hidden border border-border-muted bg-surface-muted surface-hover transition-[border-color,box-shadow,transform] duration-normal ease-standard hover:border-accent-cyan/70 hover:shadow-card"
                         >
                           <Image
                             src={project.image}
@@ -484,7 +484,7 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
                             quality={88}
                           />
                           <div
-                            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#03060b]/50 to-transparent"
+                            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-surface-base/50 to-transparent"
                             aria-hidden
                           />
                         </motion.div>

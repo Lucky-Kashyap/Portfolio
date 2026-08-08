@@ -4,6 +4,7 @@ import { Suspense, useMemo, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Points, PointMaterial } from "@react-three/drei";
 import * as THREE from "three";
+import { useTheme } from "@/components/theme/ThemeProvider";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
 
 function ParticleField({ count = 900 }: { count?: number }) {
@@ -123,16 +124,22 @@ function HeroSculpture() {
   );
 }
 
-function Scene() {
+function Scene({
+  bg,
+  accent,
+}: {
+  bg: string;
+  accent: string;
+}) {
   return (
     <>
-      <color attach="background" args={["#03060b"]} />
+      <color attach="background" args={[bg]} />
       <ambientLight intensity={0.35} />
       <directionalLight position={[4, 3, 2]} intensity={1.1} color="#e2e8f0" />
-      <pointLight position={[-3, 1, 2]} intensity={1.4} color="#38bdf8" />
+      <pointLight position={[-3, 1, 2]} intensity={1.4} color={accent} />
       <ParticleField />
       <HeroSculpture />
-      <fog attach="fog" args={["#03060b", 6, 16]} />
+      <fog attach="fog" args={[bg, 6, 16]} />
     </>
   );
 }
@@ -142,6 +149,10 @@ function Scene() {
  */
 export function HeroWebGL({ className }: { className?: string }) {
   const reduced = usePrefersReducedMotion();
+  const { theme } = useTheme();
+  const bg = theme === "light" ? "#f4f7fb" : "#03060b";
+  const accent = theme === "light" ? "#0284c7" : "#38bdf8";
+
   if (reduced) return null;
 
   return (
@@ -153,7 +164,7 @@ export function HeroWebGL({ className }: { className?: string }) {
         style={{ width: "100%", height: "100%" }}
       >
         <Suspense fallback={null}>
-          <Scene />
+          <Scene bg={bg} accent={accent} />
         </Suspense>
       </Canvas>
     </div>

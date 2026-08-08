@@ -21,22 +21,23 @@ export function Footer() {
       if (!root || reduced) return;
 
       const items = root.querySelectorAll("[data-footer-item]");
-      gsap.fromTo(
-        items,
-        { opacity: 0, y: 18 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.55,
-          stagger: 0.07,
-          ease: "power3.out",
-          scrollTrigger: {
-            trigger: root,
-            start: "top 92%",
-            once: true,
-          },
+      // immediateRender:false keeps content visible until ScrollTrigger plays
+      // (avoids stuck opacity:0 if Lenis/ST timing misses the first pass)
+      gsap.from(items, {
+        opacity: 0,
+        y: 18,
+        duration: 0.55,
+        stagger: 0.07,
+        ease: "power3.out",
+        immediateRender: false,
+        clearProps: "opacity,transform",
+        scrollTrigger: {
+          trigger: root,
+          start: "top 95%",
+          once: true,
+          toggleActions: "play none none none",
         },
-      );
+      });
     },
     { dependencies: [reduced], scope: ref },
   );
@@ -44,10 +45,10 @@ export function Footer() {
   return (
     <footer
       ref={ref}
-      className="relative overflow-hidden border-t border-border-muted py-6 md:py-8"
+      className="relative overflow-hidden border-t border-border-muted bg-surface-base py-6 md:py-8"
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_60%_at_50%_120%,color-mix(in_srgb,#7dd3fc_10%,transparent),transparent_70%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_60%_at_50%_120%,color-mix(in_srgb,var(--theme-accent-cyan)_10%,transparent),transparent_70%)]"
         aria-hidden
       />
 

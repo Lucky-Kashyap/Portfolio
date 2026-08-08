@@ -127,7 +127,7 @@ function AboutAvatarVisual({ className }: { className?: string }) {
         onMouseMove={onMove}
         onMouseLeave={onLeave}
         data-cursor="hover"
-        className="@container relative z-[1] h-full min-h-[22rem] w-full overflow-hidden rounded-[1.4rem] border border-white/10 bg-[#03050a] shadow-[0_28px_70px_rgba(0,0,0,0.55)] transition-[border-color,box-shadow] duration-normal ease-standard will-change-transform hover:border-accent-cyan/55 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.28),0_28px_70px_rgba(3,6,11,0.55)]"
+        className="@container relative z-[1] h-full min-h-[22rem] w-full overflow-hidden rounded-[1.4rem] border border-border-muted bg-surface-base shadow-soft transition-[border-color,box-shadow] duration-normal ease-standard will-change-transform hover:border-accent-cyan/55 hover:shadow-accent"
         style={{ transformStyle: "preserve-3d" }}
         animate={
           reduced

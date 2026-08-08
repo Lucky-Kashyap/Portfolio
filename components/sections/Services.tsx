@@ -41,7 +41,7 @@ function ServiceSlide({
 }) {
   const Icon = serviceIcons[service.id];
   return (
-    <article className="flex h-full min-h-[13.5rem] flex-col justify-between bg-[#0a0e14] p-4 sm:min-h-[15rem] sm:p-5 md:p-6">
+    <article className="flex h-full min-h-[13.5rem] flex-col justify-between bg-surface-raised p-4 sm:min-h-[15rem] sm:p-5 md:p-6">
       <div>
         <div className="flex items-center justify-between gap-3">
           <span className="font-mono text-sm text-accent-cyan">
@@ -139,7 +139,7 @@ function DesktopServices({ reduced }: { reduced: boolean }) {
                 <span
                   className={cn(
                     "font-mono text-sm tabular-nums transition-colors duration-300",
-                    isActive ? "text-accent-cyan" : "text-white/20",
+                    isActive ? "text-accent-cyan" : "text-text-primary/20",
                   )}
                 >
                   {String(index + 1).padStart(2, "0")}

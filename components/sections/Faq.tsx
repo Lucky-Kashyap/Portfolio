@@ -201,7 +201,7 @@ export function Faq() {
                         <span
                           className={cn(
                             "font-mono text-xl font-light tabular-nums sm:text-2xl md:text-3xl",
-                            isOpen ? "text-accent-cyan" : "text-white/15",
+                            isOpen ? "text-accent-cyan" : "text-text-primary/15",
                           )}
                           aria-hidden
                         >

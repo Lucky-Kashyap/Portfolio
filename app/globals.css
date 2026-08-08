@@ -1,6 +1,131 @@
 @import "tailwindcss";
 @config "../tailwind.config.ts";
 
+/* Theme tokens — Tailwind utilities resolve via var(--theme-*); light swaps here */
+:root,
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --theme-text-primary: oklch(0.97 0.006 230);
+  --theme-text-secondary: oklch(0.82 0.02 230);
+  --theme-text-tertiary: oklch(0.68 0.02 230);
+  --theme-text-inverse: oklch(0.14 0.02 250);
+  --theme-text-muted: oklch(0.68 0.02 230);
+  --theme-surface-base: #03060b;
+  --theme-surface-muted: #070b12;
+  --theme-surface-raised: #0e1520;
+  --theme-surface-strong: #f8fafc;
+  --theme-surface-overlay: color-mix(in srgb, #03060b 88%, transparent);
+  --theme-border-default: color-mix(in srgb, #e2e8f0 42%, transparent);
+  --theme-border-muted: color-mix(in srgb, #94a3b8 18%, transparent);
+  --theme-action-primary: #f8fafc;
+  --theme-action-primary-hover: #e2e8f0;
+  --theme-action-primary-deep: oklch(0.72 0.03 230);
+  --theme-focus-ring: #7dd3fc;
+  --theme-focus-glow: color-mix(in srgb, #7dd3fc 28%, transparent);
+  --theme-accent-cyan: #7dd3fc;
+  --theme-accent-amber: #e8c47c;
+  --theme-accent-mist: #94a3b8;
+  --theme-state-disabled: color-mix(in srgb, #e2e8f0 35%, transparent);
+  --theme-state-error: #fb7185;
+  --theme-state-loading: oklch(0.72 0.03 230);
+  --theme-shadow-soft: 0 18px 50px rgba(3, 6, 11, 0.55);
+  --theme-shadow-card: 0 1px 0 color-mix(in srgb, #7dd3fc 10%, transparent),
+    0 20px 50px rgba(3, 6, 11, 0.45);
+  --theme-shadow-accent: 0 12px 40px rgba(14, 165, 233, 0.18);
+  --theme-shadow-accent-lg: 0 22px 60px rgba(14, 165, 233, 0.22);
+  --glass-bg: color-mix(in srgb, #03060b 55%, transparent);
+  --glass-bg-strong: color-mix(in srgb, #03060b 82%, transparent);
+  --glass-border: color-mix(in srgb, #ffffff 12%, transparent);
+  --glass-fg: #ffffff;
+  --field-bg: color-mix(in srgb, #03060b 88%, #7dd3fc 4%);
+  --field-bg-hover: color-mix(in srgb, #03060b 92%, #7dd3fc 6%);
+  --field-bg-focus: #03060b;
+  --hover-shadow: 0 0 0 1px color-mix(in srgb, #7dd3fc 28%, transparent),
+    0 16px 40px rgba(3, 6, 11, 0.45);
+  --snap-tick: color-mix(in srgb, #ffffff 14%, transparent);
+  --atmosphere-base: #070b12;
+  --selection-fg: #03060b;
+  --heading-stroke: color-mix(in srgb, #ffffff 55%, transparent);
+  --heading-stroke-soft: color-mix(in srgb, #7dd3fc 14%, transparent);
+  --cert-paper: #f4f6f8;
+
+  /* Aliases for custom CSS that references --color-* / --shadow-* */
+  --color-text-primary: var(--theme-text-primary);
+  --color-text-secondary: var(--theme-text-secondary);
+  --color-text-tertiary: var(--theme-text-tertiary);
+  --color-text-inverse: var(--theme-text-inverse);
+  --color-text-muted: var(--theme-text-muted);
+  --color-surface-base: var(--theme-surface-base);
+  --color-surface-muted: var(--theme-surface-muted);
+  --color-surface-raised: var(--theme-surface-raised);
+  --color-surface-strong: var(--theme-surface-strong);
+  --color-surface-overlay: var(--theme-surface-overlay);
+  --color-border-default: var(--theme-border-default);
+  --color-border-muted: var(--theme-border-muted);
+  --color-action-primary: var(--theme-action-primary);
+  --color-action-primary-hover: var(--theme-action-primary-hover);
+  --color-action-primary-deep: var(--theme-action-primary-deep);
+  --color-focus-ring: var(--theme-focus-ring);
+  --color-focus-glow: var(--theme-focus-glow);
+  --color-accent-cyan: var(--theme-accent-cyan);
+  --color-accent-amber: var(--theme-accent-amber);
+  --color-accent-mist: var(--theme-accent-mist);
+  --color-state-disabled: var(--theme-state-disabled);
+  --color-state-error: var(--theme-state-error);
+  --color-state-loading: var(--theme-state-loading);
+  --shadow-soft: var(--theme-shadow-soft);
+  --shadow-card: var(--theme-shadow-card);
+  --shadow-accent: var(--theme-shadow-accent);
+  --shadow-accent-lg: var(--theme-shadow-accent-lg);
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+  --theme-text-primary: oklch(0.22 0.025 250);
+  --theme-text-secondary: oklch(0.38 0.02 250);
+  --theme-text-tertiary: oklch(0.5 0.018 250);
+  --theme-text-inverse: oklch(0.98 0.004 230);
+  --theme-text-muted: oklch(0.5 0.018 250);
+  --theme-surface-base: #f4f7fb;
+  --theme-surface-muted: #e8eef6;
+  --theme-surface-raised: #ffffff;
+  --theme-surface-strong: #0b1220;
+  --theme-surface-overlay: color-mix(in srgb, #f4f7fb 88%, transparent);
+  --theme-border-default: color-mix(in srgb, #0f172a 22%, transparent);
+  --theme-border-muted: color-mix(in srgb, #334155 16%, transparent);
+  --theme-action-primary: #0b1220;
+  --theme-action-primary-hover: #1e293b;
+  --theme-action-primary-deep: oklch(0.45 0.04 240);
+  --theme-focus-ring: #0284c7;
+  --theme-focus-glow: color-mix(in srgb, #0ea5e9 24%, transparent);
+  --theme-accent-cyan: #0284c7;
+  --theme-accent-amber: #b45309;
+  --theme-accent-mist: #64748b;
+  --theme-state-disabled: color-mix(in srgb, #334155 35%, transparent);
+  --theme-state-error: #e11d48;
+  --theme-state-loading: oklch(0.45 0.04 240);
+  --theme-shadow-soft: 0 18px 44px rgba(15, 23, 42, 0.1);
+  --theme-shadow-card: 0 1px 0 color-mix(in srgb, #0284c7 12%, transparent),
+    0 16px 40px rgba(15, 23, 42, 0.08);
+  --theme-shadow-accent: 0 12px 36px rgba(2, 132, 199, 0.16);
+  --theme-shadow-accent-lg: 0 20px 48px rgba(2, 132, 199, 0.2);
+  --glass-bg: color-mix(in srgb, #ffffff 72%, transparent);
+  --glass-bg-strong: color-mix(in srgb, #ffffff 92%, transparent);
+  --glass-border: color-mix(in srgb, #0f172a 12%, transparent);
+  --glass-fg: #0b1220;
+  --field-bg: color-mix(in srgb, #ffffff 92%, #0284c7 4%);
+  --field-bg-hover: #ffffff;
+  --field-bg-focus: #ffffff;
+  --hover-shadow: 0 0 0 1px color-mix(in srgb, #0284c7 28%, transparent),
+    0 14px 36px rgba(15, 23, 42, 0.1);
+  --snap-tick: color-mix(in srgb, #0f172a 14%, transparent);
+  --atmosphere-base: #e8eef6;
+  --selection-fg: #f8fafc;
+  --heading-stroke: color-mix(in srgb, #0b1220 55%, transparent);
+  --heading-stroke-soft: color-mix(in srgb, #0284c7 22%, transparent);
+  --cert-paper: #eef2f7;
+}
+
 *,
 *::before,
 *::after {
@@ -112,33 +237,54 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, #7dd3fc 72%, #38bdf8);
-  color: #03060b;
-  -webkit-text-fill-color: #03060b;
+  background: color-mix(in srgb, var(--color-accent-cyan) 72%, #38bdf8);
+  color: var(--selection-fg);
+  -webkit-text-fill-color: var(--selection-fg);
   -webkit-text-stroke-color: transparent;
   text-shadow: none;
 }
 
 ::-moz-selection {
-  background: color-mix(in srgb, #7dd3fc 72%, #38bdf8);
-  color: #03060b;
+  background: color-mix(in srgb, var(--color-accent-cyan) 72%, #38bdf8);
+  color: var(--selection-fg);
   text-shadow: none;
 }
 
-/* Hollow / stroke headings (e.g. KASHYAP) — force solid fill when selected */
+/* Hollow / stroke headings (e.g. KASHYAP) */
+.text-stroke-heading {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke-width: 1.5px;
+  -webkit-text-stroke-color: var(--heading-stroke);
+  paint-order: stroke fill;
+}
+
+.text-stroke-heading-soft {
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke-width: 1.5px;
+  -webkit-text-stroke-color: var(--heading-stroke-soft);
+  paint-order: stroke fill;
+}
+
+/* Force solid fill when selected */
 .text-stroke-heading::selection,
-.text-stroke-heading *::selection {
-  background: #7dd3fc;
-  color: #03060b;
-  -webkit-text-fill-color: #03060b;
+.text-stroke-heading *::selection,
+.text-stroke-heading-soft::selection,
+.text-stroke-heading-soft *::selection {
+  background: var(--color-accent-cyan);
+  color: var(--selection-fg);
+  -webkit-text-fill-color: var(--selection-fg);
   -webkit-text-stroke-width: 0;
   -webkit-text-stroke-color: transparent;
 }
 
 .text-stroke-heading::-moz-selection,
-.text-stroke-heading *::-moz-selection {
-  background: #7dd3fc;
-  color: #03060b;
+.text-stroke-heading *::-moz-selection,
+.text-stroke-heading-soft::-moz-selection,
+.text-stroke-heading-soft *::-moz-selection {
+  background: var(--color-accent-cyan);
+  color: var(--selection-fg);
 }
 
 :focus {
@@ -187,10 +333,8 @@ button {
 }
 
 .surface-hover:hover {
-  border-color: color-mix(in srgb, #7dd3fc 70%, transparent);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, #7dd3fc 28%, transparent),
-    0 16px 40px rgba(3, 6, 11, 0.45);
+  border-color: color-mix(in srgb, var(--color-accent-cyan) 70%, transparent);
+  box-shadow: var(--hover-shadow);
 }
 
 .container-site {
@@ -344,7 +488,7 @@ section[id] {
 .snap-progress span {
   height: 3px;
   width: 1.25rem;
-  background: color-mix(in srgb, #ffffff 14%, transparent);
+  background: var(--snap-tick);
   transition:
     background-color 0.25s cubic-bezier(0.22, 1, 0.36, 1),
     width 0.25s cubic-bezier(0.22, 1, 0.36, 1);
@@ -352,27 +496,27 @@ section[id] {
 
 .snap-progress span[data-active="true"] {
   width: 2rem;
-  background: #7dd3fc;
+  background: var(--color-accent-cyan);
 }
 
 .bg-atmosphere {
   background:
     radial-gradient(
       ellipse 75% 55% at 50% -8%,
-      color-mix(in srgb, #7dd3fc 12%, transparent),
+      color-mix(in srgb, var(--color-accent-cyan) 12%, transparent),
       transparent 58%
     ),
     radial-gradient(
       ellipse 40% 35% at 92% 18%,
-      color-mix(in srgb, #e8c47c 7%, transparent),
+      color-mix(in srgb, var(--color-accent-amber) 7%, transparent),
       transparent 55%
     ),
     radial-gradient(
       ellipse 45% 40% at 8% 88%,
-      color-mix(in srgb, #38bdf8 6%, transparent),
+      color-mix(in srgb, var(--color-accent-cyan) 6%, transparent),
       transparent 60%
     ),
-    var(--color-surface-muted, #070b12);
+    var(--atmosphere-base);
 }
 
 .hero-scrim {
@@ -388,9 +532,9 @@ section[id] {
   width: 100%;
   min-height: 48px;
   padding: 12px 14px;
-  border: 1px solid color-mix(in srgb, #94a3b8 32%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent-mist) 32%, transparent);
   border-radius: var(--radius-xs);
-  background: color-mix(in srgb, #03060b 88%, #7dd3fc 4%);
+  background: var(--field-bg);
   color: var(--color-text-primary);
   font-family: inherit;
   font-size: 0.95rem;
@@ -402,20 +546,20 @@ section[id] {
 }
 
 .field:hover {
-  border-color: color-mix(in srgb, #7dd3fc 45%, transparent);
-  background: color-mix(in srgb, #03060b 92%, #7dd3fc 6%);
+  border-color: color-mix(in srgb, var(--color-accent-cyan) 45%, transparent);
+  background: var(--field-bg-hover);
 }
 
 .field:focus,
 .field:focus-visible {
-  border-color: color-mix(in srgb, #7dd3fc 70%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent-cyan) 70%, transparent);
   outline: none;
-  background: #03060b;
-  box-shadow: 0 0 0 3px color-mix(in srgb, #7dd3fc 22%, transparent);
+  background: var(--field-bg-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent-cyan) 22%, transparent);
 }
 
 .field::placeholder {
-  color: color-mix(in srgb, #94a3b8 88%, transparent);
+  color: color-mix(in srgb, var(--color-accent-mist) 88%, transparent);
   font-size: 0.9rem;
   font-weight: 400;
   opacity: 1;
@@ -485,7 +629,7 @@ html.has-custom-cursor [data-cursor="hover"] {
   }
   35% {
     transform: translateY(-5px);
-    color: #7dd3fc;
+    color: var(--color-accent-cyan);
   }
   100% {
     transform: translateY(0);
@@ -502,7 +646,7 @@ html.has-custom-cursor [data-cursor="hover"] {
   position: absolute;
   inset: -4px;
   border-radius: 10px;
-  border: 1px solid color-mix(in srgb, #7dd3fc 0%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent-cyan) 0%, transparent);
   transition:
     border-color 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
@@ -510,7 +654,7 @@ html.has-custom-cursor [data-cursor="hover"] {
 
 .brand-mark-wrap:hover::after,
 .brand-mark-wrap:focus-visible::after {
-  border-color: color-mix(in srgb, #7dd3fc 55%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent-cyan) 55%, transparent);
   transform: rotate(6deg) scale(1.06);
 }
 
@@ -541,7 +685,7 @@ html.has-custom-cursor [data-cursor="hover"] {
   width: 100%;
   transform: scaleX(0);
   transform-origin: right;
-  background: #7dd3fc;
+  background: var(--color-accent-cyan);
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 

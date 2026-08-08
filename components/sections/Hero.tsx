@@ -39,8 +39,7 @@ function LetterName({
     <span
       className={cn(
         "inline-flex flex-wrap justify-start",
-        outline &&
-          "text-stroke-heading text-transparent [-webkit-text-stroke:1.5px_rgba(255,255,255,0.55)]",
+        outline && "text-stroke-heading",
         className,
       )}
       aria-label={text}
@@ -264,7 +263,7 @@ export function Hero() {
         <div className="absolute inset-0 z-[2] bg-[radial-gradient(ellipse_42%_48%_at_82%_42%,color-mix(in_srgb,#e8c47c_14%,transparent),transparent_62%)]" />
         <p
           ref={creativeRef}
-          className="absolute right-[-4%] top-[38%] z-[2] -translate-y-1/2 select-none text-right font-display text-[clamp(3.5rem,16vw,12rem)] font-bold tracking-tighter text-transparent uppercase [-webkit-text-stroke:1.5px_rgba(125,211,252,0.14)] md:right-[2%] lg:right-[4%]"
+          className="text-stroke-heading-soft absolute right-[-4%] top-[38%] z-[2] -translate-y-1/2 select-none text-right font-display text-[clamp(3.5rem,16vw,12rem)] font-bold tracking-tighter uppercase md:right-[2%] lg:right-[4%]"
         >
           Creative
         </p>

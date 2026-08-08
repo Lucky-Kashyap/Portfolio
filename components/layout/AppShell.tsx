@@ -8,6 +8,7 @@ import { Header } from "@/components/layout/Header";
 import { PageLoader } from "@/components/layout/PageLoader";
 import { SiteReveal } from "@/components/layout/SiteReveal";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
 
 type AppShellProps = {
   children: ReactNode;
@@ -15,13 +16,15 @@ type AppShellProps = {
 
 export function AppShell({ children }: AppShellProps) {
   return (
-    <SmoothScroll>
-      <PageLoader />
-      <ScrollProgressGlow />
-      <CustomCursor />
-      <Header />
-      <SiteReveal>{children}</SiteReveal>
-      <FloatingActions />
-    </SmoothScroll>
+    <ThemeProvider>
+      <SmoothScroll>
+        <PageLoader />
+        <ScrollProgressGlow />
+        <CustomCursor />
+        <Header />
+        <SiteReveal>{children}</SiteReveal>
+        <FloatingActions />
+      </SmoothScroll>
+    </ThemeProvider>
   );
 }

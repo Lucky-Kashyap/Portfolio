@@ -13,6 +13,7 @@ import {
   LinkedInIcon,
 } from "@/components/motion/SocialMagneticIcons";
 import { Magnetic } from "@/components/motion/Magnetic";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { navItems, site } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
@@ -39,14 +40,16 @@ function TopLink({
       <a
         href={href}
         aria-label={label}
-        title={label}
         data-cursor="hover"
         {...(external
           ? { target: "_blank", rel: "noopener noreferrer" }
           : undefined)}
-        className="inline-flex size-7 items-center justify-center rounded-full text-text-tertiary transition-colors duration-fast hover:text-accent-cyan"
+        className="group relative inline-flex size-7 items-center justify-center rounded-full text-text-tertiary transition-colors duration-fast hover:text-accent-cyan"
       >
         {children}
+        <span className="pointer-events-none absolute top-[calc(100%+8px)] left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-xs border border-border-muted bg-surface-base px-2 py-1 text-[10px] font-medium tracking-[0.14em] text-text-secondary uppercase opacity-0 shadow-soft transition-opacity duration-fast group-hover:opacity-100 group-focus-visible:opacity-100">
+          {label}
+        </span>
       </a>
     </Magnetic>
   );
@@ -143,7 +146,7 @@ export function Header() {
           className={cn(
             "pointer-events-auto transition-[background,backdrop-filter,border-color] duration-normal",
             scrolled
-              ? "border-b border-white/5 bg-surface-base/40 backdrop-blur-sm"
+              ? "border-b border-border-muted/60 bg-surface-base/40 backdrop-blur-sm"
               : "border-b border-transparent bg-transparent",
           )}
         >
@@ -188,6 +191,8 @@ export function Header() {
                 ))}
               </ul>
 
+              <ThemeToggle />
+
               {/* Mobile menu lives in the strip — float nav is desktop-only */}
               <IconButton
                 className="!size-7 !min-h-7 !min-w-7 md:hidden"
@@ -216,7 +221,7 @@ export function Header() {
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
           >
             <div className="container-site pointer-events-none flex justify-center">
-              <div className="pointer-events-auto flex max-w-full items-center gap-2 rounded-full border border-white/10 bg-surface-base/75 px-2 py-1 shadow-soft backdrop-blur-xl">
+              <div className="pointer-events-auto flex max-w-full items-center gap-2 rounded-full border border-border-muted/80 bg-surface-base/75 px-2 py-1 shadow-soft backdrop-blur-xl">
                 <TextLink
                   href="#top"
                   variant="brand"
@@ -238,7 +243,7 @@ export function Header() {
                   </span>
                 </TextLink>
 
-                <span className="mx-0.5 h-4 w-px bg-white/10" aria-hidden />
+                <span className="mx-0.5 h-4 w-px bg-border-muted" aria-hidden />
 
                 <nav aria-label="Primary">
                   <IconNavLinks items={navItems} activeId={active} />

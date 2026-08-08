@@ -150,8 +150,8 @@ export function SocialMagneticIcons({
                 className={cn(
                   "group inline-flex items-center justify-center rounded-full border transition-[background,color,box-shadow,border-color,transform] duration-normal ease-standard active:scale-95",
                   isHeader
-                    ? "border-border-muted bg-surface-raised text-text-secondary hover:border-accent-cyan/70 hover:bg-accent-cyan hover:text-surface-base hover:shadow-[0_0_16px_rgba(125,211,252,0.35)]"
-                    : "border-transparent bg-[#e8e4dc] text-[#1a1a1a] shadow-soft hover:bg-accent-cyan hover:text-surface-base hover:shadow-[0_0_24px_rgba(125,211,252,0.45)]",
+                    ? "border-border-muted bg-surface-raised text-text-secondary hover:border-accent-cyan/70 hover:bg-accent-cyan hover:text-surface-base hover:shadow-accent"
+                    : "border border-border-muted bg-surface-raised text-text-primary shadow-soft hover:border-accent-cyan/70 hover:bg-accent-cyan hover:text-surface-base hover:shadow-accent",
                   sizeClass[size],
                 )}
               >
