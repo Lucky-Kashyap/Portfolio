@@ -58,7 +58,7 @@ export const faqs = [
   {
     id: "opportunities",
     question: "Are you open to new opportunities or collaborations?",
-    answer: about.passion,
+    answer: `${site.availability.detail} ${about.passion}`,
   },
   {
     id: "contact",

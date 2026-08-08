@@ -21,13 +21,15 @@ export const skillBubbles: readonly SkillBubble[] = [
   { id: "java", label: "Java", icon: "openjdk", color: "437291" },
 
   // Frameworks & UI
-  { id: "react", label: "React", icon: "react", color: "61DAFB" },
+  { id: "react", label: "React.js", icon: "react", color: "61DAFB" },
+  { id: "react19", label: "React 19", icon: "react", color: "61DAFB" },
   { id: "next", label: "Next.js", icon: "nextdotjs", color: "FFFFFF" },
-  { id: "angular", label: "Angular", icon: "angular", color: "DD0031" },
-  { id: "tailwind", label: "Tailwind", icon: "tailwindcss", color: "06B6D4" },
+  { id: "angular", label: "Angular 14", icon: "angular", color: "DD0031" },
+  { id: "tailwind", label: "Tailwind CSS", icon: "tailwindcss", color: "06B6D4" },
   { id: "bootstrap", label: "Bootstrap", icon: "bootstrap", color: "7952B3" },
   { id: "wordpress", label: "WordPress", icon: "wordpress", color: "21759B" },
-  { id: "mui", label: "MUI", icon: "mui", color: "007FFF" },
+  { id: "mui", label: "Material UI", icon: "mui", color: "007FFF" },
+  { id: "shadcn", label: "Shadcn/UI", icon: "shadcnui", color: "FFFFFF" },
   { id: "radix", label: "Radix", icon: "radixui", color: "FFFFFF" },
 
   // State & data
@@ -47,7 +49,20 @@ export const skillBubbles: readonly SkillBubble[] = [
   { id: "express", label: "Express", icon: "express", color: "FFFFFF" },
   { id: "mysql", label: "MySQL", icon: "mysql", color: "4479A1" },
   { id: "mongodb", label: "MongoDB", icon: "mongodb", color: "47A248" },
-  { id: "rest", label: "REST", icon: "postman", color: "FF6C37" },
+  { id: "rest", label: "REST API", icon: "postman", color: "FF6C37" },
+  { id: "postman", label: "Postman", icon: "postman", color: "FF6C37" },
+
+  // AI assistants
+  { id: "chatgpt", label: "ChatGPT", icon: "openai", color: "412991" },
+  { id: "copilot", label: "GitHub Copilot", icon: "githubcopilot", color: "FFFFFF" },
+  { id: "gemini", label: "Gemini", icon: "googlegemini", color: "8E75B2" },
+  {
+    id: "v0",
+    label: "v0 by Vercel",
+    icon: "vercel",
+    color: "FFFFFF",
+  },
+  { id: "lovable", label: "Lovable", icon: "lovable", color: "FF5C5C" },
 
   // Tooling
   { id: "git", label: "Git", icon: "git", color: "F05032" },
@@ -61,9 +76,12 @@ export const skillBubbles: readonly SkillBubble[] = [
   { id: "prettier", label: "Prettier", icon: "prettier", color: "F7B93E" },
   { id: "babel", label: "Babel", icon: "babel", color: "F9DC3E" },
 
-  // Design & QA
+  // Editors & QA
   { id: "figma", label: "Figma", icon: "figma", color: "F24E1E" },
   { id: "vscode", label: "VS Code", icon: "visualstudiocode", color: "007ACC" },
+  { id: "cursor", label: "Cursor", icon: "cursor", color: "FFFFFF" },
+  { id: "atom", label: "Atom", icon: "atom", color: "66595C" },
+  { id: "sublime", label: "Sublime Text", icon: "sublimetext", color: "FF9800" },
   { id: "chrome", label: "Chrome DevTools", icon: "googlechrome", color: "4285F4" },
   { id: "lighthouse", label: "Lighthouse", icon: "lighthouse", color: "F44B21" },
   { id: "analytics", label: "Analytics", icon: "googleanalytics", color: "E37400" },

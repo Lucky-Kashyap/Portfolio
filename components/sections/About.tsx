@@ -31,7 +31,7 @@ const ABOUT_HELP_LINES = [
   "Get to know the engineer behind the UI",
   "React · Next.js · TypeScript in production",
   "Motion, performance, and accessible craft",
-  "Based in Jaipur — open to collaborate",
+  "Available for hire — React.js / Next.js roles",
   "Scroll down for experience & projects",
 ] as const;
 

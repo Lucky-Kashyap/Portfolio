@@ -186,6 +186,15 @@ const config = {
           "0%": { transform: "scale(1)", borderColor: "rgba(37,211,102,0.55)" },
           "100%": { transform: "scale(1.55)", borderColor: "rgba(37,211,102,0)" },
         },
+        "live-ping": {
+          "0%": { transform: "scale(1)", opacity: "0.7" },
+          "70%": { transform: "scale(2.4)", opacity: "0" },
+          "100%": { transform: "scale(2.4)", opacity: "0" },
+        },
+        "live-pulse": {
+          "0%, 100%": { opacity: "1", boxShadow: "0 0 0 0 rgba(52,211,153,0.45)" },
+          "50%": { opacity: "0.85", boxShadow: "0 0 0 5px rgba(52,211,153,0)" },
+        },
       },
       animation: {
         "loader-progress":
@@ -196,6 +205,8 @@ const config = {
         "wa-wiggle": "wa-wiggle 0.7s ease-in-out infinite",
         "wa-ping": "wa-ping 0.9s cubic-bezier(0, 0, 0.2, 1) infinite",
         "wa-ring": "wa-ring 0.9s cubic-bezier(0, 0, 0.2, 1) infinite",
+        "live-ping": "live-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite",
+        "live-pulse": "live-pulse 2s ease-in-out infinite",
       },
     },
   },

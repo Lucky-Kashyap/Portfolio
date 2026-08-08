@@ -1,14 +1,14 @@
 import type { ReactNode } from "react";
 import {
+  Bot,
   Check,
   Code2,
   Database,
-  Gauge,
+  GitBranch,
   GraduationCap,
   Layers,
   Palette,
-  ShieldCheck,
-  Wrench,
+  Terminal,
 } from "lucide-react";
 import { Card, ChipGroup, Eyebrow, Text } from "@/components/ui";
 import type { ExperienceItem } from "@/lib/content";
@@ -21,11 +21,11 @@ type StackGroupCardProps = {
 
 const stackIcons: Record<string, ReactNode> = {
   Frontend: <Code2 size={16} aria-hidden />,
+  "UI & Styling": <Palette size={16} aria-hidden />,
   "State & Data": <Database size={16} aria-hidden />,
-  "Styling & Motion": <Palette size={16} aria-hidden />,
-  Quality: <ShieldCheck size={16} aria-hidden />,
-  Tools: <Wrench size={16} aria-hidden />,
-  "Performance & SEO": <Gauge size={16} aria-hidden />,
+  "AI Assistants": <Bot size={16} aria-hidden />,
+  "Dev Tools": <Terminal size={16} aria-hidden />,
+  "Version Control": <GitBranch size={16} aria-hidden />,
 };
 
 export function StackGroupCard({ title, items }: StackGroupCardProps) {

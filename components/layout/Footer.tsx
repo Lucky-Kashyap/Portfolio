@@ -109,6 +109,9 @@ export function Footer() {
             <Text tone="muted" size="sm" className="mt-1">
               Based in {site.location} · © {year} {site.brand}
             </Text>
+            <p className="mt-1.5 text-[11px] tracking-[0.08em] text-text-tertiary">
+              {site.builtWith}
+            </p>
           </div>
 
           <div data-footer-item>

@@ -3,7 +3,12 @@
 import { useRef, useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useGSAP } from "@gsap/react";
-import { Button, Container, AvatarVideoFrame } from "@/components/ui";
+import {
+  AvailabilityBadge,
+  Button,
+  Container,
+  AvatarVideoFrame,
+} from "@/components/ui";
 import { AvatarSlot } from "@/components/avatar/AvatarScrollStage";
 import { SocialMagneticIcons } from "@/components/motion/SocialMagneticIcons";
 import { HeroScene } from "@/components/three/HeroScene";
@@ -312,6 +317,10 @@ export function Hero() {
             </div>
 
             <HeroSummary reduced={reduced} />
+
+            <div data-hero-intro className="mt-4">
+              <AvailabilityBadge size="sm" />
+            </div>
 
             <div className="mt-5 flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row md:mt-6">
               <div data-hero-cta>

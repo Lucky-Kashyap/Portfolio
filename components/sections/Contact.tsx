@@ -12,6 +12,7 @@ import {
   Phone,
 } from "lucide-react";
 import {
+  AvailabilityBadge,
   Button,
   Container,
   Field,
@@ -26,7 +27,6 @@ import { ScrollWords } from "@/components/motion/ScrollHeading";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
 import { site } from "@/lib/content";
 import { cn } from "@/lib/utils";
-import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -98,8 +98,6 @@ export function Contact() {
     email: false,
     message: false,
   });
-  const reduced = usePrefersReducedMotion();
-
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
@@ -140,26 +138,14 @@ export function Contact() {
         <ScrollReveal>
           <div className="flex flex-wrap items-center gap-3">
             <Eyebrow className="mb-0">Contact</Eyebrow>
-            <span className="inline-flex items-center gap-2 rounded-full border border-border-muted bg-surface-raised px-2.5 py-1 text-[10px] font-semibold tracking-[0.14em] text-text-secondary uppercase">
-              <span
-                className={cn(
-                  "size-1.5 rounded-full bg-emerald-400",
-                  !reduced && "animate-pulse",
-                )}
-                aria-hidden
-              />
-              Available for work
-            </span>
           </div>
+          <AvailabilityBadge showDetail className="mt-3" />
           <ScrollWords
             id="contact-heading"
             as={2}
             text="Let's build something extraordinary together."
             className="mt-4 max-w-2xl"
           />
-          <Text tone="muted" className="mt-4 max-w-xl text-base leading-relaxed">
-            {site.connect}
-          </Text>
         </ScrollReveal>
 
         {/* Contact channels + form — stretch so bottoms align on desktop */}
@@ -272,7 +258,7 @@ export function Contact() {
                   Tell me about your project
                 </p>
                 <Text tone="muted" className="mt-1.5 text-sm leading-relaxed">
-                  I usually reply within 24–48 hours.
+                  Typically reply within 24 hours.
                 </Text>
               </div>
 
