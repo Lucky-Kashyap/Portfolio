@@ -81,55 +81,59 @@ function AboutAvatarVisual({ className }: { className?: string }) {
   return (
     <div className={cn("relative h-full w-full min-h-[22rem]", className)}>
       <div
-        className="pointer-events-none absolute -inset-4 z-0"
+        className="pointer-events-none absolute -inset-5 z-0"
         aria-hidden
       >
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_65%_at_50%_40%,rgba(232,196,124,0.16),transparent_70%)] blur-2xl" />
-        <div className="absolute inset-0 animate-avatar-glow-pulse motion-reduce:animate-none bg-[radial-gradient(ellipse_40%_50%_at_70%_30%,rgba(125,211,252,0.14),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_58%_68%_at_48%_38%,rgba(232,196,124,0.2),transparent_68%)] blur-2xl" />
+        <div className="absolute inset-0 animate-avatar-glow-pulse motion-reduce:animate-none bg-[radial-gradient(ellipse_42%_52%_at_72%_28%,rgba(125,211,252,0.18),transparent_68%)]" />
       </div>
 
-      <figure className="@container relative z-[1] h-full min-h-[22rem] w-full overflow-hidden rounded-[1.4rem] border border-border-muted bg-[#05070c] shadow-[0_24px_60px_rgba(0,0,0,0.45)]">
-        {/*
-          CREATIVE was clipping because fontSize used 22cqw — on a wide card
-          that made glyphs taller than the frame, then overflow-hidden cut the tops.
-        */}
+      <figure className="@container relative z-[1] h-full min-h-[22rem] w-full overflow-hidden rounded-[1.4rem] border border-white/10 bg-[#03050a] shadow-[0_28px_70px_rgba(0,0,0,0.55)]">
+        {/* Soft dual-rim field behind the portrait */}
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 z-0 flex justify-center px-3 pt-5"
+          className="pointer-events-none absolute inset-0 z-0"
           aria-hidden
         >
-          <span
-            className="w-full select-none text-center font-semibold tracking-[-0.05em] text-transparent uppercase"
-            style={{
-              fontSize: "clamp(1.7rem, 10.5cqw, 3.4rem)",
-              WebkitTextStroke: "1.5px rgba(125, 211, 252, 0.92)",
-              textShadow:
-                "0 0 22px rgba(125, 211, 252, 0.38), 0 0 44px rgba(125, 211, 252, 0.18)",
-              lineHeight: 1,
-            }}
-          >
-            CREATIVE
-          </span>
+          <div className="absolute -left-8 top-1/4 size-40 rounded-full bg-[radial-gradient(circle,rgba(125,211,252,0.22),transparent_70%)] blur-2xl" />
+          <div className="absolute -right-6 top-[18%] size-36 rounded-full bg-[radial-gradient(circle,rgba(232,196,124,0.2),transparent_70%)] blur-2xl" />
         </div>
 
         <motion.div
           className="absolute inset-0 z-[1]"
-          animate={reduced ? undefined : { y: [0, -3, 0] }}
+          animate={reduced ? undefined : { y: [0, -4, 0] }}
           transition={
             reduced
               ? undefined
-              : { duration: 5.5, repeat: Infinity, ease: "easeInOut" }
+              : { duration: 5.8, repeat: Infinity, ease: "easeInOut" }
           }
         >
           <Image
-            src={`${site.aboutVisual}?v=face`}
-            alt={`${site.brand} — stylized AI avatar with CREATIVE backdrop`}
+            src={`${site.aboutVisual}?v=ai-real-2`}
+            alt={`${site.brand} — photoreal AI avatar`}
             fill
-            className="object-cover object-[50%_55%] mix-blend-lighten"
+            className="object-cover object-[50%_22%] sm:object-[50%_20%] [filter:contrast(1.05)_saturate(1.08)_brightness(1.02)]"
             sizes="(min-width: 1024px) 36vw, 90vw"
-            quality={92}
+            quality={95}
             priority
           />
         </motion.div>
+
+        {/* Face-first lighting: keep skin natural, add cinematic depth */}
+        <div
+          className="pointer-events-none absolute inset-0 z-[2]"
+          aria-hidden
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_50%_32%,transparent_35%,rgba(3,5,10,0.28)_100%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-[#03050a] via-[#03050a]/55 to-transparent" />
+          <div className="absolute inset-y-0 left-0 w-[18%] bg-gradient-to-r from-[rgba(125,211,252,0.1)] to-transparent" />
+          <div className="absolute inset-y-0 right-0 w-[18%] bg-gradient-to-l from-[rgba(232,196,124,0.1)] to-transparent" />
+        </div>
+
+        <div
+          className="pointer-events-none absolute inset-0 z-[3] rounded-[1.4rem] ring-1 ring-inset ring-white/10"
+          aria-hidden
+        />
+
         <AboutHelpTicker reduced={reduced} />
       </figure>
     </div>

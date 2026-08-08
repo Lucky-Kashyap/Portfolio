@@ -31,7 +31,7 @@ function CertSnapCard({
   const totalLabel = String(total).padStart(2, "0");
 
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-[16px] border border-border-muted bg-[#0a0e14] transition-[border-color,box-shadow] duration-fast hover:border-accent-cyan/40 hover:shadow-soft">
+    <article className="flex h-full flex-col overflow-hidden rounded-[16px] border border-border-muted bg-[#0a0e14] surface-hover transition-[border-color,box-shadow,transform] duration-normal ease-standard hover:border-accent-cyan/70 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.28),0_18px_50px_rgba(3,6,11,0.55)]">
       <div className="relative aspect-[4/3] bg-[#f4f6f8] p-2">
         <div className="relative h-full w-full">
           {cert.image ? (
@@ -217,7 +217,7 @@ function PerspectivePanel({
             </div>
 
             {/* Full certificate visible — contain, no crop, no overlay */}
-            <div className="relative mx-auto h-[min(52vh,420px)] w-full max-w-2xl overflow-hidden rounded-[16px] border border-border-muted bg-[#f4f6f8] p-3 shadow-card transition-[border-color,box-shadow] duration-fast hover:border-accent-cyan/40 hover:shadow-soft sm:h-[min(58vh,480px)] sm:p-4 lg:mx-0 lg:h-[min(62vh,520px)]">
+            <div className="relative mx-auto h-[min(52vh,420px)] w-full max-w-2xl overflow-hidden rounded-[16px] border border-border-muted bg-[#f4f6f8] p-3 shadow-card surface-hover transition-[border-color,box-shadow,transform] duration-normal ease-standard hover:border-accent-cyan/70 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.28),0_18px_50px_rgba(3,6,11,0.55)] sm:h-[min(58vh,480px)] sm:p-4 lg:mx-0 lg:h-[min(62vh,520px)]">
               <div className="relative h-full w-full">
                 {cert.image ? (
                   <Image

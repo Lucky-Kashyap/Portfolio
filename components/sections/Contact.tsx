@@ -66,7 +66,7 @@ function ContactChannel({
       className={cn(
         "group flex items-center gap-2.5 rounded-sm border border-border-muted bg-surface-raised px-3 py-2.5 no-underline",
         "transition-[border-color,background-color] duration-fast",
-        "hover:border-accent-cyan/40 hover:bg-surface-muted",
+        "transition-[border-color,background-color,box-shadow] duration-normal ease-standard hover:border-accent-cyan/70 hover:bg-surface-muted hover:shadow-[0_0_0_1px_rgba(125,211,252,0.22)]",
       )}
     >
       <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-xs border border-border-muted bg-surface-muted text-text-primary">

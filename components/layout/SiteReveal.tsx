@@ -12,7 +12,7 @@ type SiteRevealProps = {
 
 /**
  * Reveals the main site once PageLoader fires `portfolio:ready`.
- * Keeps content mounted (for SEO / preload) but hidden until ready.
+ * Carpet-style clip unveil — content unrolls into view under the loader wipe.
  */
 export function SiteReveal({ children, className }: SiteRevealProps) {
   const reduced = usePrefersReducedMotion();
@@ -26,7 +26,8 @@ export function SiteReveal({ children, className }: SiteRevealProps) {
 
     const onReady = () => setReady(true);
     window.addEventListener("portfolio:ready", onReady);
-    const fallback = window.setTimeout(() => setReady(true), 4500);
+    // Match PageLoader worst-case: load + hold + exit + buffer
+    const fallback = window.setTimeout(() => setReady(true), 9500);
 
     return () => {
       window.removeEventListener("portfolio:ready", onReady);
@@ -40,17 +41,29 @@ export function SiteReveal({ children, className }: SiteRevealProps) {
 
   return (
     <motion.div
-      className={cn("will-change-transform", className)}
-      initial={{ opacity: 0, y: 28, filter: "blur(10px)" }}
+      className={cn("will-change-[clip-path,opacity,filter]", className)}
+      initial={{
+        opacity: 0.65,
+        filter: "blur(8px)",
+        clipPath: "inset(100% 0 0 0)",
+      }}
       animate={
         ready
-          ? { opacity: 1, y: 0, filter: "blur(0px)" }
-          : { opacity: 0, y: 28, filter: "blur(10px)" }
+          ? {
+              opacity: 1,
+              filter: "blur(0px)",
+              clipPath: "inset(0% 0 0 0)",
+            }
+          : {
+              opacity: 0.65,
+              filter: "blur(8px)",
+              clipPath: "inset(100% 0 0 0)",
+            }
       }
       transition={{
-        duration: 0.95,
-        delay: ready ? 0.08 : 0,
-        ease: [0.22, 1, 0.36, 1],
+        duration: 1.15,
+        delay: ready ? 0.04 : 0,
+        ease: [0.76, 0, 0.24, 1],
       }}
     >
       {children}

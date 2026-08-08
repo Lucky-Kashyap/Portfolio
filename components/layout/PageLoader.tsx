@@ -5,7 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { site } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
-/** About-me status beats — longer loader so each line can land clearly */
+/** Status beats — paced so each line can land clearly */
 const STATUS_LINES = [
   "READYING SYSTEMS…",
   `MEET ${site.brand.toUpperCase()}`,
@@ -19,20 +19,21 @@ const STATUS_LINES = [
   "CREATIVE EXPERIENCES — READY",
 ] as const;
 
-/** Bottom bar phase labels (appealing progress copy) */
 const PHASE_LABELS = [
-  { until: 0.18, label: "Readying" },
-  { until: 0.38, label: "Loading assets" },
-  { until: 0.58, label: "Creative Experiences" },
-  { until: 0.78, label: "Syncing portfolio" },
-  { until: 0.92, label: "Finalizing" },
+  { until: 0.16, label: "Readying" },
+  { until: 0.36, label: "Loading assets" },
+  { until: 0.56, label: "Creative Experiences" },
+  { until: 0.76, label: "Syncing portfolio" },
+  { until: 0.9, label: "Finalizing" },
   { until: 1.01, label: "Almost there" },
 ] as const;
 
-/** Longer climb — more time to read about-me lines */
-const LOAD_MS = 7800;
-const HOLD_AT_100_MS = 520;
-const EXIT_MS = 950;
+/** Steady climb — not a fast ease-out spike */
+const LOAD_MS = 6200;
+const HOLD_AT_100_MS = 640;
+const EXIT_MS = 1200;
+/** How often the visible integer may tick (+1 max) — keeps rolling digits calm */
+const TICK_MS = 48;
 
 const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"] as const;
 
@@ -56,14 +57,21 @@ function phaseLabelFor(t: number): PhaseLabel {
   return PHASE_LABELS[PHASE_LABELS.length - 1].label;
 }
 
-/** Soft ease — never snaps early to 100 */
-function easeOutQuart(t: number) {
-  return 1 - Math.pow(1 - t, 4);
+/** Smooth S-curve — calm start, steady middle, soft landing at 100 */
+function easeInOutQuint(t: number) {
+  const x = Math.min(1, Math.max(0, t));
+  return x < 0.5
+    ? 16 * x * x * x * x * x
+    : 1 - Math.pow(-2 * x + 2, 5) / 2;
+}
+
+function clampPercent(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(100, Math.max(0, value));
 }
 
 /**
- * Govind-style rolling digit column — strip of 0–9 slides to the active digit.
- * Tween (not spring) so digits never overshoot past the target (e.g. 100 → 155).
+ * Rolling digit — snaps on big jumps so mid-tweens never invent values like 155%.
  */
 function RollingDigit({
   value,
@@ -73,6 +81,11 @@ function RollingDigit({
   className?: string;
 }) {
   const digit = ((Math.trunc(value) % 10) + 10) % 10;
+  const prevRef = useRef(digit);
+  const jump = Math.abs(digit - prevRef.current);
+  useEffect(() => {
+    prevRef.current = digit;
+  }, [digit]);
 
   return (
     <span
@@ -85,7 +98,10 @@ function RollingDigit({
       <motion.span
         className="absolute inset-x-0 top-0 flex flex-col items-center will-change-transform"
         animate={{ y: `${-digit}em` }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        transition={{
+          duration: jump > 2 ? 0 : 0.32,
+          ease: [0.22, 1, 0.36, 1],
+        }}
       >
         {DIGITS.map((d) => (
           <span
@@ -98,11 +114,6 @@ function RollingDigit({
       </motion.span>
     </span>
   );
-}
-
-function clampPercent(value: number) {
-  if (!Number.isFinite(value)) return 0;
-  return Math.min(100, Math.max(0, value));
 }
 
 function RollingPercent({ value }: { value: number }) {
@@ -143,12 +154,18 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
   const [phase, setPhase] = useState<"loading" | "exiting" | "done">(
     reduceMotion ? "done" : "loading",
   );
+  /** Visible integer 0–100 only — never mid-digit garbage */
   const [progress, setProgress] = useState(0);
   const [statusIndex, setStatusIndex] = useState(0);
-  const [phaseLabel, setPhaseLabel] = useState<PhaseLabel>(PHASE_LABELS[0].label);
+  const [phaseLabel, setPhaseLabel] = useState<PhaseLabel>(
+    PHASE_LABELS[0].label,
+  );
   const year = useMemo(() => new Date().getFullYear(), []);
   const initials = useMemo(() => brandInitials(site.brand), []);
   const completedRef = useRef(false);
+  const displayRef = useRef(0);
+  const targetRef = useRef(0);
+  const lastTickRef = useRef(0);
 
   useEffect(() => {
     if (reduceMotion) {
@@ -165,11 +182,9 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
 
     const tick = (now: number) => {
       const t = Math.min(1, (now - started) / LOAD_MS);
-      const eased = easeOutQuart(t);
-      const next = clampPercent(eased * 100);
-      setProgress(next);
+      const eased = easeInOutQuint(t);
+      targetRef.current = clampPercent(eased * 100);
       setPhaseLabel(phaseLabelFor(t));
-
       setStatusIndex(
         Math.min(
           STATUS_LINES.length - 1,
@@ -177,7 +192,19 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
         ),
       );
 
-      if (t < 1) {
+      // Monotonic integer crawl — at most +1 per TICK_MS so rollers stay smooth
+      if (now - lastTickRef.current >= TICK_MS) {
+        lastTickRef.current = now;
+        const targetInt = Math.min(100, Math.floor(targetRef.current));
+        // After the clock finishes, keep easing the visible % up to 100 one step at a time
+        const goal = t >= 1 ? 100 : targetInt;
+        if (displayRef.current < goal) {
+          displayRef.current = Math.min(100, displayRef.current + 1);
+          setProgress(displayRef.current);
+        }
+      }
+
+      if (t < 1 || displayRef.current < 100) {
         frame = requestAnimationFrame(tick);
       } else {
         setProgress(100);
@@ -220,25 +247,35 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
   const displayProgress = clampPercent(progress);
   const pctLabel = String(Math.round(displayProgress)).padStart(3, "0");
   const barWidth = `${displayProgress}%`;
+  const exiting = phase === "exiting";
 
   return (
     <motion.div
       className={cn(
         "fixed inset-0 z-[100] overflow-hidden bg-surface-base text-text-primary",
-        phase === "exiting" && "pointer-events-none",
+        exiting && "pointer-events-none",
       )}
       role="status"
       aria-live="polite"
       aria-busy="true"
       aria-label={`Loading portfolio ${pctLabel} percent. ${STATUS_LINES[statusIndex]}`}
-      initial={{ opacity: 1 }}
+      initial={false}
       animate={
-        phase === "exiting"
-          ? { opacity: 0, y: -28, filter: "blur(12px)" }
-          : { opacity: 1, y: 0, filter: "blur(0px)" }
+        exiting
+          ? {
+              clipPath: "inset(0 0 100% 0)",
+            }
+          : {
+              clipPath: "inset(0 0 0% 0)",
+            }
       }
-      transition={{ duration: EXIT_MS / 1000, ease: [0.22, 1, 0.36, 1] }}
+      transition={{
+        duration: EXIT_MS / 1000,
+        ease: [0.76, 0, 0.24, 1],
+      }}
+      style={{ clipPath: "inset(0 0 0% 0)" }}
     >
+      {/* Soft atmosphere */}
       <div
         className="pointer-events-none absolute inset-0"
         aria-hidden
@@ -256,6 +293,41 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
           backgroundSize: "56px 56px",
         }}
       />
+
+      {/* Shimmer veil — carpet sheen while loading */}
+      <motion.div
+        className="pointer-events-none absolute inset-0 z-[1] opacity-40"
+        aria-hidden
+        style={{
+          background:
+            "linear-gradient(105deg, transparent 35%, rgba(125,211,252,0.14) 48%, rgba(255,255,255,0.1) 50%, rgba(125,211,252,0.14) 52%, transparent 65%)",
+          backgroundSize: "220% 100%",
+        }}
+        animate={{ backgroundPosition: ["120% 0%", "-40% 0%"] }}
+        transition={{
+          duration: 2.4,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+      />
+
+      {/* Carpet edge highlight during exit */}
+      <AnimatePresence>
+        {exiting ? (
+          <motion.div
+            key="carpet-edge"
+            className="pointer-events-none absolute inset-x-0 z-[30] h-px bg-gradient-to-r from-transparent via-accent-cyan to-transparent"
+            initial={{ top: "0%", opacity: 0.9 }}
+            animate={{ top: "100%", opacity: 0.35 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              duration: EXIT_MS / 1000,
+              ease: [0.76, 0, 0.24, 1],
+            }}
+            aria-hidden
+          />
+        ) : null}
+      </AnimatePresence>
 
       <div className="absolute inset-x-0 top-0 z-20 flex items-start justify-between px-5 pt-5 md:px-8 md:pt-7">
         <motion.p
@@ -286,8 +358,11 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
       <div className="relative z-10 flex h-full flex-col items-center justify-center px-6">
         <motion.div
           initial={{ opacity: 0, y: 36 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+          animate={{
+            opacity: exiting ? 0 : 1,
+            y: exiting ? -24 : 0,
+          }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
           <RollingPercent value={displayProgress} />
         </motion.div>
@@ -300,7 +375,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
                 initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
-                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                 className="text-center text-sm font-semibold tracking-[0.18em] text-white uppercase sm:text-base md:text-lg md:tracking-[0.2em]"
               >
                 {STATUS_LINES[statusIndex]}
@@ -311,7 +386,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
               aria-hidden
               animate={{ opacity: [1, 0.25, 1] }}
               transition={{
-                duration: 0.75,
+                duration: 0.9,
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
@@ -325,15 +400,29 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
       </div>
 
       <div className="absolute inset-x-0 bottom-0 z-20 px-5 pb-9 md:px-10 md:pb-11">
-        <div className="relative h-[2px] w-full rounded-full bg-white/15">
+        <div className="relative h-[2px] w-full overflow-hidden rounded-full bg-white/15">
           <motion.div
             className="absolute inset-y-0 left-0 rounded-full bg-accent-cyan"
-            style={{ width: barWidth }}
+            animate={{ width: barWidth }}
+            transition={{ duration: 0.18, ease: "linear" }}
             aria-hidden
+          />
+          {/* Progress shimmer */}
+          <motion.div
+            className="pointer-events-none absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/50 to-transparent"
+            aria-hidden
+            animate={{ left: ["-35%", "110%"] }}
+            transition={{
+              duration: 1.6,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
           />
           <motion.div
             className="absolute top-1/2 size-2.5 -translate-y-1/2 rounded-full bg-white shadow-[0_0_18px_5px_rgba(125,211,252,0.9)]"
-            style={{ left: barWidth, marginLeft: "-5px" }}
+            animate={{ left: barWidth }}
+            transition={{ duration: 0.18, ease: "linear" }}
+            style={{ marginLeft: "-5px" }}
             aria-hidden
           />
         </div>
@@ -344,7 +433,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.28 }}
+              transition={{ duration: 0.32 }}
               className="text-xs font-semibold tracking-[0.16em] text-white uppercase sm:text-sm md:tracking-[0.2em]"
             >
               {phaseLabel}

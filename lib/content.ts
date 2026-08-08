@@ -45,7 +45,7 @@ export const site = {
   heroAvatarPoster: "/media/hero-avatar-poster.jpg",
   /** Face + upper torso crop — leave room for gesture/hand in frame */
   heroAvatarObjectPosition: "50% 22%",
-  /** About section — stylized AI avatar (face-based, not the hero suit clip) */
+  /** About section — photoreal AI avatar portrait */
   aboutVisual: "/about/about-ai-avatar.png",
   /** Photo avatar (meta / OG) */
   avatar: "/profile/divyanshu-kashyap-frontend-developer-jaipur.webp",

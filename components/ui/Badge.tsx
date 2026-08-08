@@ -31,11 +31,13 @@ function Chip({
 
   return (
     <motion.li
+      data-cursor="hover"
       className={cn(
         "rounded-xs border border-border-muted bg-surface-raised will-change-transform",
-        "transition-[border-color,box-shadow,background-color] duration-fast",
-        "hover:border-accent-cyan/45 hover:bg-surface-muted hover:shadow-soft",
-        "focus-within:border-accent-cyan/45",
+        "transition-[border-color,box-shadow,background-color,color,transform] duration-normal ease-standard",
+        "hover:border-accent-cyan/75 hover:bg-surface-muted hover:text-text-primary",
+        "hover:shadow-[0_0_0_1px_rgba(125,211,252,0.3),0_8px_22px_rgba(3,6,11,0.35)]",
+        "focus-within:border-accent-cyan/75",
         sizeClass[size],
         className,
       )}

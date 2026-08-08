@@ -181,7 +181,7 @@ export function Faq() {
                       "overflow-hidden border transition-[border-color,background-color] duration-fast",
                       isOpen
                         ? "border-accent-cyan/40 bg-surface-raised"
-                        : "border-border-muted bg-surface-raised/40 hover:border-accent-cyan/40",
+                        : "border-border-muted bg-surface-raised/40 transition-[border-color,box-shadow,background-color] duration-normal ease-standard hover:border-accent-cyan/70 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.22)]",
                     )}
                   >
                     <h3 className="m-0">

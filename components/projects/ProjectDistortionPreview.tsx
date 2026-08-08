@@ -265,7 +265,9 @@ export function ProjectDistortionPreview({
           alpha: true,
           powerPreference: "high-performance",
         }}
-        style={{ width: "100%", height: "100%" }}
+        // Parent uses pointer-events-none, but R3F canvas defaults to auto and
+        // re-enables hit-testing — that ghost overlay blocked About skill chips.
+        style={{ width: "100%", height: "100%", pointerEvents: "none" }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
         }}

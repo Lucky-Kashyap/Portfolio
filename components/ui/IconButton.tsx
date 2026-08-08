@@ -17,9 +17,9 @@ type IconButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variantClass: Record<IconButtonVariant, string> = {
   ghost:
-    "border border-border-muted bg-transparent text-text-primary transition-[background,border-color] duration-fast hover:bg-surface-raised hover:border-accent-cyan/40",
+    "border border-border-muted bg-transparent text-text-primary transition-[background,border-color,box-shadow] duration-normal ease-standard hover:bg-surface-raised hover:border-accent-cyan/70 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.2)]",
   raised:
-    "border border-border-muted bg-surface-raised text-text-primary shadow-card transition-[border-color,box-shadow] duration-fast hover:border-border-default hover:shadow-soft",
+    "border border-border-muted bg-surface-raised text-text-primary shadow-card transition-[border-color,box-shadow] duration-normal ease-standard hover:border-accent-cyan/70 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.22),0_12px_36px_rgba(3,6,11,0.4)]",
   primary:
     "bg-action-primary text-text-inverse shadow-soft transition-[background,box-shadow] duration-fast hover:bg-action-primary-hover hover:shadow-accent-lg",
 };

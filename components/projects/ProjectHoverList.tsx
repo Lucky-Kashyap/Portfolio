@@ -299,6 +299,7 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
               top: y,
               width: PREVIEW_W,
               height: PREVIEW_H,
+              pointerEvents: "none",
             }}
             initial={false}
             animate={{
@@ -310,7 +311,7 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
               scale: { type: "spring", stiffness: 320, damping: 26, mass: 0.55 },
             }}
           >
-            <div className="relative h-full w-full">
+            <div className="pointer-events-none relative h-full w-full">
               {previewSrc ? (
                 <Image
                   src={previewSrc}
@@ -318,7 +319,7 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
                   fill
                   sizes={`${PREVIEW_W}px`}
                   quality={90}
-                  className="object-contain object-center"
+                  className="pointer-events-none object-contain object-center"
                   priority={false}
                 />
               ) : null}
@@ -345,7 +346,7 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
                 aria-hidden
               />
               {active ? (
-                <p className="absolute right-3 bottom-3 left-3 truncate font-display text-xs font-bold tracking-tight text-text-primary drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)]">
+                <p className="pointer-events-none absolute right-3 bottom-3 left-3 truncate font-display text-xs font-bold tracking-tight text-text-primary drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)]">
                   {active.title}
                 </p>
               ) : null}
@@ -472,7 +473,7 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
                           }
                           animate={{ y: 0, opacity: 1, scale: 1 }}
                           transition={{ duration: 0.45, ease: EASE_OUT }}
-                          className="relative aspect-[16/10] overflow-hidden border border-border-muted bg-[#070b12] transition-[border-color,box-shadow] duration-fast hover:border-accent-cyan/40 hover:shadow-soft"
+                          className="relative aspect-[16/10] overflow-hidden border border-border-muted bg-[#070b12] surface-hover transition-[border-color,box-shadow,transform] duration-normal ease-standard hover:border-accent-cyan/70 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.28),0_18px_50px_rgba(3,6,11,0.55)]"
                         >
                           <Image
                             src={project.image}
@@ -500,16 +501,6 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
           })}
         </ul>
       </div>
-
-      {showDesktopHover ? (
-        <p className="mt-3 text-[11px] tracking-[0.14em] text-text-tertiary uppercase">
-          Hover a line to preview · click to open
-        </p>
-      ) : (
-        <p className="mt-3 text-[11px] tracking-[0.14em] text-text-tertiary uppercase">
-          Tap a project to expand
-        </p>
-      )}
     </div>
   );
 }
