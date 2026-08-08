@@ -95,18 +95,44 @@ export function InfoListCard({
       </div>
       <ul
         className={cn(
-          dense ? "mt-4 space-y-2.5" : "mt-5 space-y-2.5",
-          columns === 2 && "sm:grid sm:grid-cols-2 sm:gap-x-4 sm:gap-y-2.5 sm:space-y-0",
+          dense ? "mt-4 space-y-1" : "mt-5 space-y-1",
+          columns === 2 && "sm:grid sm:grid-cols-2 sm:gap-x-4 sm:gap-y-1 sm:space-y-0",
         )}
       >
         {items.map((item) => (
-          <li key={item} className="flex items-start gap-2.5">
-            <span className="mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full bg-surface-muted text-text-primary">
-              <Check size={12} strokeWidth={2.5} aria-hidden />
-            </span>
-            <Text tone="muted" size="sm" className="leading-snug">
-              {item}
-            </Text>
+          <li key={item}>
+            <div
+              data-cursor="hover"
+              className={cn(
+                "group/item flex items-start gap-2.5 rounded-xs px-2 py-1.5",
+                "-mx-2 transition-[transform,background-color,color] duration-normal ease-standard",
+                "hover:translate-x-1.5 hover:bg-accent-cyan/[0.06]",
+              )}
+            >
+              <span
+                className={cn(
+                  "mt-0.5 inline-flex size-5 shrink-0 items-center justify-center rounded-full",
+                  "bg-surface-muted text-text-primary",
+                  "transition-[background-color,color,box-shadow,transform] duration-normal ease-standard",
+                  "group-hover/item:scale-110 group-hover/item:bg-accent-cyan/15 group-hover/item:text-accent-cyan",
+                  "group-hover/item:shadow-[0_0_0_1px_rgba(125,211,252,0.45)]",
+                )}
+              >
+                <Check
+                  size={12}
+                  strokeWidth={2.5}
+                  aria-hidden
+                  className="transition-transform duration-normal ease-standard group-hover/item:scale-110"
+                />
+              </span>
+              <Text
+                tone="muted"
+                size="sm"
+                className="leading-snug transition-colors duration-normal ease-standard group-hover/item:text-text-primary"
+              >
+                {item}
+              </Text>
+            </div>
           </li>
         ))}
       </ul>
