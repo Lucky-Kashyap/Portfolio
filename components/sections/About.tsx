@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import Image from "next/image";
 import { useGSAP } from "@gsap/react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -77,9 +77,43 @@ function AboutHelpTicker({ reduced }: { reduced: boolean }) {
 
 function AboutAvatarVisual({ className }: { className?: string }) {
   const reduced = usePrefersReducedMotion();
+  const cardRef = useRef<HTMLElement>(null);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0, px: 0, py: 0 });
+  const [finePointer, setFinePointer] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: fine)");
+    const update = () => setFinePointer(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  const onMove = (event: MouseEvent<HTMLElement>) => {
+    if (reduced || !finePointer || !cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width; // 0–1
+    const y = (event.clientY - rect.top) / rect.height;
+    const nx = (x - 0.5) * 2; // -1–1
+    const ny = (y - 0.5) * 2;
+    setTilt({
+      rx: -ny * 9,
+      ry: nx * 11,
+      px: nx * 10,
+      py: ny * 8,
+    });
+  };
+
+  const onLeave = () => setTilt({ rx: 0, ry: 0, px: 0, py: 0 });
 
   return (
-    <div className={cn("relative h-full w-full min-h-[22rem]", className)}>
+    <div
+      className={cn(
+        "relative h-full w-full min-h-[22rem]",
+        "[perspective:1100px]",
+        className,
+      )}
+    >
       <div
         className="pointer-events-none absolute -inset-5 z-0"
         aria-hidden
@@ -88,8 +122,23 @@ function AboutAvatarVisual({ className }: { className?: string }) {
         <div className="absolute inset-0 animate-avatar-glow-pulse motion-reduce:animate-none bg-[radial-gradient(ellipse_42%_52%_at_72%_28%,rgba(125,211,252,0.18),transparent_68%)]" />
       </div>
 
-      <figure className="@container relative z-[1] h-full min-h-[22rem] w-full overflow-hidden rounded-[1.4rem] border border-white/10 bg-[#03050a] shadow-[0_28px_70px_rgba(0,0,0,0.55)]">
-        {/* Soft dual-rim field behind the portrait */}
+      <motion.figure
+        ref={cardRef}
+        onMouseMove={onMove}
+        onMouseLeave={onLeave}
+        data-cursor="hover"
+        className="@container relative z-[1] h-full min-h-[22rem] w-full overflow-hidden rounded-[1.4rem] border border-white/10 bg-[#03050a] shadow-[0_28px_70px_rgba(0,0,0,0.55)] transition-[border-color,box-shadow] duration-normal ease-standard will-change-transform hover:border-accent-cyan/55 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.28),0_28px_70px_rgba(3,6,11,0.55)]"
+        style={{ transformStyle: "preserve-3d" }}
+        animate={
+          reduced
+            ? undefined
+            : {
+                rotateX: tilt.rx,
+                rotateY: tilt.ry,
+                transition: { type: "spring", stiffness: 220, damping: 22, mass: 0.45 },
+              }
+        }
+      >
         <div
           className="pointer-events-none absolute inset-0 z-0"
           aria-hidden
@@ -99,34 +148,48 @@ function AboutAvatarVisual({ className }: { className?: string }) {
         </div>
 
         <motion.div
-          className="absolute inset-0 z-[1]"
-          animate={reduced ? undefined : { y: [0, -4, 0] }}
-          transition={
+          className="absolute inset-[-6%] z-[1]"
+          animate={
             reduced
               ? undefined
-              : { duration: 5.8, repeat: Infinity, ease: "easeInOut" }
+              : {
+                  x: tilt.px,
+                  y: tilt.py,
+                  transition: {
+                    type: "spring",
+                    stiffness: 180,
+                    damping: 24,
+                    mass: 0.4,
+                  },
+                }
           }
         >
           <Image
-            src={`${site.aboutVisual}?v=ai-real-2`}
+            src={`${site.aboutVisual}?v=ai-sharp-3`}
             alt={`${site.brand} — photoreal AI avatar`}
             fill
-            className="object-cover object-[50%_22%] sm:object-[50%_20%] [filter:contrast(1.05)_saturate(1.08)_brightness(1.02)]"
+            className="object-cover object-[50%_18%] [filter:contrast(1.06)_saturate(1.1)_brightness(1.03)]"
             sizes="(min-width: 1024px) 36vw, 90vw"
-            quality={95}
+            quality={100}
             priority
           />
         </motion.div>
 
-        {/* Face-first lighting: keep skin natural, add cinematic depth */}
         <div
           className="pointer-events-none absolute inset-0 z-[2]"
           aria-hidden
         >
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_50%_32%,transparent_35%,rgba(3,5,10,0.28)_100%)]" />
-          <div className="absolute inset-x-0 bottom-0 h-[42%] bg-gradient-to-t from-[#03050a] via-[#03050a]/55 to-transparent" />
-          <div className="absolute inset-y-0 left-0 w-[18%] bg-gradient-to-r from-[rgba(125,211,252,0.1)] to-transparent" />
-          <div className="absolute inset-y-0 right-0 w-[18%] bg-gradient-to-l from-[rgba(232,196,124,0.1)] to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_50%_32%,transparent_35%,rgba(3,5,10,0.22)_100%)]" />
+          <div className="absolute inset-x-0 bottom-0 h-[38%] bg-gradient-to-t from-[#03050a] via-[#03050a]/50 to-transparent" />
+          <div className="absolute inset-y-0 left-0 w-[16%] bg-gradient-to-r from-[rgba(125,211,252,0.12)] to-transparent" />
+          <div className="absolute inset-y-0 right-0 w-[16%] bg-gradient-to-l from-[rgba(232,196,124,0.12)] to-transparent" />
+          {/* Specular highlight follows tilt */}
+          <div
+            className="absolute inset-0 opacity-55 transition-[background] duration-200"
+            style={{
+              background: `radial-gradient(circle at ${50 + tilt.ry * 2.2}% ${28 + tilt.rx * -1.8}%, rgba(255,255,255,0.14), transparent 42%)`,
+            }}
+          />
         </div>
 
         <div
@@ -135,7 +198,7 @@ function AboutAvatarVisual({ className }: { className?: string }) {
         />
 
         <AboutHelpTicker reduced={reduced} />
-      </figure>
+      </motion.figure>
     </div>
   );
 }
