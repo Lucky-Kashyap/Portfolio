@@ -99,8 +99,12 @@ export function AvatarScrollStage() {
       height: number,
       opacity: number,
     ) => {
-      frame.style.transform = `translate3d(${roundPx(left)}px, ${roundPx(top)}px, 0)`;
-      frame.style.width = `${roundPx(width)}px`;
+      // Clamp to the layout viewport so narrow phones never clip the frame
+      const vw = window.innerWidth || width;
+      const safeW = Math.min(Math.max(width, 0), vw);
+      const safeL = Math.max(0, Math.min(left, vw - safeW));
+      frame.style.transform = `translate3d(${roundPx(safeL)}px, ${roundPx(top)}px, 0)`;
+      frame.style.width = `${roundPx(safeW)}px`;
       frame.style.height = `${roundPx(height)}px`;
       frame.style.opacity = String(opacity);
       frame.style.visibility = opacity > 0.02 ? "visible" : "hidden";

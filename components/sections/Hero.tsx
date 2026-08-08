@@ -179,7 +179,15 @@ export function Hero() {
       gsap.set(nameRef.current, { opacity: 1 });
       gsap.set(ctas, { opacity: 0, y: 14 });
       gsap.set(social, { opacity: 0, y: 12 });
-      gsap.set(avatar, { opacity: 0, y: 28, scale: 0.94 });
+      // Force x/xPercent to 0 — leftover -translate-x-1/2 from older full-bleed
+      // styles can stick in GSAP's transform cache and clip the video on narrow phones.
+      gsap.set(avatar, {
+        opacity: 0,
+        y: 28,
+        scale: 0.94,
+        x: 0,
+        xPercent: 0,
+      });
 
       tl.to(bgRef.current, { opacity: 1, duration: 0.7 }, 0)
         .to(
@@ -188,7 +196,11 @@ export function Hero() {
           0.05,
         )
         .to(intro, { opacity: 1, y: 0, duration: 0.5, stagger: 0.07 }, 0.1)
-        .to(avatar, { opacity: 1, y: 0, scale: 1, duration: 0.9 }, 0.15)
+        .to(
+          avatar,
+          { opacity: 1, y: 0, scale: 1, x: 0, xPercent: 0, duration: 0.9 },
+          0.15,
+        )
         .to(ctas, { opacity: 1, y: 0, duration: 0.45, stagger: 0.08 }, 0.48)
         .to(social, { opacity: 1, y: 0, duration: 0.35, stagger: 0.04 }, 0.62);
 
@@ -334,15 +346,12 @@ export function Hero() {
             />
           </div>
 
-          {/* Mobile: full-bleed; desktop: stretch to match copy height */}
+          {/* Mobile: stay inside container (avoid 100vw breakout clipping); desktop: stretch */}
           <div
             data-hero-avatar
-            className={cn(
-              "order-1 flex w-full items-stretch justify-center lg:order-2 lg:h-auto lg:min-h-0 lg:justify-end",
-              "max-lg:relative max-lg:left-1/2 max-lg:w-screen max-lg:max-w-[100vw] max-lg:-translate-x-1/2",
-            )}
+            className="order-1 flex w-full min-w-0 items-stretch justify-center lg:order-2 lg:h-auto lg:min-h-0 lg:justify-end"
           >
-            <div className="relative w-full lg:h-full lg:max-w-none lg:pl-2 xl:pl-4">
+            <div className="relative w-full min-w-0 lg:h-full lg:max-w-none lg:pl-2 xl:pl-4">
               {/* Warm rim light around the figure */}
               <div
                 className="pointer-events-none absolute -inset-6 z-0 hidden lg:block"
@@ -352,7 +361,7 @@ export function Hero() {
                 <div className="absolute inset-0 animate-avatar-glow-pulse bg-[radial-gradient(ellipse_40%_45%_at_75%_30%,rgba(125,211,252,0.16),transparent_70%)]" />
               </div>
 
-              <div className="relative z-[1] h-full w-full">
+              <div className="relative z-[1] h-full w-full min-w-0">
                 {reduced ? (
                   <AvatarVideoFrame
                     src={site.heroAvatarVideo}
@@ -365,7 +374,7 @@ export function Hero() {
                 ) : (
                   <AvatarSlot
                     id="hero"
-                    className="mx-auto h-full w-full max-lg:max-h-[min(42svh,340px)]"
+                    className="mx-auto h-full w-full min-w-0 max-lg:max-h-[min(42svh,340px)]"
                   >
                     <div className="aspect-[5/4] w-full min-[400px]:aspect-[4/5] lg:aspect-auto lg:h-full lg:min-h-[26rem]" />
                   </AvatarSlot>
