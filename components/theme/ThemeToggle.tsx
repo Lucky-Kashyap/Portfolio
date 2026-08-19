@@ -21,7 +21,7 @@ export function ThemeToggle({ className, size = "md" }: ThemeToggleProps) {
   return (
     <IconButton
       className={cn(
-        "group relative !size-7 !min-h-7 !min-w-7 text-text-tertiary hover:text-accent-cyan",
+        "group relative !size-7 !min-h-7 !min-w-7 border-border-muted text-text-secondary hover:border-accent-cyan/70 hover:text-accent-cyan",
         className,
       )}
       size={size}

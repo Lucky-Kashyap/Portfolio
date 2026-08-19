@@ -44,7 +44,7 @@ function TopLink({
         {...(external
           ? { target: "_blank", rel: "noopener noreferrer" }
           : undefined)}
-        className="group relative inline-flex size-7 items-center justify-center rounded-full text-text-tertiary transition-colors duration-fast hover:text-accent-cyan"
+        className="group relative inline-flex size-7 items-center justify-center rounded-full text-text-secondary transition-colors duration-fast hover:text-accent-cyan"
       >
         {children}
         <span className="pointer-events-none absolute top-[calc(100%+8px)] left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-xs border border-border-muted bg-surface-base px-2 py-1 text-[10px] font-medium tracking-[0.14em] text-text-secondary uppercase opacity-0 shadow-soft transition-opacity duration-fast group-hover:opacity-100 group-focus-visible:opacity-100">
@@ -144,7 +144,7 @@ export function Header() {
         {/* Slim contact strip — never a heavy full-bleed bar */}
         <div
           className={cn(
-            "pointer-events-auto transition-[background,backdrop-filter,border-color] duration-normal",
+            "header-strip pointer-events-auto transition-[background,backdrop-filter,border-color] duration-normal",
             scrolled
               ? "border-b border-border-muted/60 bg-surface-base/40 backdrop-blur-sm"
               : "border-b border-transparent bg-transparent",
@@ -155,25 +155,25 @@ export function Header() {
               <a
                 href={mailHref}
                 data-cursor="hover"
-                className="inline-flex max-w-[42vw] items-center gap-1.5 truncate text-[11px] text-text-tertiary transition-colors duration-fast hover:text-accent-cyan sm:max-w-none"
+                className="inline-flex max-w-[42vw] items-center gap-1.5 truncate text-[11px] text-text-secondary transition-colors duration-fast hover:text-accent-cyan sm:max-w-none"
                 aria-label="Email"
               >
-                <Mail size={12} className="shrink-0 opacity-80" aria-hidden />
+                <Mail size={12} className="shrink-0" aria-hidden />
                 <span className="truncate">{site.email}</span>
               </a>
               <a
                 href={phoneHref}
                 data-cursor="hover"
-                className="hidden items-center gap-1.5 text-[11px] text-text-tertiary transition-colors duration-fast hover:text-accent-cyan sm:inline-flex"
+                className="hidden items-center gap-1.5 text-[11px] text-text-secondary transition-colors duration-fast hover:text-accent-cyan sm:inline-flex"
                 aria-label="Phone"
               >
-                <Phone size={12} className="shrink-0 opacity-80" aria-hidden />
+                <Phone size={12} className="shrink-0" aria-hidden />
                 <span>+91 {site.phone}</span>
               </a>
               <a
                 href={phoneHref}
                 data-cursor="hover"
-                className="inline-flex size-7 items-center justify-center text-text-tertiary transition-colors duration-fast hover:text-accent-cyan sm:hidden"
+                className="inline-flex size-7 items-center justify-center text-text-secondary transition-colors duration-fast hover:text-accent-cyan sm:hidden"
                 aria-label="Call"
               >
                 <Phone size={13} aria-hidden />
