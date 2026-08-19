@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
+import { PORTFOLIO_READY_EVENT, BOOT_SAFETY_MS } from "@/lib/boot";
 import { cn } from "@/lib/utils";
 
 type SiteRevealProps = {
@@ -12,7 +13,7 @@ type SiteRevealProps = {
 
 /**
  * Reveals the main site once PageLoader fires `portfolio:ready`.
- * Carpet-style clip unveil — content unrolls into view under the loader wipe.
+ * Opacity-only — clip/blur on the whole page stutters on mobile GPUs.
  */
 export function SiteReveal({ children, className }: SiteRevealProps) {
   const reduced = usePrefersReducedMotion();
@@ -25,12 +26,11 @@ export function SiteReveal({ children, className }: SiteRevealProps) {
     }
 
     const onReady = () => setReady(true);
-    window.addEventListener("portfolio:ready", onReady);
-    // Match PageLoader worst-case: load + hold + exit + buffer
-    const fallback = window.setTimeout(() => setReady(true), 9500);
+    window.addEventListener(PORTFOLIO_READY_EVENT, onReady);
+    const fallback = window.setTimeout(() => setReady(true), BOOT_SAFETY_MS);
 
     return () => {
-      window.removeEventListener("portfolio:ready", onReady);
+      window.removeEventListener(PORTFOLIO_READY_EVENT, onReady);
       window.clearTimeout(fallback);
     };
   }, [reduced]);
@@ -41,29 +41,12 @@ export function SiteReveal({ children, className }: SiteRevealProps) {
 
   return (
     <motion.div
-      className={cn("will-change-[clip-path,opacity,filter]", className)}
-      initial={{
-        opacity: 0.65,
-        filter: "blur(8px)",
-        clipPath: "inset(100% 0 0 0)",
-      }}
-      animate={
-        ready
-          ? {
-              opacity: 1,
-              filter: "blur(0px)",
-              clipPath: "inset(0% 0 0 0)",
-            }
-          : {
-              opacity: 0.65,
-              filter: "blur(8px)",
-              clipPath: "inset(100% 0 0 0)",
-            }
-      }
+      className={cn("will-change-[opacity,transform]", className)}
+      initial={{ opacity: 0, y: 10 }}
+      animate={ready ? { opacity: 1, y: 0 } : { opacity: 0, y: 10 }}
       transition={{
-        duration: 1.15,
-        delay: ready ? 0.04 : 0,
-        ease: [0.76, 0, 0.24, 1],
+        duration: 0.48,
+        ease: [0.22, 1, 0.36, 1],
       }}
     >
       {children}

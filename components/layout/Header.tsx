@@ -15,6 +15,7 @@ import {
 import { Magnetic } from "@/components/motion/Magnetic";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { navItems, site } from "@/lib/content";
+import { BOOT_SAFETY_MS } from "@/lib/boot";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
 
@@ -70,7 +71,7 @@ export function Header() {
     }
     const onReady = () => setReady(true);
     window.addEventListener("portfolio:ready", onReady);
-    const fallback = window.setTimeout(() => setReady(true), 4500);
+    const fallback = window.setTimeout(() => setReady(true), BOOT_SAFETY_MS);
     return () => {
       window.removeEventListener("portfolio:ready", onReady);
       window.clearTimeout(fallback);

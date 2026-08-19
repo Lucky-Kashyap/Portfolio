@@ -1,8 +1,6 @@
-export { AutoplayVideo } from "./AutoplayVideo";
 export { AvatarVideoFrame } from "./AvatarVideoFrame";
 export { AvailabilityBadge } from "./AvailabilityBadge";
 export { ChipGroup } from "./Badge";
-export { BrandMark } from "./BrandMark";
 export { Button } from "./Button";
 export { Card, cardSurfaceClass } from "./Card";
 export { Container } from "./Container";

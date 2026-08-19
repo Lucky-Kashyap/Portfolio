@@ -32,7 +32,7 @@ export const seo = {
     "SEO Next.js developer India",
   ],
   ogImage: "/divyanshu-kashyap-frontend-engineer-portfolio-og.webp",
-  profileImage: "/profile/divyanshu-kashyap-frontend-developer-jaipur.webp",
+  profileImage: site.avatar,
   locale: "en_IN",
   themeColor: "#03060b",
 } as const;

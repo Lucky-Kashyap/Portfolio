@@ -5,14 +5,15 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Points, PointMaterial } from "@react-three/drei";
 import * as THREE from "three";
 import { useTheme } from "@/components/theme/ThemeProvider";
-import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
+import { usePortfolioReady, usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
+import { isCoarsePointer } from "@/lib/boot";
 
 function ParticleField({ count = 900 }: { count?: number }) {
   const ref = useRef<THREE.Points>(null);
   const positions = useMemo(() => {
     const n =
       typeof window !== "undefined" && window.innerWidth < 768
-        ? Math.min(count, 420)
+        ? Math.min(count, 220)
         : count;
     const arr = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) {
@@ -149,18 +150,24 @@ function Scene({
  */
 export function HeroWebGL({ className }: { className?: string }) {
   const reduced = usePrefersReducedMotion();
+  const ready = usePortfolioReady(reduced);
   const { theme } = useTheme();
   const bg = theme === "light" ? "#f4f7fb" : "#03060b";
   const accent = theme === "light" ? "#0284c7" : "#38bdf8";
+  const mobile = typeof window !== "undefined" && isCoarsePointer();
 
-  if (reduced) return null;
+  if (reduced || !ready) return null;
 
   return (
     <div className={className} aria-hidden>
       <Canvas
-        dpr={[1, 1.6]}
+        dpr={mobile ? [1, 1] : [1, 1.35]}
         camera={{ position: [0, 0, 5.2], fov: 45 }}
-        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
+        gl={{
+          antialias: !mobile,
+          alpha: true,
+          powerPreference: mobile ? "low-power" : "high-performance",
+        }}
         style={{ width: "100%", height: "100%" }}
       >
         <Suspense fallback={null}>

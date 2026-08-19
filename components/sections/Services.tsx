@@ -2,12 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-  AnimatePresence,
-  motion,
-  useMotionValueEvent,
-  useScroll,
-} from "framer-motion";
-import {
   Activity,
   Boxes,
   Cable,
@@ -17,8 +11,6 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Container, Eyebrow, Heading, Text } from "@/components/ui";
-import { ScrollReveal } from "@/components/motion/ScrollReveal";
-import { SnapRail } from "@/components/motion/SnapRail";
 import { about, services } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
@@ -32,85 +24,104 @@ const serviceIcons: Record<(typeof services)[number]["id"], LucideIcon> = {
   seo: Search,
 };
 
-function ServiceSlide({
-  service,
-  index,
-}: {
-  service: (typeof services)[number];
-  index: number;
-}) {
-  const Icon = serviceIcons[service.id];
-  return (
-    <article className="flex h-full min-h-[13.5rem] flex-col justify-between bg-surface-raised p-4 sm:min-h-[15rem] sm:p-5 md:p-6">
-      <div>
-        <div className="flex items-center justify-between gap-3">
-          <span className="font-mono text-sm text-accent-cyan">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <Icon size={18} className="text-accent-cyan" aria-hidden />
-        </div>
-        <h3 className="mt-4 text-lg font-bold tracking-tight text-text-primary sm:text-xl">
-          {service.title}
-        </h3>
-        <p className="mt-2.5 text-sm leading-relaxed text-text-secondary">
-          {service.description}
-        </p>
-      </div>
-      <p className="mt-5 text-[10px] font-semibold tracking-[0.16em] text-text-tertiary uppercase">
-        Outcome · {service.outcome}
-      </p>
-    </article>
-  );
+function markSrc(id: (typeof services)[number]["id"]) {
+  if (id === "ui-architecture" || id === "react-next") return "/icons/ui-window.svg";
+  if (id === "api") return "/icons/stack-cube.svg";
+  return "/icons/grid-mark.svg";
 }
 
-function DesktopServices({ reduced }: { reduced: boolean }) {
+function indexFromSection(el: HTMLElement) {
+  const rect = el.getBoundingClientRect();
+  const vh = window.innerHeight || 1;
+  const n = services.length;
+
+  if (rect.bottom < vh * 0.1) return n - 1;
+  if (rect.top > vh * 0.9) return 0;
+
+  const start = vh * 0.7;
+  const end = vh * 0.28;
+  const usable = Math.max(1, rect.height + (start - end));
+  const p = (start - rect.top) / usable;
+  return Math.min(n - 1, Math.max(0, Math.floor(p * n + 1e-6)));
+}
+
+function ServicesBoard({ reduced }: { reduced: boolean }) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const hoveringRef = useRef(false);
+  const scrollingRef = useRef(false);
+  const rafRef = useRef(0);
+  const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [active, setActive] = useState(0);
-  const interactLock = useRef(false);
-  const unlockTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const current = services[active];
-  const Icon = current ? serviceIcons[current.id] : Boxes;
 
-  const { scrollYProgress } = useScroll({
-    target: trackRef,
-    offset: ["start start", "end end"],
-  });
-
-  const lockInteraction = () => {
-    interactLock.current = true;
-    if (unlockTimer.current) clearTimeout(unlockTimer.current);
+  const applyFromScroll = () => {
+    const el = rootRef.current;
+    if (!el) return;
+    const next = indexFromSection(el);
+    setActive((prev) => (prev === next ? prev : next));
   };
 
-  const releaseInteraction = () => {
-    if (unlockTimer.current) clearTimeout(unlockTimer.current);
-    unlockTimer.current = setTimeout(() => {
-      interactLock.current = false;
-    }, 900);
-  };
-
-  const selectService = (index: number) => {
-    lockInteraction();
+  const hoverTo = (index: number) => {
+    if (scrollingRef.current) return;
+    hoveringRef.current = true;
     setActive(index);
   };
 
-  useMotionValueEvent(scrollYProgress, "change", (progress) => {
-    if (reduced || interactLock.current) return;
-    const n = services.length;
-    const next = Math.min(n - 1, Math.max(0, Math.floor(progress * n)));
-    setActive((prev) => (prev === next ? prev : next));
-  });
-
   useEffect(() => {
-    return () => {
-      if (unlockTimer.current) clearTimeout(unlockTimer.current);
-    };
-  }, []);
+    const el = rootRef.current;
+    if (!el || reduced) return;
 
-  const stickyBlock = (
-    <Container className="grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-stretch lg:gap-8">
+    const flush = () => {
+      rafRef.current = 0;
+      if (hoveringRef.current && !scrollingRef.current) return;
+      applyFromScroll();
+    };
+
+    const schedule = () => {
+      if (rafRef.current) return;
+      rafRef.current = requestAnimationFrame(flush);
+    };
+
+    const onScroll = () => {
+      scrollingRef.current = true;
+      hoveringRef.current = false;
+      schedule();
+      if (settleTimer.current) clearTimeout(settleTimer.current);
+      settleTimer.current = setTimeout(() => {
+        scrollingRef.current = false;
+        applyFromScroll();
+      }, 90);
+    };
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("wheel", onScroll, { passive: true });
+    window.addEventListener("touchmove", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    const lenis = window.__lenis;
+    lenis?.on("scroll", onScroll);
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (settleTimer.current) clearTimeout(settleTimer.current);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("wheel", onScroll);
+      window.removeEventListener("touchmove", onScroll);
+      window.removeEventListener("resize", onScroll);
+      lenis?.off("scroll", onScroll);
+    };
+  }, [reduced]);
+
+  return (
+    <div
+      ref={rootRef}
+      className="mt-10 grid gap-6 lg:mt-12 lg:grid-cols-2 lg:items-stretch lg:gap-10"
+    >
       <ul
-        className="flex h-full list-none flex-col border-y border-border-muted p-0"
-        onMouseLeave={releaseInteraction}
+        className="m-0 grid min-h-[28rem] list-none grid-rows-6 border-y border-border-muted p-0 lg:min-h-[32rem]"
+        onMouseLeave={() => {
+          hoveringRef.current = false;
+          if (!scrollingRef.current) applyFromScroll();
+        }}
       >
         {services.map((service, index) => {
           const isActive = active === index;
@@ -118,18 +129,16 @@ function DesktopServices({ reduced }: { reduced: boolean }) {
           return (
             <li
               key={service.id}
-              className="border-b border-border-muted last:border-b-0"
+              className="min-h-0 border-b border-border-muted last:border-b-0"
             >
-              <motion.button
+              <button
                 type="button"
                 data-cursor="hover"
-                onMouseEnter={() => selectService(index)}
-                onFocus={() => selectService(index)}
-                onClick={() => selectService(index)}
-                whileHover={reduced ? undefined : { x: 6 }}
-                transition={{ type: "spring", stiffness: 320, damping: 24 }}
+                onMouseEnter={() => hoverTo(index)}
+                onFocus={() => hoverTo(index)}
+                onClick={() => hoverTo(index)}
                 className={cn(
-                  "flex w-full items-center gap-3 px-1 py-4 text-left transition-colors duration-300",
+                  "flex h-full w-full items-center gap-3 px-0 text-left transition-colors duration-200",
                   isActive
                     ? "text-text-primary"
                     : "text-text-tertiary hover:text-text-secondary",
@@ -138,119 +147,93 @@ function DesktopServices({ reduced }: { reduced: boolean }) {
               >
                 <span
                   className={cn(
-                    "font-mono text-sm tabular-nums transition-colors duration-300",
-                    isActive ? "text-accent-cyan" : "text-text-primary/20",
+                    "w-7 shrink-0 font-mono text-sm tabular-nums",
+                    isActive ? "text-text-primary" : "text-text-primary/35",
                   )}
                 >
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <ItemIcon
-                  size={18}
+                  size={16}
                   aria-hidden
                   className={cn(
-                    "shrink-0 transition-colors duration-300",
+                    "shrink-0",
                     isActive ? "text-accent-cyan" : "text-text-tertiary",
                   )}
                 />
-                <span className="min-w-0 flex-1 text-lg font-semibold tracking-tight md:text-xl">
+                <span className="min-w-0 flex-1 text-[0.95rem] font-semibold leading-snug tracking-tight md:text-lg">
                   {service.title}
                 </span>
                 <span
                   className={cn(
-                    "hidden text-[11px] tracking-[0.14em] uppercase transition-colors duration-300 xl:inline",
+                    "hidden max-w-[11rem] shrink-0 text-right text-[10px] tracking-[0.14em] uppercase lg:inline",
                     isActive ? "text-accent-cyan" : "text-text-tertiary",
                   )}
                 >
                   {service.outcome}
                 </span>
-              </motion.button>
+              </button>
+              <p className="sr-only">
+                {service.description} Outcome: {service.outcome}.
+              </p>
             </li>
           );
         })}
       </ul>
 
-      <div className="relative flex min-h-0 h-full">
-        <div className="relative flex h-full w-full flex-col overflow-hidden border border-border-muted bg-surface-base p-5 surface-hover transition-[border-color,box-shadow,transform] duration-normal ease-standard hover:border-accent-cyan/70 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.28),0_18px_50px_rgba(3,6,11,0.55)] md:p-6">
-          <div
-            className="pointer-events-none absolute -right-8 -top-8 size-40 rounded-full bg-[radial-gradient(circle,rgba(125,211,252,0.18),transparent_70%)]"
-            aria-hidden
-          />
-          {/* Decorative SVG mark */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={
-              current?.id === "ui-architecture" || current?.id === "react-next"
-                ? "/icons/ui-window.svg"
-                : current?.id === "api"
-                  ? "/icons/stack-cube.svg"
-                  : "/icons/grid-mark.svg"
-            }
-            alt=""
-            width={56}
-            height={56}
-            className="absolute top-4 right-4 opacity-70"
-            aria-hidden
-          />
-          <div className="relative z-[1] flex min-h-0 flex-1 flex-col">
-            <AnimatePresence mode="wait">
-              {current ? (
-                <motion.div
-                  key={current.id}
-                  className="flex min-h-0 flex-1 flex-col"
-                  initial={
-                    reduced
-                      ? false
-                      : { opacity: 0, y: 14, filter: "blur(6px)" }
-                  }
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  exit={
-                    reduced
-                      ? undefined
-                      : { opacity: 0, y: -10, filter: "blur(4px)" }
-                  }
-                  transition={{ duration: 0.38, ease: [0.22, 1, 0.36, 1] }}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon size={20} className="text-accent-cyan" aria-hidden />
-                    <p className="font-mono text-xs tracking-[0.2em] text-accent-cyan">
-                      {String(active + 1).padStart(2, "0")} /{" "}
-                      {String(services.length).padStart(2, "0")}
-                    </p>
-                  </div>
-                  <h3 className="mt-4 text-2xl font-bold tracking-tight text-text-primary">
-                    {current.title}
-                  </h3>
-                  <p className="mt-3 max-w-prose text-base leading-relaxed text-text-secondary">
-                    {current.description}
-                  </p>
-                  <div className="mt-auto border-t border-border-muted pt-4">
-                    <p className="text-xs font-semibold tracking-[0.16em] text-text-tertiary uppercase">
-                      Outcome · {current.outcome}
-                    </p>
-                    <p className="mt-4 text-sm leading-relaxed text-text-tertiary">
-                      {about.specialize}
-                    </p>
-                  </div>
-                </motion.div>
-              ) : null}
-            </AnimatePresence>
-          </div>
-        </div>
+      <div className="relative min-h-[28rem] overflow-hidden border border-border-muted bg-surface-base lg:min-h-[32rem]">
+        <div
+          className="pointer-events-none absolute -right-8 -top-8 size-40 rounded-full bg-[radial-gradient(circle,rgba(125,211,252,0.16),transparent_70%)]"
+          aria-hidden
+        />
+        {services.map((service, index) => {
+          const isActive = active === index;
+          const Icon = serviceIcons[service.id];
+          return (
+            <article
+              key={service.id}
+              className={cn(
+                "absolute inset-0 flex flex-col p-5 transition-opacity duration-200 ease-standard sm:p-6 lg:p-7",
+                isActive
+                  ? "z-[1] opacity-100"
+                  : "pointer-events-none z-0 opacity-0",
+              )}
+              aria-hidden={!isActive}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={markSrc(service.id)}
+                alt=""
+                width={48}
+                height={48}
+                className="absolute top-5 right-5 opacity-70"
+                aria-hidden
+              />
+              <div className="flex items-center gap-2.5">
+                <Icon size={18} className="text-accent-cyan" aria-hidden />
+                <p className="font-mono text-xs tracking-[0.2em] text-accent-cyan">
+                  {String(index + 1).padStart(2, "0")} /{" "}
+                  {String(services.length).padStart(2, "0")}
+                </p>
+              </div>
+              <h3 className="mt-5 text-2xl font-bold tracking-tight text-text-primary">
+                {service.title}
+              </h3>
+              <p className="mt-3 max-w-prose text-base leading-relaxed text-text-secondary">
+                {service.description}
+              </p>
+              <div className="mt-auto border-t border-border-muted pt-4">
+                <p className="text-xs font-semibold tracking-[0.16em] text-accent-cyan uppercase">
+                  Outcome · {service.outcome}
+                </p>
+                <p className="mt-3 text-sm leading-relaxed text-text-tertiary">
+                  {about.specialize}
+                </p>
+              </div>
+            </article>
+          );
+        })}
       </div>
-    </Container>
-  );
-
-  if (reduced) {
-    return <div className="mt-8 lg:mt-10">{stickyBlock}</div>;
-  }
-
-  return (
-    <div
-      ref={trackRef}
-      className="relative mt-8 lg:mt-10"
-      style={{ height: `${Math.max(services.length, 2) * 72}vh` }}
-    >
-      <div className="sticky top-28 md:top-32">{stickyBlock}</div>
     </div>
   );
 }
@@ -265,8 +248,8 @@ export function Services() {
       className="section-pad scroll-mt-28 border-y border-border-muted bg-surface-raised/40 md:scroll-mt-32"
     >
       <Container>
-        <div className="grid items-end gap-3 sm:gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-8">
-          <ScrollReveal>
+        <div className="grid items-end gap-4 lg:grid-cols-2 lg:gap-10">
+          <div>
             <Eyebrow className="mb-2">Services</Eyebrow>
             <Heading
               id="services-heading"
@@ -276,29 +259,17 @@ export function Services() {
             >
               How I help teams ship
             </Heading>
-          </ScrollReveal>
-          <ScrollReveal delay={0.05}>
-            <Text
-              tone="muted"
-              className="max-w-md text-sm leading-relaxed sm:text-base lg:justify-self-end lg:text-right"
-            >
-              {about.impact}
-            </Text>
-          </ScrollReveal>
+          </div>
+          <Text
+            tone="muted"
+            className="max-w-md text-sm leading-relaxed sm:text-base lg:max-w-none lg:justify-self-end lg:text-right"
+          >
+            {about.impact}
+          </Text>
         </div>
+
+        <ServicesBoard reduced={reduced} />
       </Container>
-
-      <div className="section-content lg:hidden">
-        <SnapRail count={services.length} label="Services">
-          {services.map((service, index) => (
-            <ServiceSlide key={service.id} service={service} index={index} />
-          ))}
-        </SnapRail>
-      </div>
-
-      <div className="hidden lg:block">
-        <DesktopServices reduced={reduced} />
-      </div>
     </section>
   );
 }

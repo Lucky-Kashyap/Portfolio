@@ -13,6 +13,7 @@ import { AutoplayVideo } from "@/components/ui/AutoplayVideo";
 import { site } from "@/lib/content";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
+import { onPortfolioReady } from "@/lib/boot";
 
 function clamp01(n: number) {
   return Math.min(1, Math.max(0, n));
@@ -90,7 +91,7 @@ export function AvatarScrollStage() {
     }
 
     let raf = 0;
-    let running = true;
+    let running = false;
 
     const place = (
       top: number,
@@ -110,11 +111,6 @@ export function AvatarScrollStage() {
       frame.style.visibility = opacity > 0.02 ? "visible" : "hidden";
       frame.style.pointerEvents = opacity > 0.5 ? "auto" : "none";
     };
-
-    const boot = hero.getBoundingClientRect();
-    if (boot.width > 4) {
-      place(boot.top, boot.left, boot.width, boot.height, 1);
-    }
 
     const update = () => {
       const from = hero.getBoundingClientRect();
@@ -144,14 +140,23 @@ export function AvatarScrollStage() {
       raf = requestAnimationFrame(loop);
     };
 
-    raf = requestAnimationFrame(loop);
-    window.addEventListener("portfolio:ready", update);
+    const start = () => {
+      if (running) return;
+      running = true;
+      const boot = hero.getBoundingClientRect();
+      if (boot.width > 4) {
+        place(boot.top, boot.left, boot.width, boot.height, 1);
+      }
+      raf = requestAnimationFrame(loop);
+    };
+
+    const stopReady = onPortfolioReady(start);
     window.addEventListener("resize", update);
 
     return () => {
       running = false;
       cancelAnimationFrame(raf);
-      window.removeEventListener("portfolio:ready", update);
+      stopReady();
       window.removeEventListener("resize", update);
     };
   }, [reduced, mounted]);
