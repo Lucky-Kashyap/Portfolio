@@ -6,15 +6,12 @@
 export const site = {
   brand: "Divyanshu Kashyap",
   mark: "DIVYANSHU.DEV",
-  pronouns: "He/Him",
   role: "Frontend Engineer | React.js | Next.js | TypeScript | Scalable UI Architecture | API Integration | Performance & Accessibility",
   tagline:
     "Building scalable, responsive, and high-performance web applications.",
   location: "Gokul Vatika, Jaipur, Rajasthan",
-  address: "Gokul Vatika",
   email: "kashyapdivyanshu279@gmail.com",
   phone: "9634308605",
-  phoneLabel: "Work",
   whatsapp: "https://wa.me/919634308605",
   /** Direct download — file lives in public/pdfs */
   resume: "/pdfs/Divyanshu_resume.pdf",
@@ -26,16 +23,9 @@ export const site = {
   leetcodeUser: "luckykashyap",
   leetcodeStats: {
     solved: 44,
-    total: 4013,
     acceptance: "53.52%",
     easy: 26,
     medium: 18,
-    hard: 0,
-    languages: [
-      { name: "C++", solved: 31 },
-      { name: "JavaScript", solved: 13 },
-      { name: "Java", solved: 3 },
-    ],
   },
   /**
    * Marketing AI avatar video (muted autoplay + tap unmute).
@@ -49,83 +39,6 @@ export const site = {
   aboutVisual: "/about/about-ai-avatar.png",
   /** Photo avatar (meta / OG) */
   avatar: "/profile/divyanshu-kashyap-frontend-developer-jaipur.webp",
-  /**
-   * Full spoken intro (English hero fallback / captions).
-   * Prefer `heroSpeechChapters` / `aboutSpeechChapters` for timed narration.
-   */
-  avatarIntro:
-    "Hey! I'm Divyanshu Kashyap, a Frontend Engineer and Frontend Developer based in Jaipur. I build with React.js, Next.js, and TypeScript — UI development, website development, WordPress, SEO, and performance. I also ship AI-based products with fewer API calls, smarter caching, code splitting, and optimization. Explore my work, and let's build something extraordinary together.",
-  /** Hero unmute — English narration */
-  heroSpeechChapters: [
-    {
-      id: "hello",
-      label: "Intro",
-      text: "Hey! I'm Divyanshu Kashyap — a Frontend Engineer and Frontend Developer based in Jaipur. Welcome to my portfolio.",
-    },
-    {
-      id: "roles",
-      label: "Roles",
-      text: "I work as a Frontend Engineer, Frontend Developer, React.js developer, Next.js builder, and UI developer — shipping clean interfaces and fast web experiences.",
-    },
-    {
-      id: "stack",
-      label: "Stack",
-      text: "My core stack is React.js, Next.js, and TypeScript. I also do website development, modern UI systems, and WordPress when clients need content-first sites.",
-    },
-    {
-      id: "seo-perf",
-      label: "SEO & Performance",
-      text: "I focus on SEO, Lighthouse performance, code splitting, and optimization — so sites load fast, rank better, and feel smooth for users.",
-    },
-    {
-      id: "ai-api",
-      label: "AI & API",
-      text: "I also build AI-based products — smart UI, fewer API calls, caching, and efficient data flow to cut network load and boost performance.",
-    },
-    {
-      id: "close",
-      label: "Connect",
-      text: "If you need product UI, a landing page, SEO, a performance upgrade, or AI product frontend — I can help. Explore the projects below, and let's build something extraordinary together.",
-    },
-  ] as const,
-  /** About unmute — Hindi narration */
-  aboutSpeechChapters: [
-    {
-      id: "hello",
-      label: "परिचय",
-      text: "नमस्ते! मैं दिव्यांशु कश्यप हूँ — जयपुर से एक फ्रंटएंड इंजीनियर और फ्रंटएंड डेवलपर। मेरे पोर्टफोलियो में आपका स्वागत है।",
-    },
-    {
-      id: "roles",
-      label: "भूमिकाएँ",
-      text: "मैं फ्रंटएंड इंजीनियर, फ्रंटएंड डेवलपर, रिएक्ट जे एस डेवलपर, नेक्स्ट जे एस बिल्डर, और यूआई डेवलपर के रूप में काम करता हूँ — साफ़ इंटरफ़ेस और तेज़ वेब अनुभव बनाता हूँ।",
-    },
-    {
-      id: "stack",
-      label: "स्टैक",
-      text: "मेरा मुख्य स्टैक React.js, Next.js और TypeScript है। मैं वेबसाइट डेवलपमेंट, आधुनिक यूआई सिस्टम, और वर्डप्रेस डेवलपमेंट भी करता हूँ — जब क्लाइंट को कंटेंट-फर्स्ट साइट चाहिए।",
-    },
-    {
-      id: "seo-perf",
-      label: "SEO और परफ़ॉर्मेंस",
-      text: "मैं SEO, Lighthouse परफ़ॉर्मेंस, कोड स्प्लिटिंग, और ऑप्टिमाइज़ेशन पर फोकस करता हूँ — ताकि साइट तेज़ लोड हो, रैंकिंग बेहतर हो, और यूज़र एक्सपीरियंस स्मूद रहे।",
-    },
-    {
-      id: "ai-api",
-      label: "AI और API",
-      text: "मैं ए आई बेस्ड प्रोडक्ट्स भी बनाता हूँ — स्मार्ट यूआई, कम ए पी आई कॉल्स, कैशिंग, और कुशल डेटा फ़्लो से नेटवर्क लोड घटाकर परफ़ॉर्मेंस बढ़ाता हूँ।",
-    },
-    {
-      id: "services",
-      label: "सेवाएँ",
-      text: "मेरी सेवाओं में React और Next.js ऐप्स, यूआई आर्किटेक्चर, वेबसाइट और वर्डप्रेस डेवलपमेंट, ए पी आई इंटीग्रेशन, मोशन डिज़ाइन, परफ़ॉर्मेंस ट्यूनिंग, एस ई ओ, और कोड स्प्लिटिंग शामिल है।",
-    },
-    {
-      id: "close",
-      label: "जुड़ें",
-      text: "अगर आपको प्रोडक्ट यूआई, लैंडिंग पेज, एस ई ओ, परफ़ॉर्मेंस अपग्रेड, या ए आई प्रोडक्ट फ़्रंटएंड चाहिए — मैं मदद कर सकता हूँ। नीचे प्रोजेक्ट्स देखें, और मिलकर कुछ शानदार बनाते हैं।",
-    },
-  ] as const,
   heroHeadline: "FRONTEND ENGINEER",
   heroRoles: [
     "FRONTEND ENGINEER",
@@ -179,9 +92,6 @@ export const about = {
     "Enterprise platforms, AI-assisted apps, media tools, and customer-facing products — clarity, speed, and maintainable architecture.",
   passion:
     "Based in Jaipur and available for hire — open to remote React.js / Next.js roles worldwide while deepening full-stack fundamentals.",
-  /** @deprecated alias — prefer `narrative` */
-  shortBio:
-    "I specialize in transforming complex business requirements into intuitive digital experiences. From reusable UI architecture to API integration, performance, accessibility, and motion — I ship interfaces that feel fast and look intentional.",
   expertise: [
     "React.js & Next.js Development",
     "Angular Development",
