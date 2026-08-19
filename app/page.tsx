@@ -1,6 +1,7 @@
 import dynamic from "next/dynamic";
 import { About, Experience } from "@/components/sections/About";
 import { Hero } from "@/components/sections/Hero";
+import { Services } from "@/components/sections/Services";
 import { AvatarSectionBridge } from "@/components/avatar/AvatarSectionBridge";
 import { Footer } from "@/components/layout/Footer";
 import { SectionSkeleton } from "@/components/ui/SectionSkeleton";
@@ -16,11 +17,6 @@ const Certifications = dynamic(
       (m) => m.Certifications,
     ),
   { loading: () => <SectionSkeleton label="Loading certifications" /> },
-);
-const Services = dynamic(
-  () =>
-    import("@/components/sections/Services").then((m) => m.Services),
-  { loading: () => <SectionSkeleton label="Loading services" /> },
 );
 const Manifesto = dynamic(
   () =>

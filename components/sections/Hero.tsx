@@ -90,9 +90,9 @@ function AnimatedHeroRoles({ reduced }: { reduced: boolean }) {
       <AnimatePresence mode="wait">
         <motion.p
           key={active}
-          initial={reduced ? false : { y: 22, opacity: 0, filter: "blur(6px)" }}
-          animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
-          exit={reduced ? undefined : { y: -18, opacity: 0, filter: "blur(4px)" }}
+          initial={reduced ? false : { y: 22, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={reduced ? undefined : { y: -18, opacity: 0 }}
           transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           className="text-[clamp(1.05rem,2.4vw,1.75rem)] font-bold tracking-tight text-accent-cyan uppercase"
         >
@@ -302,21 +302,30 @@ export function Hero() {
                 )}
               >
                 <span className="block pr-1 drop-shadow-[0_0_28px_rgba(125,211,252,0.22)]">
-                  <LetterName text={first} reduced={reduced} />
+                  <LetterName
+                    key={ready ? "first-in" : "first-pre"}
+                    text={first}
+                    reduced={reduced || !ready}
+                  />
                 </span>
                 {last ? (
                   <span className="mt-0.5 block pr-1">
-                    <LetterName text={last} outline reduced={reduced} />
+                    <LetterName
+                      key={ready ? "last-in" : "last-pre"}
+                      text={last}
+                      outline
+                      reduced={reduced || !ready}
+                    />
                   </span>
                 ) : null}
               </h1>
             </div>
 
             <div data-hero-intro>
-              <AnimatedHeroRoles reduced={reduced} />
+              <AnimatedHeroRoles reduced={reduced || !ready} />
             </div>
 
-            <HeroSummary reduced={reduced} />
+      <HeroSummary reduced={reduced || !ready} />
 
             <div data-hero-intro className="mt-4">
               <AvailabilityBadge size="sm" />

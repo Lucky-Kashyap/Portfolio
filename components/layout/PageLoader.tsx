@@ -3,6 +3,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { site } from "@/lib/content";
+import {
+  getLoaderTimings,
+  markPortfolioReady,
+  PORTFOLIO_LOADER_START_EVENT,
+} from "@/lib/boot";
 import { cn } from "@/lib/utils";
 
 /** Status beats — paced so each line can land clearly */
@@ -13,8 +18,6 @@ const STATUS_LINES = [
   "REACT · NEXT.JS · TYPESCRIPT",
   "SCALABLE UI · API · PERFORMANCE",
   "SHIPPING CREATIVE EXPERIENCES",
-  "LOADING PROJECT ASSETS…",
-  "CALIBRATING MOTION & WEBGL…",
   "FINALIZING INTERFACE…",
   "CREATIVE EXPERIENCES — READY",
 ] as const;
@@ -28,12 +31,7 @@ const PHASE_LABELS = [
   { until: 1.01, label: "Almost there" },
 ] as const;
 
-/** Steady climb — not a fast ease-out spike */
-const LOAD_MS = 6200;
-const HOLD_AT_100_MS = 640;
-const EXIT_MS = 1200;
-/** How often the visible integer may tick (+1 max) — keeps rolling digits calm */
-const TICK_MS = 48;
+const TICK_MS = 42;
 
 const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"] as const;
 
@@ -57,12 +55,10 @@ function phaseLabelFor(t: number): PhaseLabel {
   return PHASE_LABELS[PHASE_LABELS.length - 1].label;
 }
 
-/** Smooth S-curve — calm start, steady middle, soft landing at 100 */
-function easeInOutQuint(t: number) {
+/** Smooth S-curve — calm start, readable middle, soft landing at 100 */
+function easeInOutCubic(t: number) {
   const x = Math.min(1, Math.max(0, t));
-  return x < 0.5
-    ? 16 * x * x * x * x * x
-    : 1 - Math.pow(-2 * x + 2, 5) / 2;
+  return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 }
 
 function clampPercent(value: number) {
@@ -116,7 +112,7 @@ function RollingDigit({
   );
 }
 
-function RollingPercent({ value }: { value: number }) {
+function RollingPercent({ value, lite }: { value: number; lite?: boolean }) {
   const clamped = Math.round(clampPercent(value));
   const hundreds = Math.floor(clamped / 100);
   const tens = Math.floor((clamped % 100) / 10);
@@ -126,9 +122,9 @@ function RollingPercent({ value }: { value: number }) {
     <div
       className="flex items-start leading-none text-text-primary"
       style={{
-        fontSize: "clamp(4.25rem, 22vw, 11.5rem)",
+        fontSize: "clamp(3.5rem, 18vw, 11.5rem)",
         fontVariantNumeric: "tabular-nums",
-        textShadow: "0 0 48px rgba(125,211,252,0.2)",
+        textShadow: lite ? "none" : "0 0 48px rgba(125,211,252,0.2)",
       }}
       aria-hidden
     >
@@ -160,6 +156,8 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
   const [phaseLabel, setPhaseLabel] = useState<PhaseLabel>(
     PHASE_LABELS[0].label,
   );
+  const [lite, setLite] = useState(false);
+  const [exitMs, setExitMs] = useState(560);
   const year = useMemo(() => new Date().getFullYear(), []);
   const initials = useMemo(() => brandInitials(site.brand), []);
   const completedRef = useRef(false);
@@ -171,18 +169,22 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
     if (reduceMotion) {
       setPhase("done");
       onComplete?.();
-      window.dispatchEvent(new Event("portfolio:ready"));
+      markPortfolioReady();
       return;
     }
 
-    window.dispatchEvent(new Event("portfolio:loader-start"));
+    const timings = getLoaderTimings();
+    setLite(timings.lite);
+    setExitMs(timings.exitMs);
+    window.dispatchEvent(new Event(PORTFOLIO_LOADER_START_EVENT));
 
     const started = performance.now();
     let frame = 0;
+    const catchUp = 1;
 
     const tick = (now: number) => {
-      const t = Math.min(1, (now - started) / LOAD_MS);
-      const eased = easeInOutQuint(t);
+      const t = Math.min(1, (now - started) / timings.loadMs);
+      const eased = easeInOutCubic(t);
       targetRef.current = clampPercent(eased * 100);
       setPhaseLabel(phaseLabelFor(t));
       setStatusIndex(
@@ -192,14 +194,11 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
         ),
       );
 
-      // Monotonic integer crawl — at most +1 per TICK_MS so rollers stay smooth
       if (now - lastTickRef.current >= TICK_MS) {
         lastTickRef.current = now;
-        const targetInt = Math.min(100, Math.floor(targetRef.current));
-        // After the clock finishes, keep easing the visible % up to 100 one step at a time
-        const goal = t >= 1 ? 100 : targetInt;
+        const goal = t >= 1 ? 100 : Math.min(100, Math.floor(targetRef.current));
         if (displayRef.current < goal) {
-          displayRef.current = Math.min(100, displayRef.current + 1);
+          displayRef.current = Math.min(100, displayRef.current + catchUp);
           setProgress(displayRef.current);
         }
       }
@@ -212,7 +211,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
         setStatusIndex(STATUS_LINES.length - 1);
         if (!completedRef.current) {
           completedRef.current = true;
-          window.setTimeout(() => setPhase("exiting"), HOLD_AT_100_MS);
+          window.setTimeout(() => setPhase("exiting"), timings.holdMs);
         }
       }
     };
@@ -224,14 +223,14 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
   useEffect(() => {
     if (phase !== "exiting") return;
 
+    markPortfolioReady();
     const doneTimer = window.setTimeout(() => {
       setPhase("done");
       onComplete?.();
-      window.dispatchEvent(new Event("portfolio:ready"));
-    }, EXIT_MS);
+    }, exitMs);
 
     return () => window.clearTimeout(doneTimer);
-  }, [phase, onComplete]);
+  }, [phase, onComplete, exitMs]);
 
   useEffect(() => {
     if (phase === "done") return;
@@ -262,18 +261,13 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
       initial={false}
       animate={
         exiting
-          ? {
-              clipPath: "inset(0 0 100% 0)",
-            }
-          : {
-              clipPath: "inset(0 0 0% 0)",
-            }
+          ? { opacity: 0, y: lite ? -12 : -28 }
+          : { opacity: 1, y: 0 }
       }
       transition={{
-        duration: EXIT_MS / 1000,
-        ease: [0.76, 0, 0.24, 1],
+        duration: exitMs / 1000,
+        ease: [0.22, 1, 0.36, 1],
       }}
-      style={{ clipPath: "inset(0 0 0% 0)" }}
     >
       {/* Soft atmosphere */}
       <div
@@ -294,9 +288,11 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
         }}
       />
 
-      {/* Shimmer veil — carpet sheen while loading */}
       <motion.div
-        className="pointer-events-none absolute inset-0 z-[1] opacity-40"
+        className={cn(
+          "pointer-events-none absolute inset-0 z-[1]",
+          lite ? "opacity-25" : "opacity-40",
+        )}
         aria-hidden
         style={{
           background:
@@ -305,7 +301,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
         }}
         animate={{ backgroundPosition: ["120% 0%", "-40% 0%"] }}
         transition={{
-          duration: 2.4,
+          duration: lite ? 2.8 : 2.4,
           repeat: Infinity,
           ease: "linear",
         }}
@@ -313,7 +309,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
 
       {/* Carpet edge highlight during exit */}
       <AnimatePresence>
-        {exiting ? (
+        {exiting && !lite ? (
           <motion.div
             key="carpet-edge"
             className="pointer-events-none absolute inset-x-0 z-[30] h-px bg-gradient-to-r from-transparent via-accent-cyan to-transparent"
@@ -321,8 +317,8 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
             animate={{ top: "100%", opacity: 0.35 }}
             exit={{ opacity: 0 }}
             transition={{
-              duration: EXIT_MS / 1000,
-              ease: [0.76, 0, 0.24, 1],
+              duration: exitMs / 1000,
+              ease: [0.22, 1, 0.36, 1],
             }}
             aria-hidden
           />
@@ -364,7 +360,7 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
           }}
           transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
-          <RollingPercent value={displayProgress} />
+          <RollingPercent value={displayProgress} lite={lite} />
         </motion.div>
 
         <div className="mt-8 flex min-h-[2rem] max-w-2xl flex-col items-center justify-center gap-3 sm:mt-10">
@@ -372,10 +368,10 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
             <AnimatePresence mode="wait">
               <motion.p
                 key={STATUS_LINES[statusIndex]}
-                initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
-                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
                 className="text-center text-sm font-semibold tracking-[0.18em] text-text-primary uppercase sm:text-base md:text-lg md:tracking-[0.2em]"
               >
                 {STATUS_LINES[statusIndex]}
@@ -407,7 +403,6 @@ export function PageLoader({ onComplete }: PageLoaderProps) {
             transition={{ duration: 0.18, ease: "linear" }}
             aria-hidden
           />
-          {/* Progress shimmer */}
           <motion.div
             className="pointer-events-none absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-action-primary/40 to-transparent"
             aria-hidden

@@ -1,11 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import Lenis from "lenis";
 import { ReactLenis, useLenis } from "lenis/react";
 import { gsap, registerGsap, ScrollTrigger } from "@/lib/gsap";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
+import {
+  isCoarsePointer,
+  PORTFOLIO_LOADER_START_EVENT,
+  PORTFOLIO_READY_EVENT,
+} from "@/lib/boot";
 import "lenis/dist/lenis.css";
 
 declare global {
@@ -57,8 +61,8 @@ function LenisGsapBridge() {
       ScrollTrigger.refresh();
     };
 
-    window.addEventListener("portfolio:loader-start", onLoaderStart);
-    window.addEventListener("portfolio:ready", onLoaderDone);
+    window.addEventListener(PORTFOLIO_LOADER_START_EVENT, onLoaderStart);
+    window.addEventListener(PORTFOLIO_READY_EVENT, onLoaderDone);
 
     const onResize = () => ScrollTrigger.refresh();
     window.addEventListener("resize", onResize);
@@ -68,8 +72,8 @@ function LenisGsapBridge() {
     return () => {
       lenis.off("scroll", onScroll);
       gsap.ticker.remove(ticker);
-      window.removeEventListener("portfolio:loader-start", onLoaderStart);
-      window.removeEventListener("portfolio:ready", onLoaderDone);
+      window.removeEventListener(PORTFOLIO_LOADER_START_EVENT, onLoaderStart);
+      window.removeEventListener(PORTFOLIO_READY_EVENT, onLoaderDone);
       window.removeEventListener("resize", onResize);
       if (window.__lenis === lenis) delete window.__lenis;
     };
@@ -84,8 +88,14 @@ type SmoothScrollProps = {
 
 export function SmoothScroll({ children }: SmoothScrollProps) {
   const reduceMotion = usePrefersReducedMotion();
+  const [enableSmooth, setEnableSmooth] = useState(false);
 
-  if (reduceMotion) {
+  useEffect(() => {
+    // Native touch scrolling is smoother on phones; Lenis waits until after paint.
+    setEnableSmooth(!reduceMotion && !isCoarsePointer());
+  }, [reduceMotion]);
+
+  if (!enableSmooth) {
     return <>{children}</>;
   }
 
@@ -93,11 +103,11 @@ export function SmoothScroll({ children }: SmoothScrollProps) {
     <ReactLenis
       root
       options={{
-        lerp: 0.065,
-        duration: 1.25,
+        lerp: 0.085,
+        duration: 1.05,
         smoothWheel: true,
-        wheelMultiplier: 0.8,
-        touchMultiplier: 1.25,
+        wheelMultiplier: 0.85,
+        touchMultiplier: 1,
         anchors: false,
         autoRaf: false,
       }}

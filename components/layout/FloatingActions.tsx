@@ -7,6 +7,7 @@ import { ArrowUp, FileDown } from "lucide-react";
 import { TextLink } from "@/components/ui";
 import { Magnetic } from "@/components/motion/Magnetic";
 import { site } from "@/lib/content";
+import { BOOT_SAFETY_MS } from "@/lib/boot";
 import { scrollToTop } from "@/lib/scroll";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
@@ -75,7 +76,7 @@ export function FloatingActions() {
     }
     const onReady = () => setReady(true);
     window.addEventListener("portfolio:ready", onReady);
-    const fallback = window.setTimeout(() => setReady(true), 4500);
+    const fallback = window.setTimeout(() => setReady(true), BOOT_SAFETY_MS);
     return () => {
       window.removeEventListener("portfolio:ready", onReady);
       window.clearTimeout(fallback);

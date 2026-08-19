@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { onPortfolioReady, BOOT_SAFETY_MS } from "@/lib/boot";
 
 /** True when the user prefers reduced motion (a11y). */
 export function usePrefersReducedMotion() {
@@ -27,12 +28,14 @@ export function usePortfolioReady(reducedMotion: boolean) {
       return;
     }
 
-    const onReady = () => setReady(true);
-    window.addEventListener("portfolio:ready", onReady);
-    const fallback = window.setTimeout(() => setReady(true), 7500);
+    const fallback = window.setTimeout(() => setReady(true), BOOT_SAFETY_MS);
+    const stop = onPortfolioReady(() => {
+      window.clearTimeout(fallback);
+      setReady(true);
+    });
 
     return () => {
-      window.removeEventListener("portfolio:ready", onReady);
+      stop();
       window.clearTimeout(fallback);
     };
   }, [reducedMotion]);

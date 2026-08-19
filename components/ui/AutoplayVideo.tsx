@@ -7,6 +7,7 @@ import {
   releaseVideoAudio,
   subscribeVideoAudio,
 } from "@/lib/video-audio";
+import { onPortfolioReady } from "@/lib/boot";
 
 type AutoplayVideoProps = {
   src: string;
@@ -102,33 +103,39 @@ export function AutoplayVideo({
     el.muted = true;
     el.defaultMuted = true;
 
-    if (!lazy) {
-      el.play().catch(() => {});
-      return () => {
-        muteAmbient();
-      };
-    }
+    let io: IntersectionObserver | null = null;
+    let stopReady: (() => void) | undefined;
 
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const e of entries) {
-          if (e.isIntersecting) {
-            if (!userPausedRef.current) {
-              el.muted = true;
-              el.loop = true;
-              el.play().catch(() => {});
+    const startAmbient = () => {
+      if (!lazy) {
+        el.play().catch(() => {});
+        return;
+      }
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) {
+              if (!userPausedRef.current) {
+                el.muted = true;
+                el.loop = true;
+                el.play().catch(() => {});
+              }
+            } else {
+              el.pause();
+              muteAmbient();
             }
-          } else {
-            el.pause();
-            muteAmbient();
           }
-        }
-      },
-      { rootMargin: "200px" },
-    );
-    io.observe(el);
+        },
+        { rootMargin: "120px" },
+      );
+      io.observe(el);
+    };
+
+    stopReady = onPortfolioReady(startAmbient);
+
     return () => {
-      io.disconnect();
+      stopReady?.();
+      io?.disconnect();
       muteAmbient();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -221,7 +228,7 @@ export function AutoplayVideo({
         muted
         loop
         playsInline
-        preload={lazy ? "none" : "metadata"}
+        preload="none"
         className={cn(
           "absolute inset-0 size-full",
           objectFit === "contain" ? "object-contain" : "object-cover",
