@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="lovableGrad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF8F6B"/>
+      <stop offset="0.45" stop-color="#FF5C8A"/>
+      <stop offset="1" stop-color="#C084FC"/>
+    </linearGradient>
+  </defs>
+  <path
+    fill="url(#lovableGrad)"
+    fill-rule="evenodd"
+    d="M7.2 1.2C11.05 1.2 14.2 4.35 14.2 8.2v2.7H16.8c3.85 0 7 3.15 7 7s-3.15 7-7 7H1.2V8.2c0-3.85 3.15-7 7-7Z"
+    clip-rule="evenodd"
+  />
+</svg>

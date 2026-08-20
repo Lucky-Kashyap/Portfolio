@@ -42,6 +42,7 @@ function CertSnapCard({
             <Image
               src={cert.image}
               alt={`${cert.name} — ${cert.organization}`}
+              title={`${cert.name} — ${cert.organization}`}
               fill
               className="object-contain object-center"
               sizes="90vw"
@@ -227,6 +228,7 @@ function PerspectivePanel({
                   <Image
                     src={cert.image}
                     alt={`${cert.name} certificate awarded to Divyanshu Kashyap by ${cert.organization}`}
+                    title={`${cert.name} certificate — ${cert.organization}`}
                     fill
                     className="object-contain object-center"
                     sizes="(max-width: 1024px) 90vw, 55vw"

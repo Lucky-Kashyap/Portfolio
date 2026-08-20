@@ -26,13 +26,13 @@ export function Manifesto() {
           text={about.narrative}
           className="max-w-4xl text-[clamp(1.35rem,3.2vw,2.35rem)] font-bold leading-snug tracking-tight text-text-primary"
           shadowOpacity={0.14}
-          offset={["start 0.92", "end 0.45"]}
+          offset={["start 0.9", "start 0.5"]}
         />
         <TextGradientScroll
           text={`${about.impact} ${about.passion}`}
           className="mt-6 max-w-3xl text-base leading-relaxed text-text-secondary md:mt-8 md:text-lg"
           shadowOpacity={0.16}
-          offset={["start 0.98", "end 0.5"]}
+          offset={["start 0.92", "start 0.55"]}
         />
         <p className="mt-5 max-w-2xl text-sm leading-relaxed tracking-wide text-text-tertiary md:mt-6">
           {site.connect}

@@ -383,6 +383,7 @@ export function Hero() {
                   <AvatarVideoFrame
                     src={site.heroAvatarVideo}
                     poster={site.heroAvatarPoster}
+                    posterAlt={`${site.brand} — AI avatar video preview`}
                     lazy={false}
                     objectPosition={site.heroAvatarObjectPosition}
                     caption={site.heroHeadline}

@@ -2,7 +2,9 @@
 
 import {
   createElement,
+  useEffect,
   useRef,
+  useState,
   type ReactNode,
 } from "react";
 import {
@@ -28,6 +30,9 @@ type TextGradientScrollProps = {
   shadowOpacity?: number;
   offset?: ScrollOffset;
 };
+
+/** Snappy default: finish reveal within ~40vh of travel, not the full paragraph height. */
+const DEFAULT_OFFSET = ["start 0.88", "start 0.48"] as ScrollOffset;
 
 function Word({
   children,
@@ -58,8 +63,18 @@ function Word({
   );
 }
 
+function wordRange(index: number, total: number): [number, number] {
+  // Compress + overlap so the line fills in early instead of dripping word-by-word
+  const finishBy = 0.62;
+  const window = Math.max(0.08, (1 / total) * finishBy * 2.4);
+  const start = (index / Math.max(1, total - 1 || 1)) * (finishBy - window * 0.35);
+  const end = Math.min(1, start + window);
+  return [Math.max(0, start), end];
+}
+
 /**
  * Word-by-word opacity scrubbed to scroll (About / Philosophy).
+ * Desktop: short scrub distance. Mobile: one-shot cascade (touch scrub feels laggy).
  */
 export function TextGradientScroll({
   text,
@@ -67,22 +82,75 @@ export function TextGradientScroll({
   as = "p",
   id,
   shadowOpacity = 0.18,
-  offset = ["start 0.95", "end 0.55"] as ScrollOffset,
+  offset = DEFAULT_OFFSET,
 }: TextGradientScrollProps) {
   const container = useRef<HTMLElement | null>(null);
   const reduced = usePrefersReducedMotion();
   const words = text.trim().split(/\s+/).filter(Boolean);
+  const [useCascade, setUseCascade] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(max-width: 767px), (pointer: coarse)").matches;
+  });
+  const [cascadeOn, setCascadeOn] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px), (pointer: coarse)");
+    const sync = () => setUseCascade(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
+    if (!useCascade || reduced) return;
+    const el = container.current;
+    if (!el) return;
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setCascadeOn(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.2, rootMargin: "0px 0px -8% 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [useCascade, reduced, text]);
 
   const { scrollYProgress } = useScroll({
     target: container,
-    offset: offset ?? ["start 0.95", "end 0.55"],
+    offset: offset ?? DEFAULT_OFFSET,
   });
 
   if (reduced) {
+    return createElement(as, { id, className }, text);
+  }
+
+  if (useCascade) {
     return createElement(
       as,
-      { id, className },
-      text,
+      {
+        id,
+        ref: container,
+        className: cn("flex flex-wrap", className),
+        "aria-label": text,
+      },
+      words.map((word, i) => (
+        <span
+          key={`${word}-${i}`}
+          className="relative mr-[0.28em] inline-block last:mr-0"
+          style={{
+            opacity: cascadeOn ? 1 : shadowOpacity,
+            transition: cascadeOn
+              ? `opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1) ${Math.min(i * 0.018, 0.28)}s`
+              : undefined,
+          }}
+        >
+          {word}
+        </span>
+      )),
     );
   }
 
@@ -94,19 +162,15 @@ export function TextGradientScroll({
       className: cn("flex flex-wrap", className),
       "aria-label": text,
     },
-    words.map((word, i) => {
-      const start = i / words.length;
-      const end = Math.min(1, start + 1 / words.length);
-      return (
-        <Word
-          key={`${word}-${i}`}
-          progress={scrollYProgress}
-          range={[start, end]}
-          shadowOpacity={shadowOpacity}
-        >
-          {word}
-        </Word>
-      );
-    }),
+    words.map((word, i) => (
+      <Word
+        key={`${word}-${i}`}
+        progress={scrollYProgress}
+        range={wordRange(i, words.length)}
+        shadowOpacity={shadowOpacity}
+      >
+        {word}
+      </Word>
+    )),
   );
 }

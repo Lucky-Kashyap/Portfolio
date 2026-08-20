@@ -9,7 +9,8 @@ type ScrollProgressGlowProps = {
 };
 
 /**
- * Thin top progress bar + soft vignette that tracks scroll for cinematic feel.
+ * Thin top progress bar that tracks scroll.
+ * Updates on scroll events only — no perpetual rAF (critical for mobile smoothness).
  */
 export function ScrollProgressGlow({ className }: ScrollProgressGlowProps) {
   const barRef = useRef<HTMLDivElement>(null);
@@ -21,14 +22,30 @@ export function ScrollProgressGlow({ className }: ScrollProgressGlowProps) {
     if (!bar) return;
 
     let raf = 0;
-    const update = () => {
+    const paint = () => {
+      raf = 0;
       const max = document.documentElement.scrollHeight - window.innerHeight;
       const p = max > 0 ? window.scrollY / max : 0;
       bar.style.transform = `scaleX(${Math.min(1, Math.max(0, p))})`;
-      raf = requestAnimationFrame(update);
     };
-    raf = requestAnimationFrame(update);
-    return () => cancelAnimationFrame(raf);
+
+    const schedule = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(paint);
+    };
+
+    paint();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    const lenis = window.__lenis;
+    lenis?.on("scroll", schedule);
+
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      lenis?.off("scroll", schedule);
+    };
   }, [reduced]);
 
   if (reduced) return null;

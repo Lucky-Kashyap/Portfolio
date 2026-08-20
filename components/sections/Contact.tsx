@@ -161,6 +161,7 @@ export function Contact() {
                 <Image
                   src="/contact/contact-collab-visual.webp"
                   alt="Stylized AI illustration of a frontend engineer collaborating over digital messages and UI panels"
+                  title="Frontend engineer collaboration illustration"
                   fill
                   className="object-cover object-[center_30%]"
                   sizes="(max-width: 1024px) 100vw, 50vw"

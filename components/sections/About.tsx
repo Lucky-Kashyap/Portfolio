@@ -167,6 +167,7 @@ function AboutAvatarVisual({ className }: { className?: string }) {
           <Image
             src={`${site.aboutVisual}?v=ai-sharp-3`}
             alt={`${site.brand} — photoreal AI avatar`}
+            title={`${site.brand} — photoreal AI avatar`}
             fill
             className="object-cover object-[50%_18%] [filter:contrast(1.06)_saturate(1.1)_brightness(1.03)]"
             sizes="(min-width: 1024px) 36vw, 90vw"

@@ -12,6 +12,8 @@ import { onPortfolioReady } from "@/lib/boot";
 type AutoplayVideoProps = {
   src: string;
   poster?: string;
+  /** Required for SEO when poster is set — describes the fallback image. */
+  posterAlt?: string;
   className?: string;
   objectPosition?: string;
   /** cover crops to fill; contain keeps full frame (no side cut) */
@@ -30,6 +32,7 @@ type AutoplayVideoProps = {
 export function AutoplayVideo({
   src,
   poster,
+  posterAlt = "Video preview",
   className,
   objectPosition = "50% 50%",
   objectFit = "cover",
@@ -182,7 +185,8 @@ export function AutoplayVideo({
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={poster}
-        alt=""
+        alt={posterAlt}
+        title={posterAlt}
         className={cn(
           "size-full",
           objectFit === "contain" ? "object-contain" : "object-cover",
@@ -229,6 +233,7 @@ export function AutoplayVideo({
         loop
         playsInline
         preload="none"
+        aria-label={posterAlt}
         className={cn(
           "absolute inset-0 size-full",
           objectFit === "contain" ? "object-contain" : "object-cover",

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 type BrandMarkProps = {
   className?: string;
   size?: number;
+  /** Accessible name — defaults to the site brand */
   title?: string;
 };
 
@@ -14,18 +15,18 @@ type BrandMarkProps = {
 export function BrandMark({
   className,
   size = 40,
-  title = "Divyanshu Kashyap",
+  title = "Divyanshu Kashyap brand mark",
 }: BrandMarkProps) {
-  const labelled = Boolean(title);
+  const label = title.trim() || "Divyanshu Kashyap brand mark";
 
   return (
     <Image
       src="/svgs/brand-mark.webp"
-      alt={labelled ? title : ""}
+      alt={label}
+      title={label}
       width={size}
       height={size}
       className={cn("shrink-0 rounded-sm object-cover", className)}
-      aria-hidden={labelled ? undefined : true}
       unoptimized
     />
   );

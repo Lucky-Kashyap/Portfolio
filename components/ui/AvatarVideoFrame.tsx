@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 type AvatarVideoFrameProps = {
   src: string;
   poster: string;
+  posterAlt?: string;
   objectPosition?: string;
   lazy?: boolean;
   caption?: string;
@@ -19,6 +20,7 @@ type AvatarVideoFrameProps = {
 export function AvatarVideoFrame({
   src,
   poster,
+  posterAlt,
   objectPosition,
   lazy = true,
   caption,
@@ -41,6 +43,7 @@ export function AvatarVideoFrame({
         <AutoplayVideo
           src={src}
           poster={poster}
+          posterAlt={posterAlt}
           lazy={lazy}
           tapSurfaceUnmute
           objectFit="cover"

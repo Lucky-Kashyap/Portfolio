@@ -91,7 +91,6 @@ export function AvatarScrollStage() {
     }
 
     let raf = 0;
-    let running = false;
 
     const place = (
       top: number,
@@ -113,6 +112,7 @@ export function AvatarScrollStage() {
     };
 
     const update = () => {
+      raf = 0;
       const from = hero.getBoundingClientRect();
       if (from.width < 4) return;
 
@@ -134,30 +134,31 @@ export function AvatarScrollStage() {
       }
     };
 
-    const loop = () => {
-      if (!running) return;
-      update();
-      raf = requestAnimationFrame(loop);
+    const schedule = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
     };
 
     const start = () => {
-      if (running) return;
-      running = true;
       const boot = hero.getBoundingClientRect();
       if (boot.width > 4) {
         place(boot.top, boot.left, boot.width, boot.height, 1);
       }
-      raf = requestAnimationFrame(loop);
+      schedule();
     };
 
     const stopReady = onPortfolioReady(start);
-    window.addEventListener("resize", update);
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    const lenis = window.__lenis;
+    lenis?.on("scroll", schedule);
 
     return () => {
-      running = false;
       cancelAnimationFrame(raf);
       stopReady();
-      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      lenis?.off("scroll", schedule);
     };
   }, [reduced, mounted]);
 
@@ -184,6 +185,7 @@ export function AvatarScrollStage() {
         <AutoplayVideo
           src={site.heroAvatarVideo}
           poster={site.heroAvatarPoster}
+          posterAlt={`${site.brand} — AI avatar video preview`}
           lazy={false}
           tapSurfaceUnmute
           objectFit="cover"
@@ -237,7 +239,8 @@ export function AvatarSlot({
       <img
         data-avatar-slot-poster={id}
         src={site.heroAvatarPoster}
-        alt=""
+        alt={`${site.brand} — AI avatar portrait`}
+        title={`${site.brand} — AI avatar portrait`}
         className="absolute inset-0 size-full rounded-[1.75rem] object-cover"
         style={{ objectPosition: site.heroAvatarObjectPosition }}
         draggable={false}

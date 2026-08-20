@@ -31,14 +31,14 @@ export function ScrollWords({
     const tween = gsap.from(spans, {
       yPercent: 110,
       opacity: 0,
-      duration: 0.7,
-      stagger: 0.06,
+      duration: 0.42,
+      stagger: 0.028,
       ease: "power3.out",
       immediateRender: false,
       clearProps: "opacity,transform",
       scrollTrigger: {
         trigger: el,
-        start: "top 85%",
+        start: "top 90%",
         toggleActions: "play none none none",
       },
     });

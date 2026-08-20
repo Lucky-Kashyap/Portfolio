@@ -35,7 +35,7 @@ export function ScrollReveal({
   y = 40,
   x = 0,
   delay = 0,
-  duration = 0.9,
+  duration = 0.5,
 }: ScrollRevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const reduced = usePrefersReducedMotion();
