@@ -30,6 +30,16 @@ function markSrc(id: (typeof services)[number]["id"]) {
   return "/icons/grid-mark.svg";
 }
 
+function markAlt(id: (typeof services)[number]["id"], title: string) {
+  if (id === "ui-architecture" || id === "react-next") {
+    return `${title} — UI window icon`;
+  }
+  if (id === "api") {
+    return `${title} — stack cube icon`;
+  }
+  return `${title} — grid mark icon`;
+}
+
 function indexFromSection(el: HTMLElement) {
   const rect = el.getBoundingClientRect();
   const vh = window.innerHeight || 1;
@@ -52,6 +62,7 @@ function ServicesBoard({ reduced }: { reduced: boolean }) {
   const rafRef = useRef(0);
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [active, setActive] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   const applyFromScroll = () => {
     const el = rootRef.current;
@@ -67,8 +78,17 @@ function ServicesBoard({ reduced }: { reduced: boolean }) {
   };
 
   useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const sync = () => setIsDesktop(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  useEffect(() => {
     const el = rootRef.current;
-    if (!el || reduced) return;
+    // Scroll-linked highlight is desktop-only — on mobile it fights touch scroll
+    if (!el || reduced || !isDesktop) return;
 
     const flush = () => {
       rafRef.current = 0;
@@ -94,8 +114,6 @@ function ServicesBoard({ reduced }: { reduced: boolean }) {
 
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("wheel", onScroll, { passive: true });
-    window.addEventListener("touchmove", onScroll, { passive: true });
     window.addEventListener("resize", onScroll, { passive: true });
     const lenis = window.__lenis;
     lenis?.on("scroll", onScroll);
@@ -104,12 +122,73 @@ function ServicesBoard({ reduced }: { reduced: boolean }) {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       if (settleTimer.current) clearTimeout(settleTimer.current);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("wheel", onScroll);
-      window.removeEventListener("touchmove", onScroll);
       window.removeEventListener("resize", onScroll);
       lenis?.off("scroll", onScroll);
     };
-  }, [reduced]);
+  }, [reduced, isDesktop]);
+
+  // Mobile / tablet: compact accordion — no duplicate 28rem panels
+  if (!isDesktop) {
+    return (
+      <ul className="mt-8 m-0 list-none divide-y divide-border-muted border-y border-border-muted p-0">
+        {services.map((service, index) => {
+          const isActive = active === index;
+          const ItemIcon = serviceIcons[service.id];
+          return (
+            <li key={service.id}>
+              <button
+                type="button"
+                data-cursor="hover"
+                onClick={() => setActive(index)}
+                className={cn(
+                  "flex w-full items-center gap-3 py-3.5 text-left transition-colors duration-200",
+                  isActive ? "text-text-primary" : "text-text-tertiary",
+                )}
+                aria-expanded={isActive}
+              >
+                <span
+                  className={cn(
+                    "w-7 shrink-0 font-mono text-sm tabular-nums",
+                    isActive ? "text-text-primary" : "text-text-primary/35",
+                  )}
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <ItemIcon
+                  size={16}
+                  aria-hidden
+                  className={cn(
+                    "shrink-0",
+                    isActive ? "text-accent-cyan" : "text-text-tertiary",
+                  )}
+                />
+                <span className="min-w-0 flex-1 text-[0.95rem] font-semibold leading-snug tracking-tight">
+                  {service.title}
+                </span>
+              </button>
+              <div
+                className={cn(
+                  "grid transition-[grid-template-rows] duration-200 ease-standard",
+                  isActive ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+                )}
+              >
+                <div className="overflow-hidden">
+                  <div className="pb-4 pl-10 pr-1">
+                    <p className="text-sm leading-relaxed text-text-secondary">
+                      {service.description}
+                    </p>
+                    <p className="mt-2 text-[10px] font-semibold tracking-[0.14em] text-accent-cyan uppercase">
+                      Outcome · {service.outcome}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    );
+  }
 
   return (
     <div
@@ -203,11 +282,11 @@ function ServicesBoard({ reduced }: { reduced: boolean }) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={markSrc(service.id)}
-                alt=""
+                alt={markAlt(service.id, service.title)}
+                title={markAlt(service.id, service.title)}
                 width={48}
                 height={48}
                 className="absolute top-5 right-5 opacity-70"
-                aria-hidden
               />
               <div className="flex items-center gap-2.5">
                 <Icon size={18} className="text-accent-cyan" aria-hidden />
@@ -248,7 +327,7 @@ export function Services() {
       className="section-pad scroll-mt-28 border-y border-border-muted bg-surface-raised/40 md:scroll-mt-32"
     >
       <Container>
-        <div className="grid items-end gap-4 lg:grid-cols-2 lg:gap-10">
+        <div className="grid items-end gap-3 lg:grid-cols-2 lg:gap-10">
           <div>
             <Eyebrow className="mb-2">Services</Eyebrow>
             <Heading

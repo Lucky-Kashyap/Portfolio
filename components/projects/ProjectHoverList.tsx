@@ -316,6 +316,7 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
                 <Image
                   src={previewSrc}
                   alt={previewAlt}
+                  title={previewAlt}
                   fill
                   sizes={`${PREVIEW_W}px`}
                   quality={90}
@@ -478,6 +479,7 @@ export function ProjectHoverList({ projects, className }: ProjectHoverListProps)
                           <Image
                             src={project.image}
                             alt={project.imageAlt}
+                            title={project.imageAlt}
                             fill
                             className="object-cover object-top"
                             sizes="(max-width: 768px) 100vw, 700px"

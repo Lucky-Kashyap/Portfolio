@@ -13,7 +13,14 @@ export type SkillBubble = {
 export const skillBubbles: readonly SkillBubble[] = [
   // Languages
   { id: "html", label: "HTML5", icon: "html5", color: "E34F26" },
-  { id: "css", label: "CSS3", icon: "css3", color: "1572B6" },
+  {
+    id: "css",
+    label: "CSS3",
+    icon: "css",
+    color: "1572B6",
+    // simple-icons@v15 renamed css3 → css; local mark avoids CDN slug churn
+    iconUrl: "/icons/css3.svg",
+  },
   { id: "js", label: "JavaScript", icon: "javascript", color: "F7DF1E" },
   { id: "ts", label: "TypeScript", icon: "typescript", color: "3178C6" },
   { id: "sass", label: "Sass", icon: "sass", color: "CC6699" },
@@ -53,7 +60,14 @@ export const skillBubbles: readonly SkillBubble[] = [
   { id: "postman", label: "Postman", icon: "postman", color: "FF6C37" },
 
   // AI assistants
-  { id: "chatgpt", label: "ChatGPT", icon: "openai", color: "412991" },
+  {
+    id: "chatgpt",
+    label: "ChatGPT",
+    icon: "openai",
+    color: "412991",
+    // cdn.simpleicons.org 404s OpenAI; local mark is reliable on mobile
+    iconUrl: "/icons/openai.svg",
+  },
   { id: "copilot", label: "GitHub Copilot", icon: "githubcopilot", color: "FFFFFF" },
   { id: "gemini", label: "Gemini", icon: "googlegemini", color: "8E75B2" },
   {
@@ -62,7 +76,14 @@ export const skillBubbles: readonly SkillBubble[] = [
     icon: "vercel",
     color: "FFFFFF",
   },
-  { id: "lovable", label: "Lovable", icon: "lovable", color: "FF5C5C" },
+  {
+    id: "lovable",
+    label: "Lovable",
+    icon: "lovable",
+    color: "FF5C5C",
+    // Not in Simple Icons yet
+    iconUrl: "/icons/lovable.svg",
+  },
 
   // Tooling
   { id: "git", label: "Git", icon: "git", color: "F05032" },
@@ -78,9 +99,23 @@ export const skillBubbles: readonly SkillBubble[] = [
 
   // Editors & QA
   { id: "figma", label: "Figma", icon: "figma", color: "F24E1E" },
-  { id: "vscode", label: "VS Code", icon: "visualstudiocode", color: "007ACC" },
+  {
+    id: "vscode",
+    label: "VS Code",
+    icon: "visualstudiocode",
+    color: "007ACC",
+    // cdn.simpleicons.org 404s this slug on mobile <img>
+    iconUrl: "/icons/vscode.svg",
+  },
   { id: "cursor", label: "Cursor", icon: "cursor", color: "FFFFFF" },
-  { id: "atom", label: "Atom", icon: "atom", color: "66595C" },
+  {
+    id: "atom",
+    label: "Atom",
+    icon: "atom",
+    color: "66595C",
+    // Missing from simple-icons@v11 used by canvas loader
+    iconUrl: "/icons/atom.svg",
+  },
   { id: "sublime", label: "Sublime Text", icon: "sublimetext", color: "FF9800" },
   { id: "chrome", label: "Chrome DevTools", icon: "googlechrome", color: "4285F4" },
   { id: "lighthouse", label: "Lighthouse", icon: "lighthouse", color: "F44B21" },
@@ -112,17 +147,26 @@ export const skillBubbles: readonly SkillBubble[] = [
   { id: "astro", label: "Astro", icon: "astro", color: "FFFFFF" },
 ] as const;
 
+const SIMPLE_ICONS_VERSION = "v15";
+
 export function skillIconUrl(skill: Pick<SkillBubble, "icon" | "color" | "iconUrl">) {
   if (skill.iconUrl) return skill.iconUrl;
-  return `https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/${skill.icon}.svg`;
+  return `https://cdn.jsdelivr.net/npm/simple-icons@${SIMPLE_ICONS_VERSION}/icons/${skill.icon}.svg`;
 }
 
-/** Colored Simple Icons CDN URL (for DOM <img> tags). */
+/**
+ * Prefer local / colored assets when set.
+ * Avoid cdn.simpleicons.org — many slugs (openai, visualstudiocode) 404 there.
+ * For monochrome Simple Icons SVGs, callers should colorize via CSS mask.
+ */
 export function skillIconColorUrl(
   skill: Pick<SkillBubble, "icon" | "color" | "iconUrl">,
 ) {
-  if (skill.iconUrl) return skill.iconUrl;
-  const color =
-    skill.color.toUpperCase() === "FFFFFF" ? "E2E8F0" : skill.color;
-  return `https://cdn.simpleicons.org/${skill.icon}/${color}`;
+  return skillIconUrl(skill);
+}
+
+export function skillIconIsPrecolored(
+  skill: Pick<SkillBubble, "iconUrl">,
+): boolean {
+  return Boolean(skill.iconUrl);
 }

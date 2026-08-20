@@ -9,12 +9,50 @@ import {
 } from "react";
 import {
   skillBubbles,
-  skillIconColorUrl,
+  skillIconIsPrecolored,
   skillIconUrl,
   type SkillBubble,
 } from "@/lib/skills";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
 import { cn } from "@/lib/utils";
+
+function skillIconAlt(skill: Pick<SkillBubble, "label">) {
+  return `${skill.label} logo`;
+}
+
+function SkillIconMark({ skill }: { skill: SkillBubble }) {
+  const color =
+    skill.color.toUpperCase() === "FFFFFF" ? "E2E8F0" : skill.color;
+  const src = skillIconUrl(skill);
+  const alt = skillIconAlt(skill);
+  const precolored = skillIconIsPrecolored(skill);
+
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={src}
+      alt={alt}
+      title={skill.label}
+      width={40}
+      height={40}
+      className={cn(
+        "size-9 object-contain sm:size-10",
+        !precolored && "rounded-sm p-1.5",
+      )}
+      style={
+        precolored
+          ? undefined
+          : {
+              backgroundColor: `#${color}`,
+              // Monochrome Simple Icons are black — brand tile keeps them readable
+              // in light and dark themes while alt text stays crawlable.
+            }
+      }
+      loading="lazy"
+      decoding="async"
+    />
+  );
+}
 
 type Body = {
   skill: SkillBubble;
@@ -48,22 +86,25 @@ function sizeForIndex(i: number) {
 /** Load brand SVG, inject fill color, return drawable image (canvas-safe). */
 async function loadBrandIcon(skill: SkillBubble): Promise<HTMLImageElement | null> {
   const color = skill.color === "FFFFFF" || skill.color === "ffffff" ? "E2E8F0" : skill.color;
+  const primary = skillIconUrl({ ...skill, color });
 
-  const tryUrls = [
-    skill.iconUrl,
-    `https://cdn.jsdelivr.net/npm/simple-icons@v11/icons/${skill.icon}.svg`,
-    skillIconUrl({ ...skill, color }),
-  ].filter(Boolean) as string[];
+  const tryUrls = [primary, skill.iconUrl].filter(
+    (url, i, arr): url is string => Boolean(url) && arr.indexOf(url!) === i,
+  );
 
   for (const url of tryUrls) {
     try {
-      // Prefer fetch → blob so canvas drawImage is reliable (no CORS taint / SVG size issues)
-      if (url.includes("simple-icons") || url.endsWith(".svg") || url.includes("cdn.simpleicons.org")) {
+      const isSvg =
+        url.endsWith(".svg") ||
+        url.includes("simple-icons") ||
+        url.startsWith("/icons/");
+
+      if (isSvg) {
         const res = await fetch(url, { mode: "cors" });
         if (!res.ok) continue;
         let svg = await res.text();
+        // Local/precolored assets keep their own fills; monochrome SI get tinted
         if (!skill.iconUrl) {
-          // Colorize monochrome Simple Icons SVGs
           if (svg.includes("fill=")) {
             svg = svg.replace(/fill="(?!none)[^"]*"/g, `fill="#${color}"`);
           } else {
@@ -85,8 +126,7 @@ async function loadBrandIcon(skill: SkillBubble): Promise<HTMLImageElement | nul
     }
   }
 
-  // Last resort: Image element without CORS (still drawable in many browsers)
-  return loadImage(skillIconUrl({ ...skill, color }), false);
+  return loadImage(primary, false);
 }
 
 function loadImage(src: string, useCors = true): Promise<HTMLImageElement | null> {
@@ -109,7 +149,8 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
   const scrollBurstDoneRef = useRef(false);
   const reduced = usePrefersReducedMotion();
   const [ready, setReady] = useState(false);
-  const [isCoarse, setIsCoarse] = useState(false);
+  /** Static grid on touch / narrow viewports — canvas physics tanks mobile scroll. */
+  const [useStaticGrid, setUseStaticGrid] = useState(true);
 
   const burstScatter = useCallback((cx: number, cy: number, strength = 14) => {
     for (const b of bodiesRef.current) {
@@ -163,20 +204,34 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
   }, []);
 
   useEffect(() => {
-    setIsCoarse(window.matchMedia("(pointer: coarse)").matches);
+    const mqCoarse = window.matchMedia("(pointer: coarse)");
+    const mqNarrow = window.matchMedia("(max-width: 767px)");
+    const sync = () => {
+      setUseStaticGrid(mqCoarse.matches || mqNarrow.matches);
+    };
+    sync();
+    mqCoarse.addEventListener("change", sync);
+    mqNarrow.addEventListener("change", sync);
+    return () => {
+      mqCoarse.removeEventListener("change", sync);
+      mqNarrow.removeEventListener("change", sync);
+    };
   }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const wrap = wrapRef.current;
-    if (!canvas || !wrap || reduced || isCoarse) return;
+    if (!canvas || !wrap || reduced || useStaticGrid) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    let visible = true;
+    let running = false;
+
     const resize = () => {
       const rect = wrap.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
       canvas.width = Math.floor(rect.width * dpr);
       canvas.height = Math.floor(rect.height * dpr);
       canvas.style.width = `${rect.width}px`;
@@ -363,24 +418,41 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
       }
 
       for (const b of bodies) drawBubble(b);
-      rafRef.current = requestAnimationFrame(step);
+
+      if (visible) {
+        rafRef.current = requestAnimationFrame(step);
+      } else {
+        running = false;
+      }
     };
 
-    rafRef.current = requestAnimationFrame(step);
+    const startLoop = () => {
+      if (running || !visible) return;
+      running = true;
+      rafRef.current = requestAnimationFrame(step);
+    };
 
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (!entry.isIntersecting || scrollBurstDoneRef.current) continue;
+          visible = entry.isIntersecting;
+          if (!entry.isIntersecting) {
+            cancelAnimationFrame(rafRef.current);
+            running = false;
+            continue;
+          }
+          startLoop();
+          if (scrollBurstDoneRef.current) continue;
           if (bodiesRef.current.length === 0) continue;
           scrollBurstDoneRef.current = true;
           const rect = wrap.getBoundingClientRect();
           burstScatter(rect.width * 0.5, rect.height * 0.45, 16);
         }
       },
-      { threshold: 0.35 },
+      { threshold: 0.12, rootMargin: "80px 0px" },
     );
     io.observe(wrap);
+    startLoop();
 
     return () => {
       cancelAnimationFrame(rafRef.current);
@@ -389,7 +461,7 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
       bodiesRef.current = [];
       scrollBurstDoneRef.current = false;
     };
-  }, [reduced, isCoarse, initBodies, burstScatter]);
+  }, [reduced, useStaticGrid, initBodies, burstScatter]);
 
   const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
     const rect = wrapRef.current?.getBoundingClientRect();
@@ -409,11 +481,11 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
     pointerRef.current.active = false;
   };
 
-  if (reduced || isCoarse) {
+  if (reduced || useStaticGrid) {
     return (
       <ul
         className={cn(
-          "grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8",
+          "grid grid-cols-3 gap-2.5 sm:grid-cols-4 sm:gap-3 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8",
           className,
         )}
         aria-label="Technology skills"
@@ -421,17 +493,9 @@ export function SkillBubbles({ className }: SkillBubblesProps) {
         {skillBubbles.map((skill) => (
           <li
             key={skill.id}
-            className="flex flex-col items-center gap-2 rounded-sm border border-border-muted bg-surface-raised p-3 text-center surface-hover transition-[border-color,box-shadow,transform] duration-normal ease-standard hover:border-accent-cyan/70 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.28),0_12px_36px_rgba(3,6,11,0.45)] sm:p-4"
+            className="flex flex-col items-center gap-1.5 rounded-sm border border-border-muted bg-surface-raised p-2.5 text-center surface-hover transition-[border-color,box-shadow,transform] duration-normal ease-standard hover:border-accent-cyan/70 hover:shadow-[0_0_0_1px_rgba(125,211,252,0.28),0_12px_36px_rgba(3,6,11,0.45)] sm:gap-2 sm:p-3 md:p-4"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={skillIconColorUrl(skill)}
-              alt=""
-              width={40}
-              height={40}
-              className="size-9 sm:size-10"
-              loading="lazy"
-            />
+            <SkillIconMark skill={skill} />
             <span className="text-[10px] leading-tight text-text-secondary sm:text-xs">
               {skill.label}
             </span>

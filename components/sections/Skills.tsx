@@ -19,11 +19,11 @@ export function Skills() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/icons/grid-mark.svg"
-          alt=""
+          alt="Skills section grid decorative mark"
+          title="Skills section grid decorative mark"
           width={96}
           height={96}
           className="pointer-events-none absolute -top-2 right-4 hidden opacity-40 sm:block md:right-8"
-          aria-hidden
         />
         <ScrollReveal>
           <div className="flex flex-wrap items-end justify-between gap-3">
@@ -43,10 +43,13 @@ export function Skills() {
 
         <TextGradientScroll
           text="A living playground of the technologies I ship with every day — scroll in, then move your cursor to scatter them."
-          className="mt-4 max-w-2xl text-base leading-relaxed text-text-secondary sm:mt-5 sm:text-lg"
+          className="mt-4 max-w-2xl text-base leading-relaxed text-text-secondary max-md:hidden sm:mt-5 sm:text-lg"
           shadowOpacity={0.2}
-          offset={["start 0.95", "start 0.5"]}
+          offset={["start 0.9", "start 0.55"]}
         />
+        <p className="mt-4 max-w-2xl text-base leading-relaxed text-text-secondary md:hidden">
+          Technologies I ship with every day — tap through the stack below.
+        </p>
 
         <div className="section-content">
           <SkillBubbles />

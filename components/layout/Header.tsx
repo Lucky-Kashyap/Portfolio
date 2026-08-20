@@ -238,7 +238,7 @@ export function Header() {
                     }
                   }}
                 >
-                  <BrandMark size={22} className="rounded-full" title="" />
+                  <BrandMark size={22} className="rounded-full" />
                   <span className="text-[10px] tracking-[0.14em]">
                     {site.mark}
                   </span>
