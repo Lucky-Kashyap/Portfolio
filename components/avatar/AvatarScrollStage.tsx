@@ -86,11 +86,12 @@ export function AvatarScrollStage() {
     if (!hero || !frame) return;
 
     if (heroPoster) {
-      heroPoster.style.opacity = "1";
-      heroPoster.style.transition = "opacity 0.35s ease";
+      heroPoster.style.transition = "opacity 0.2s ease";
     }
 
     let raf = 0;
+    let settleRaf = 0;
+    let settleUntil = 0;
 
     const place = (
       top: number,
@@ -109,6 +110,12 @@ export function AvatarScrollStage() {
       frame.style.opacity = String(opacity);
       frame.style.visibility = opacity > 0.02 ? "visible" : "hidden";
       frame.style.pointerEvents = opacity > 0.5 ? "auto" : "none";
+
+      // Hide in-flow poster once the floating layer covers it — otherwise the
+      // idle-float + SiteReveal motion shows a second ghosted copy until scroll.
+      if (heroPoster) {
+        heroPoster.style.opacity = opacity > 0.15 ? "0" : "1";
+      }
     };
 
     const update = () => {
@@ -120,17 +127,18 @@ export function AvatarScrollStage() {
       // Fade out as hero leaves the viewport — no About morph
       const fadeStart = vh * 0.15;
       const fadeEnd = -from.height * 0.35;
-      const fadeT = clamp01((from.bottom - fadeEnd) / (fadeStart - fadeEnd + from.height));
-      const opacity = clamp01((from.bottom - fadeEnd) / Math.max(1, from.height * 0.55));
+      const fadeT = clamp01(
+        (from.bottom - fadeEnd) / (fadeStart - fadeEnd + from.height),
+      );
+      const opacity = clamp01(
+        (from.bottom - fadeEnd) / Math.max(1, from.height * 0.55),
+      );
 
       place(from.top, from.left, from.width, from.height, opacity);
 
       if (heroRole) {
         heroRole.style.visibility = "visible";
         heroRole.style.opacity = String(Math.min(1, opacity * fadeT));
-      }
-      if (heroPoster) {
-        heroPoster.style.opacity = "1";
       }
     };
 
@@ -139,12 +147,28 @@ export function AvatarScrollStage() {
       raf = requestAnimationFrame(update);
     };
 
+    /** Keep locked while SiteReveal / layout settles after boot. */
+    const settleLoop = (now: number) => {
+      update();
+      if (now < settleUntil) {
+        settleRaf = requestAnimationFrame(settleLoop);
+      } else {
+        settleRaf = 0;
+      }
+    };
+
+    const startSettle = (ms = 700) => {
+      settleUntil = performance.now() + ms;
+      if (!settleRaf) settleRaf = requestAnimationFrame(settleLoop);
+    };
+
     const start = () => {
       const boot = hero.getBoundingClientRect();
       if (boot.width > 4) {
         place(boot.top, boot.left, boot.width, boot.height, 1);
       }
       schedule();
+      startSettle(750);
     };
 
     const stopReady = onPortfolioReady(start);
@@ -155,10 +179,15 @@ export function AvatarScrollStage() {
 
     return () => {
       cancelAnimationFrame(raf);
+      cancelAnimationFrame(settleRaf);
       stopReady();
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
       lenis?.off("scroll", schedule);
+      if (heroPoster) {
+        heroPoster.style.opacity = "";
+        heroPoster.style.transition = "";
+      }
     };
   }, [reduced, mounted]);
 
@@ -181,7 +210,8 @@ export function AvatarScrollStage() {
       }}
       data-avatar-floating
     >
-      <div className="absolute inset-0 animate-avatar-idle-float motion-reduce:animate-none">
+      {/* Float decoration only — keep media locked so poster underneath never peeks */}
+      <div className="absolute inset-0">
         <AutoplayVideo
           src={site.heroAvatarVideo}
           poster={site.heroAvatarPoster}
@@ -195,7 +225,7 @@ export function AvatarScrollStage() {
         />
 
         <div
-          className="pointer-events-none absolute inset-0 z-[3]"
+          className="pointer-events-none absolute inset-0 z-[3] animate-avatar-idle-float motion-reduce:animate-none"
           aria-hidden
         >
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_55%_at_78%_28%,rgba(232,196,124,0.22),transparent_58%)]" />
