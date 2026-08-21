@@ -13,6 +13,7 @@ import {
 import { Container, Eyebrow, Heading, Text } from "@/components/ui";
 import { about, services } from "@/lib/content";
 import { cn } from "@/lib/utils";
+import { registerGsap, ScrollTrigger } from "@/lib/gsap";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
 
 const serviceIcons: Record<(typeof services)[number]["id"], LucideIcon> = {
@@ -23,6 +24,10 @@ const serviceIcons: Record<(typeof services)[number]["id"], LucideIcon> = {
   motion: Activity,
   seo: Search,
 };
+
+const SERVICE_COUNT = services.length;
+/** Viewport height per service while the board is pinned */
+const STEP_VH = 55;
 
 function markSrc(id: (typeof services)[number]["id"]) {
   if (id === "ui-architecture" || id === "react-next") return "/icons/ui-window.svg";
@@ -40,278 +45,219 @@ function markAlt(id: (typeof services)[number]["id"], title: string) {
   return `${title} — grid mark icon`;
 }
 
-function indexFromSection(el: HTMLElement) {
-  const rect = el.getBoundingClientRect();
-  const vh = window.innerHeight || 1;
-  const n = services.length;
+function ServicesAccordion() {
+  const [active, setActive] = useState(0);
 
-  if (rect.bottom < vh * 0.1) return n - 1;
-  if (rect.top > vh * 0.9) return 0;
-
-  const start = vh * 0.7;
-  const end = vh * 0.28;
-  const usable = Math.max(1, rect.height + (start - end));
-  const p = (start - rect.top) / usable;
-  return Math.min(n - 1, Math.max(0, Math.floor(p * n + 1e-6)));
+  return (
+    <ul className="mt-8 m-0 list-none divide-y divide-border-muted border-y border-border-muted p-0 lg:hidden">
+      {services.map((service, index) => {
+        const isActive = active === index;
+        const ItemIcon = serviceIcons[service.id];
+        return (
+          <li key={service.id}>
+            <button
+              type="button"
+              data-cursor="hover"
+              onClick={() => setActive(index)}
+              className={cn(
+                "flex w-full items-center gap-3 py-3 text-left transition-colors duration-200",
+                isActive ? "text-text-primary" : "text-text-tertiary",
+              )}
+              aria-expanded={isActive}
+            >
+              <span
+                className={cn(
+                  "w-7 shrink-0 font-mono text-sm tabular-nums",
+                  isActive ? "text-text-primary" : "text-text-primary/35",
+                )}
+              >
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <ItemIcon
+                size={16}
+                aria-hidden
+                className={cn(
+                  "shrink-0",
+                  isActive ? "text-accent-cyan" : "text-text-tertiary",
+                )}
+              />
+              <span className="min-w-0 flex-1 text-[0.95rem] font-semibold leading-snug tracking-tight">
+                {service.title}
+              </span>
+            </button>
+            {isActive ? (
+              <div className="pb-3.5 pl-10 pr-1">
+                <p className="text-sm leading-relaxed text-text-secondary">
+                  {service.description}
+                </p>
+                <p className="mt-2 text-[10px] font-semibold tracking-[0.14em] text-accent-cyan uppercase">
+                  Outcome · {service.outcome}
+                </p>
+              </div>
+            ) : null}
+          </li>
+        );
+      })}
+    </ul>
+  );
 }
 
 function ServicesBoard({ reduced }: { reduced: boolean }) {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const hoveringRef = useRef(false);
-  const scrollingRef = useRef(false);
-  const rafRef = useRef(0);
-  const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const activeRef = useRef(0);
   const [active, setActive] = useState(0);
-  const [isDesktop, setIsDesktop] = useState(false);
 
-  const applyFromScroll = () => {
-    const el = rootRef.current;
-    if (!el) return;
-    const next = indexFromSection(el);
-    setActive((prev) => (prev === next ? prev : next));
-  };
-
-  const hoverTo = (index: number) => {
-    if (scrollingRef.current) return;
-    hoveringRef.current = true;
-    setActive(index);
+  const setActiveSafe = (index: number) => {
+    const next = Math.min(SERVICE_COUNT - 1, Math.max(0, index));
+    if (activeRef.current === next) return;
+    activeRef.current = next;
+    setActive(next);
   };
 
   useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const sync = () => setIsDesktop(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
+    if (reduced) return;
+    registerGsap();
 
-  useEffect(() => {
-    const el = rootRef.current;
-    // Scroll-linked highlight is desktop-only — on mobile it fights touch scroll
-    if (!el || reduced || !isDesktop) return;
+    const track = trackRef.current;
+    if (!track) return;
 
-    const flush = () => {
-      rafRef.current = 0;
-      if (hoveringRef.current && !scrollingRef.current) return;
-      applyFromScroll();
-    };
+    const st = ScrollTrigger.create({
+      trigger: track,
+      start: "top top+=96",
+      end: "bottom bottom",
+      scrub: false,
+      invalidateOnRefresh: true,
+      onUpdate: (self) => {
+        const progress = Math.min(0.999, Math.max(0, self.progress));
+        setActiveSafe(Math.floor(progress * SERVICE_COUNT));
+      },
+      onRefresh: (self) => {
+        const progress = Math.min(0.999, Math.max(0, self.progress));
+        setActiveSafe(Math.floor(progress * SERVICE_COUNT));
+      },
+    });
 
-    const schedule = () => {
-      if (rafRef.current) return;
-      rafRef.current = requestAnimationFrame(flush);
-    };
-
-    const onScroll = () => {
-      scrollingRef.current = true;
-      hoveringRef.current = false;
-      schedule();
-      if (settleTimer.current) clearTimeout(settleTimer.current);
-      settleTimer.current = setTimeout(() => {
-        scrollingRef.current = false;
-        applyFromScroll();
-      }, 90);
-    };
-
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
-    const lenis = window.__lenis;
-    lenis?.on("scroll", onScroll);
+    const refreshId = window.requestAnimationFrame(() => ScrollTrigger.refresh());
 
     return () => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      if (settleTimer.current) clearTimeout(settleTimer.current);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      lenis?.off("scroll", onScroll);
+      window.cancelAnimationFrame(refreshId);
+      st.kill();
     };
-  }, [reduced, isDesktop]);
+  }, [reduced]);
 
-  // Mobile / tablet: compact accordion — no duplicate 28rem panels
-  if (!isDesktop) {
-    return (
-      <ul className="mt-8 m-0 list-none divide-y divide-border-muted border-y border-border-muted p-0">
-        {services.map((service, index) => {
-          const isActive = active === index;
-          const ItemIcon = serviceIcons[service.id];
-          return (
-            <li key={service.id}>
-              <button
-                type="button"
-                data-cursor="hover"
-                onClick={() => setActive(index)}
-                className={cn(
-                  "flex w-full items-center gap-3 py-3.5 text-left transition-colors duration-200",
-                  isActive ? "text-text-primary" : "text-text-tertiary",
-                )}
-                aria-expanded={isActive}
-              >
-                <span
-                  className={cn(
-                    "w-7 shrink-0 font-mono text-sm tabular-nums",
-                    isActive ? "text-text-primary" : "text-text-primary/35",
-                  )}
-                >
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <ItemIcon
-                  size={16}
-                  aria-hidden
-                  className={cn(
-                    "shrink-0",
-                    isActive ? "text-accent-cyan" : "text-text-tertiary",
-                  )}
-                />
-                <span className="min-w-0 flex-1 text-[0.95rem] font-semibold leading-snug tracking-tight">
-                  {service.title}
-                </span>
-              </button>
-              <div
-                className={cn(
-                  "grid transition-[grid-template-rows] duration-200 ease-standard",
-                  isActive ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
-                )}
-              >
-                <div className="overflow-hidden">
-                  <div className="pb-4 pl-10 pr-1">
-                    <p className="text-sm leading-relaxed text-text-secondary">
-                      {service.description}
-                    </p>
-                    <p className="mt-2 text-[10px] font-semibold tracking-[0.14em] text-accent-cyan uppercase">
-                      Outcome · {service.outcome}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-    );
-  }
+  const service = services[active] ?? services[0];
+  const Icon = serviceIcons[service.id];
 
   return (
     <div
-      ref={rootRef}
-      className="mt-10 grid gap-6 lg:mt-12 lg:grid-cols-2 lg:items-stretch lg:gap-10"
+      ref={trackRef}
+      className="relative mt-10 hidden lg:mt-12 lg:block"
+      style={
+        reduced ? undefined : { height: `${SERVICE_COUNT * STEP_VH}vh` }
+      }
     >
-      <ul
-        className="m-0 grid min-h-[28rem] list-none grid-rows-6 border-y border-border-muted p-0 lg:min-h-[32rem]"
-        onMouseLeave={() => {
-          hoveringRef.current = false;
-          if (!scrollingRef.current) applyFromScroll();
-        }}
-      >
-        {services.map((service, index) => {
-          const isActive = active === index;
-          const ItemIcon = serviceIcons[service.id];
-          return (
-            <li
-              key={service.id}
-              className="min-h-0 border-b border-border-muted last:border-b-0"
-            >
-              <button
-                type="button"
-                data-cursor="hover"
-                onMouseEnter={() => hoverTo(index)}
-                onFocus={() => hoverTo(index)}
-                onClick={() => hoverTo(index)}
-                className={cn(
-                  "flex h-full w-full items-center gap-3 px-0 text-left transition-colors duration-200",
-                  isActive
-                    ? "text-text-primary"
-                    : "text-text-tertiary hover:text-text-secondary",
-                )}
-                aria-current={isActive ? "true" : undefined}
-              >
-                <span
-                  className={cn(
-                    "w-7 shrink-0 font-mono text-sm tabular-nums",
-                    isActive ? "text-text-primary" : "text-text-primary/35",
-                  )}
-                >
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <ItemIcon
-                  size={16}
-                  aria-hidden
-                  className={cn(
-                    "shrink-0",
-                    isActive ? "text-accent-cyan" : "text-text-tertiary",
-                  )}
-                />
-                <span className="min-w-0 flex-1 text-[0.95rem] font-semibold leading-snug tracking-tight md:text-lg">
-                  {service.title}
-                </span>
-                <span
-                  className={cn(
-                    "hidden max-w-[11rem] shrink-0 text-right text-[10px] tracking-[0.14em] uppercase lg:inline",
-                    isActive ? "text-accent-cyan" : "text-text-tertiary",
-                  )}
-                >
-                  {service.outcome}
-                </span>
-              </button>
-              <p className="sr-only">
-                {service.description} Outcome: {service.outcome}.
-              </p>
-            </li>
-          );
-        })}
-      </ul>
+      <div className={cn("w-full", reduced ? "relative" : "sticky top-24")}>
+        <div className="grid grid-cols-2 items-stretch border border-border-muted">
+          {/* Left list — drives row height */}
+          <ul className="m-0 flex h-full list-none flex-col divide-y divide-border-muted border-r border-border-muted p-0">
+            {services.map((item, index) => {
+              const isActive = active === index;
+              const ItemIcon = serviceIcons[item.id];
+              return (
+                <li key={item.id} className="flex flex-1">
+                  <button
+                    type="button"
+                    data-cursor="hover"
+                    onClick={() => setActiveSafe(index)}
+                    className={cn(
+                      "relative flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors duration-200",
+                      isActive
+                        ? "bg-surface-muted/60 text-text-primary"
+                        : "text-text-tertiary hover:text-text-secondary",
+                    )}
+                    aria-current={isActive ? "true" : undefined}
+                  >
+                    <span
+                      className={cn(
+                        "w-7 shrink-0 font-mono text-sm tabular-nums",
+                        isActive ? "text-text-primary" : "text-text-primary/35",
+                      )}
+                    >
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <ItemIcon
+                      size={16}
+                      aria-hidden
+                      className={cn(
+                        "shrink-0",
+                        isActive ? "text-accent-cyan" : "text-text-tertiary",
+                      )}
+                    />
+                    <span className="min-w-0 flex-1 text-[0.95rem] font-semibold leading-snug tracking-tight xl:text-lg">
+                      {item.title}
+                    </span>
+                    <span
+                      className={cn(
+                        "hidden max-w-[10.5rem] shrink-0 text-right text-[10px] tracking-[0.14em] uppercase xl:inline",
+                        isActive ? "text-accent-cyan" : "text-text-tertiary",
+                      )}
+                    >
+                      {item.outcome}
+                    </span>
+                    {isActive ? (
+                      <span
+                        className="absolute top-1/2 right-0 size-2.5 translate-x-1/2 -translate-y-1/2 rounded-full border border-accent-cyan bg-text-primary shadow-[0_0_0_3px_color-mix(in_srgb,var(--theme-accent-cyan)_25%,transparent)]"
+                        aria-hidden
+                      />
+                    ) : null}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
 
-      <div className="relative min-h-[28rem] overflow-hidden border border-border-muted bg-surface-base lg:min-h-[32rem]">
-        <div
-          className="pointer-events-none absolute -right-8 -top-8 size-40 rounded-full bg-[radial-gradient(circle,rgba(125,211,252,0.16),transparent_70%)]"
-          aria-hidden
-        />
-        {services.map((service, index) => {
-          const isActive = active === index;
-          const Icon = serviceIcons[service.id];
-          return (
-            <article
-              key={service.id}
-              className={cn(
-                "absolute inset-0 flex flex-col p-5 transition-opacity duration-200 ease-standard sm:p-6 lg:p-7",
-                isActive
-                  ? "z-[1] opacity-100"
-                  : "pointer-events-none z-0 opacity-0",
-              )}
-              aria-hidden={!isActive}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={markSrc(service.id)}
-                alt={markAlt(service.id, service.title)}
-                title={markAlt(service.id, service.title)}
-                width={48}
-                height={48}
-                className="absolute top-5 right-5 opacity-70"
-              />
-              <div className="flex items-center gap-2.5">
-                <Icon size={18} className="text-accent-cyan" aria-hidden />
-                <p className="font-mono text-xs tracking-[0.2em] text-accent-cyan">
-                  {String(index + 1).padStart(2, "0")} /{" "}
-                  {String(services.length).padStart(2, "0")}
-                </p>
-              </div>
-              <h3 className="mt-5 text-2xl font-bold tracking-tight text-text-primary">
-                {service.title}
-              </h3>
-              <p className="mt-3 max-w-prose text-base leading-relaxed text-text-secondary">
-                {service.description}
+          {/* Right detail — same grid row = same height as left */}
+          <article className="relative flex h-full min-h-full flex-col bg-surface-base p-5 sm:p-6 lg:p-7">
+            <div
+              className="pointer-events-none absolute -right-8 -top-8 size-36 rounded-full bg-[radial-gradient(circle,rgba(125,211,252,0.14),transparent_70%)]"
+              aria-hidden
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={markSrc(service.id)}
+              alt={markAlt(service.id, service.title)}
+              title={markAlt(service.id, service.title)}
+              width={40}
+              height={40}
+              className="absolute top-5 right-5 opacity-70"
+            />
+            <div className="flex items-center gap-2.5">
+              <Icon size={18} className="text-accent-cyan" aria-hidden />
+              <p className="font-mono text-xs tracking-[0.2em] text-accent-cyan">
+                {String(active + 1).padStart(2, "0")} /{" "}
+                {String(SERVICE_COUNT).padStart(2, "0")}
               </p>
-              <div className="mt-auto border-t border-border-muted pt-4">
-                <p className="text-xs font-semibold tracking-[0.16em] text-accent-cyan uppercase">
-                  Outcome · {service.outcome}
-                </p>
-                <p className="mt-3 text-sm leading-relaxed text-text-tertiary">
-                  {about.specialize}
-                </p>
-              </div>
-            </article>
-          );
-        })}
+            </div>
+            <h3 className="mt-4 text-xl font-bold tracking-tight text-text-primary md:text-2xl">
+              {service.title}
+            </h3>
+            <p className="mt-2.5 max-w-prose text-[0.95rem] leading-relaxed text-text-secondary md:text-base">
+              {service.description}
+            </p>
+            <div className="mt-auto border-t border-border-muted pt-3.5">
+              <p className="text-xs font-semibold tracking-[0.16em] text-accent-cyan uppercase">
+                Outcome · {service.outcome}
+              </p>
+            </div>
+          </article>
+        </div>
+
+        {!reduced ? (
+          <p className="mt-3 font-mono text-[10px] tracking-[0.14em] text-text-tertiary uppercase">
+            {String(active + 1).padStart(2, "0")} /{" "}
+            {String(SERVICE_COUNT).padStart(2, "0")} · scroll to browse
+          </p>
+        ) : null}
       </div>
     </div>
   );
@@ -347,6 +293,7 @@ export function Services() {
           </Text>
         </div>
 
+        <ServicesAccordion />
         <ServicesBoard reduced={reduced} />
       </Container>
     </section>

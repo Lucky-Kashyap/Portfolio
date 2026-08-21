@@ -63,7 +63,7 @@ export const faqs = [
   {
     id: "contact",
     question: "Where are you based, and how can I contact you?",
-    answer: `I am based in Gokul Vatika, Jaipur, Rajasthan. Email ${site.email}, call +91 ${site.phone}, or reach me on GitHub, LinkedIn, and LeetCode.`,
+    answer: `I am based in Jaipur, Rajasthan. Email ${site.email}, call +91 ${site.phone}, or reach me on GitHub, LinkedIn, and LeetCode.`,
   },
   {
     id: "leetcode",

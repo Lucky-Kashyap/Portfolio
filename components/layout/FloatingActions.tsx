@@ -11,6 +11,7 @@ import { BOOT_SAFETY_MS } from "@/lib/boot";
 import { scrollToTop } from "@/lib/scroll";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/hooks/useMotionPrefs";
+import { useSiteAnalytics } from "@/hooks/useSiteAnalytics";
 
 function WhatsAppIcon({ size = 16 }: { size?: number }) {
   return (
@@ -67,6 +68,7 @@ export function FloatingActions() {
   const [showTop, setShowTop] = useState(false);
   const [ready, setReady] = useState(false);
   const reduced = usePrefersReducedMotion();
+  const { trackResumeDownload } = useSiteAnalytics();
   const lenis = useLenis();
 
   useEffect(() => {
@@ -209,6 +211,7 @@ export function FloatingActions() {
             download={resumeName}
             data-cursor="hover"
             aria-label="Download resume"
+            onClick={() => trackResumeDownload()}
             className={cn(
               "group relative inline-flex size-[44px] items-center justify-center rounded-full no-underline",
               fabGlass,

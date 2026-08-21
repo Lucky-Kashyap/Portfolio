@@ -33,7 +33,7 @@ function FaqAnswer({
   } else if (id === "contact") {
     body = (
       <>
-        I am based in Gokul Vatika, Jaipur, Rajasthan. Email{" "}
+        I am based in Jaipur, Rajasthan. Email{" "}
         <TextLink
           href={`mailto:${site.email}`}
           className={faqLinkClass}

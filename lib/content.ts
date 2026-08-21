@@ -9,7 +9,7 @@ export const site = {
   role: "Frontend Engineer | React.js | Next.js | TypeScript | Scalable UI Architecture | API Integration | Performance & Accessibility",
   tagline:
     "Building scalable, responsive, and high-performance web applications.",
-  location: "Gokul Vatika, Jaipur, Rajasthan",
+  location: "Jaipur, Rajasthan",
   email: "kashyapdivyanshu279@gmail.com",
   phone: "9634308605",
   whatsapp: "https://wa.me/919634308605",
@@ -228,7 +228,7 @@ export const experience: ExperienceItem[] = [
     employmentType: "Full-time",
     period: "Jan 2024 — Present",
     duration: "2 yrs 8 mos",
-    location: "Gokul Vatika, Jaipur, Rajasthan",
+    location: "Jaipur, Rajasthan",
     workMode: "On-site",
     skills: [
       "React.js",
