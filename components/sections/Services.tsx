@@ -145,6 +145,9 @@ function ServicesBoard({ reduced }: { reduced: boolean }) {
     };
   }, [reduced]);
 
+  const service = services[active] ?? services[0];
+  const Icon = serviceIcons[service.id];
+
   return (
     <div
       ref={trackRef}
@@ -153,26 +156,21 @@ function ServicesBoard({ reduced }: { reduced: boolean }) {
         reduced ? undefined : { height: `${SERVICE_COUNT * STEP_VH}vh` }
       }
     >
-      <div
-        className={cn(
-          "w-full",
-          reduced ? "relative" : "sticky top-24",
-        )}
-      >
-        <div className="grid grid-cols-2 items-stretch gap-0 border border-border-muted">
-          {/* Left list */}
-          <ul className="m-0 flex list-none flex-col divide-y divide-border-muted border-r border-border-muted p-0">
-            {services.map((service, index) => {
+      <div className={cn("w-full", reduced ? "relative" : "sticky top-24")}>
+        <div className="grid grid-cols-2 items-stretch border border-border-muted">
+          {/* Left list — drives row height */}
+          <ul className="m-0 flex h-full list-none flex-col divide-y divide-border-muted border-r border-border-muted p-0">
+            {services.map((item, index) => {
               const isActive = active === index;
-              const ItemIcon = serviceIcons[service.id];
+              const ItemIcon = serviceIcons[item.id];
               return (
-                <li key={service.id} className="min-h-0">
+                <li key={item.id} className="flex flex-1">
                   <button
                     type="button"
                     data-cursor="hover"
                     onClick={() => setActiveSafe(index)}
                     className={cn(
-                      "flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors duration-200",
+                      "relative flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors duration-200",
                       isActive
                         ? "bg-surface-muted/60 text-text-primary"
                         : "text-text-tertiary hover:text-text-secondary",
@@ -196,7 +194,7 @@ function ServicesBoard({ reduced }: { reduced: boolean }) {
                       )}
                     />
                     <span className="min-w-0 flex-1 text-[0.95rem] font-semibold leading-snug tracking-tight xl:text-lg">
-                      {service.title}
+                      {item.title}
                     </span>
                     <span
                       className={cn(
@@ -204,78 +202,54 @@ function ServicesBoard({ reduced }: { reduced: boolean }) {
                         isActive ? "text-accent-cyan" : "text-text-tertiary",
                       )}
                     >
-                      {service.outcome}
+                      {item.outcome}
                     </span>
+                    {isActive ? (
+                      <span
+                        className="absolute top-1/2 right-0 size-2.5 translate-x-1/2 -translate-y-1/2 rounded-full border border-accent-cyan bg-text-primary shadow-[0_0_0_3px_color-mix(in_srgb,var(--theme-accent-cyan)_25%,transparent)]"
+                        aria-hidden
+                      />
+                    ) : null}
                   </button>
                 </li>
               );
             })}
           </ul>
 
-          {/* Right detail — same outer height as left, content packed (no empty void) */}
-          <div className="relative flex min-h-full flex-col bg-surface-base">
+          {/* Right detail — same grid row = same height as left */}
+          <article className="relative flex h-full min-h-full flex-col bg-surface-base p-5 sm:p-6 lg:p-7">
             <div
               className="pointer-events-none absolute -right-8 -top-8 size-36 rounded-full bg-[radial-gradient(circle,rgba(125,211,252,0.14),transparent_70%)]"
               aria-hidden
             />
-            {services.map((service, index) => {
-              const isActive = active === index;
-              const Icon = serviceIcons[service.id];
-              return (
-                <article
-                  key={service.id}
-                  className={cn(
-                    "flex flex-col justify-center p-5 transition-opacity duration-200 ease-standard sm:p-6 lg:p-7",
-                    isActive
-                      ? "relative z-[1] h-full opacity-100"
-                      : "pointer-events-none absolute inset-0 z-0 opacity-0",
-                  )}
-                  aria-hidden={!isActive}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={markSrc(service.id)}
-                    alt={markAlt(service.id, service.title)}
-                    title={markAlt(service.id, service.title)}
-                    width={40}
-                    height={40}
-                    className="absolute top-5 right-5 opacity-70"
-                  />
-                  <div className="flex items-center gap-2.5">
-                    <Icon size={18} className="text-accent-cyan" aria-hidden />
-                    <p className="font-mono text-xs tracking-[0.2em] text-accent-cyan">
-                      {String(index + 1).padStart(2, "0")} /{" "}
-                      {String(SERVICE_COUNT).padStart(2, "0")}
-                    </p>
-                  </div>
-                  <h3 className="mt-4 text-xl font-bold tracking-tight text-text-primary md:text-2xl">
-                    {service.title}
-                  </h3>
-                  <p className="mt-2.5 max-w-prose text-[0.95rem] leading-relaxed text-text-secondary md:text-base">
-                    {service.description}
-                  </p>
-                  <div className="mt-5 border-t border-border-muted pt-3.5">
-                    <p className="text-xs font-semibold tracking-[0.16em] text-accent-cyan uppercase">
-                      Outcome · {service.outcome}
-                    </p>
-                  </div>
-                </article>
-              );
-            })}
-
-            {/* Progress marker on the shared divider */}
-            <div
-              className="pointer-events-none absolute top-0 bottom-0 -left-px w-px bg-transparent"
-              aria-hidden
-            >
-              <span
-                className="absolute left-1/2 size-2.5 -translate-x-1/2 rounded-full border border-accent-cyan bg-text-primary shadow-[0_0_0_3px_color-mix(in_srgb,var(--theme-accent-cyan)_25%,transparent)] transition-[top] duration-200 ease-standard"
-                style={{
-                  top: `calc(${((active + 0.5) / SERVICE_COUNT) * 100}% - 5px)`,
-                }}
-              />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={markSrc(service.id)}
+              alt={markAlt(service.id, service.title)}
+              title={markAlt(service.id, service.title)}
+              width={40}
+              height={40}
+              className="absolute top-5 right-5 opacity-70"
+            />
+            <div className="flex items-center gap-2.5">
+              <Icon size={18} className="text-accent-cyan" aria-hidden />
+              <p className="font-mono text-xs tracking-[0.2em] text-accent-cyan">
+                {String(active + 1).padStart(2, "0")} /{" "}
+                {String(SERVICE_COUNT).padStart(2, "0")}
+              </p>
             </div>
-          </div>
+            <h3 className="mt-4 text-xl font-bold tracking-tight text-text-primary md:text-2xl">
+              {service.title}
+            </h3>
+            <p className="mt-2.5 max-w-prose text-[0.95rem] leading-relaxed text-text-secondary md:text-base">
+              {service.description}
+            </p>
+            <div className="mt-auto border-t border-border-muted pt-3.5">
+              <p className="text-xs font-semibold tracking-[0.16em] text-accent-cyan uppercase">
+                Outcome · {service.outcome}
+              </p>
+            </div>
+          </article>
         </div>
 
         {!reduced ? (
