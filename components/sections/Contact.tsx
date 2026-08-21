@@ -5,10 +5,13 @@ import Image from "next/image";
 import {
   AlertCircle,
   ArrowUpRight,
+  Clock3,
   Code2,
+  FileDown,
   Link2,
   Mail,
   MapPin,
+  MessageCircle,
   Phone,
 } from "lucide-react";
 import {
@@ -25,6 +28,7 @@ import {
 import { Eyebrow } from "@/components/ui/Eyebrow";
 import { ScrollWords } from "@/components/motion/ScrollHeading";
 import { ScrollReveal } from "@/components/motion/ScrollReveal";
+import { useSiteAnalytics } from "@/hooks/useSiteAnalytics";
 import { site } from "@/lib/content";
 import { cn } from "@/lib/utils";
 
@@ -89,6 +93,46 @@ function ContactChannel({
   );
 }
 
+function MetaStat({
+  label,
+  value,
+  icon,
+  iconClassName,
+  valueClassName,
+}: {
+  label: string;
+  value: string;
+  icon: ReactNode;
+  iconClassName?: string;
+  valueClassName?: string;
+}) {
+  return (
+    <div className="flex items-start gap-3">
+      <span
+        className={cn(
+          "inline-flex size-9 shrink-0 items-center justify-center rounded-sm",
+          iconClassName,
+        )}
+      >
+        {icon}
+      </span>
+      <div className="min-w-0 pt-0.5">
+        <p className="font-mono text-[10px] tracking-[0.14em] text-text-tertiary uppercase">
+          {label}_
+        </p>
+        <p
+          className={cn(
+            "mt-0.5 font-mono text-[13px] font-semibold tracking-tight text-text-primary tabular-nums sm:text-sm",
+            valueClassName,
+          )}
+        >
+          {value}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export function Contact() {
   const formId = useId();
   const [status, setStatus] = useState<Status>("idle");
@@ -98,6 +142,19 @@ export function Contact() {
     email: false,
     message: false,
   });
+  const {
+    visitDurationLabel,
+    resumeDownloads,
+    ready,
+    trackResumeDownload,
+  } = useSiteAnalytics();
+
+  const resumeHref = site.resume;
+  const resumeName = site.resumeDownloadName || "Divyanshu_resume.pdf";
+  const resumeValue = ready
+    ? `${resumeDownloads} ${resumeDownloads === 1 ? "download" : "downloads"}`
+    : "—";
+
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
@@ -196,6 +253,49 @@ export function Contact() {
                     {site.location}
                   </p>
                 </div>
+              </div>
+
+              <div
+                className={cn(
+                  "space-y-3.5 rounded-sm px-3 py-3 sm:col-span-2",
+                  cardSurfaceClass,
+                )}
+              >
+                <MetaStat
+                  label="Visit Duration"
+                  value={visitDurationLabel}
+                  icon={<Clock3 size={16} strokeWidth={2} aria-hidden />}
+                  iconClassName="bg-accent-cyan/15 text-accent-cyan"
+                />
+                <MetaStat
+                  label="Response Time"
+                  value="Usually within 24-48 hours."
+                  icon={<MessageCircle size={16} strokeWidth={2} aria-hidden />}
+                  iconClassName="bg-[#a78bfa]/15 text-[#a78bfa]"
+                  valueClassName="font-medium"
+                />
+                {resumeHref ? (
+                  <a
+                    href={resumeHref}
+                    download={resumeName}
+                    data-cursor="hover"
+                    onClick={() => trackResumeDownload()}
+                    className="group flex items-start gap-3 no-underline"
+                    aria-label="Download resume"
+                  >
+                    <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-sm bg-accent-amber/15 text-accent-amber transition-colors duration-fast group-hover:bg-accent-amber/25">
+                      <FileDown size={16} strokeWidth={2} aria-hidden />
+                    </span>
+                    <span className="min-w-0 pt-0.5">
+                      <span className="block font-mono text-[10px] tracking-[0.14em] text-text-tertiary uppercase">
+                        Resume Download_
+                      </span>
+                      <span className="mt-0.5 block font-mono text-[13px] font-semibold tracking-tight text-text-primary tabular-nums group-hover:text-accent-amber sm:text-sm">
+                        {resumeValue}
+                      </span>
+                    </span>
+                  </a>
+                ) : null}
               </div>
 
               <ContactChannel

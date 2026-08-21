@@ -3,6 +3,8 @@
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { Container, Text } from "@/components/ui";
+import { FooterIssueBar } from "@/components/layout/ReportIssue";
+import { SiteStats } from "@/components/layout/SiteStats";
 import { SocialMagneticIcons } from "@/components/motion/SocialMagneticIcons";
 import { navItems, site } from "@/lib/content";
 import { scrollToId } from "@/lib/scroll";
@@ -45,6 +47,7 @@ export function Footer() {
   return (
     <footer
       ref={ref}
+      id="footer"
       className="relative overflow-hidden border-t border-border-muted bg-surface-base py-6 md:py-8"
     >
       <div
@@ -117,6 +120,16 @@ export function Footer() {
           <div data-footer-item>
             <SocialMagneticIcons size="sm" />
           </div>
+        </div>
+
+        <div
+          data-footer-item
+          className="mt-5 border-t border-border-muted pt-5 sm:mt-6"
+        >
+          <div className="mb-4">
+            <FooterIssueBar />
+          </div>
+          <SiteStats />
         </div>
       </Container>
     </footer>
